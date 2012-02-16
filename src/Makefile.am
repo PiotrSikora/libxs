@@ -67,6 +67,7 @@ libxs_la_SOURCES = \
     tcp_listener.hpp \
     thread.hpp \
     trie.hpp \
+    upoll.hpp \
     windows.hpp \
     wire.hpp \
     xpub.hpp \
@@ -124,6 +125,7 @@ libxs_la_SOURCES = \
     tcp_listener.cpp \
     thread.cpp \
     trie.cpp \
+    upoll.cpp \
     xpub.cpp \
     xrep.cpp \
     xreq.cpp \
