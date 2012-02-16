@@ -159,6 +159,11 @@ void zmq::object_t::log (int sid_, const char *text_)
      ctx->log (sid_, text_);
 }
 
+void zmq::object_t::publish_logs (const char *text_)
+{
+    ctx->publish_logs (text_);
+}
+
 void zmq::object_t::send_stop ()
 {
     //  'stop' command goes always from administrative thread to

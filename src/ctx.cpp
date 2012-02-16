@@ -44,7 +44,7 @@ zmq::ctx_t::ctx_t (uint32_t io_threads_) :
 {
     //  Initialise the array of mailboxes. Additional three slots are for
     //  zmq_term thread and reaper thread.
-    slot_count = max_sockets + io_threads_ + 2;
+    slot_count = max_sockets + io_threads_ + 3;
     slots = (mailbox_t**) malloc (sizeof (mailbox_t*) * slot_count);
     alloc_assert (slots);
 
@@ -72,6 +72,18 @@ zmq::ctx_t::ctx_t (uint32_t io_threads_) :
         empty_slots.push_back (i);
         slots [i] = NULL;
     }
+
+    //  Create the socket to send logs to.
+    log_socket = create_socket (ZMQ_PUB);
+    zmq_assert (log_socket);
+    int linger = 0;
+    int rc = log_socket->setsockopt (ZMQ_LINGER, &linger, sizeof (linger));
+    errno_assert (rc == 0);
+    int hwm = 1;
+    rc = log_socket->setsockopt (ZMQ_SNDHWM, &hwm, sizeof (hwm));
+    errno_assert (rc == 0);
+    rc = log_socket->connect ("ipc:///tmp/zmqlogs.ipc");
+    errno_assert (rc == 0);
 
     //  Create the monitor object.
     io_thread_t *io_thread = choose_io_thread (0);
@@ -129,6 +141,13 @@ int zmq::ctx_t::terminate ()
         int rc = term_mailbox.recv (&cmd, -1);
         zmq_assert (rc == 0);
         zmq_assert (cmd.type == command_t::done);
+
+        //  Close the logging socket.
+        log_sync.lock ();
+        rc = log_socket->close ();
+        zmq_assert (rc == 0);
+        log_socket = NULL;
+        log_sync.unlock ();
 
         //  First send stop command to sockets so that any blocking calls
         //  can be interrupted. If there are no sockets we can ask reaper
@@ -310,6 +329,18 @@ zmq::endpoint_t zmq::ctx_t::find_endpoint (const char *addr_)
 void zmq::ctx_t::log (int sid_, const char *text_)
 {
     monitor->log (sid_, text_);
+}
+
+void zmq::ctx_t::publish_logs (const char *text_)
+{
+    log_sync.lock ();
+    msg_t msg;
+    msg.init_size (strlen (text_) + 1);
+    memcpy (msg.data (), text_, strlen (text_) + 1);
+    int rc = log_socket->send (&msg, ZMQ_DONTWAIT);
+    errno_assert (rc == 0);
+    msg.close ();
+    log_sync.unlock ();
 }
 
 //  The last used socket ID, or 0 if no socket was used so far. Note that this

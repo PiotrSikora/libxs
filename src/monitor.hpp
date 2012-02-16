@@ -21,7 +21,10 @@
 #ifndef __ZMQ_MONITOR_HPP_INCLUDED__
 #define __ZMQ_MONITOR_HPP_INCLUDED__
 
+#include <string>
+
 #include "own.hpp"
+#include "mutex.hpp"
 #include "io_object.hpp"
 
 namespace zmq
@@ -52,6 +55,10 @@ namespace zmq
 
         //  Events from the poller.
         void timer_event (int id_);
+
+        //  Actual monitoring data to send and the related critical section.
+        std::string text;
+        mutex_t sync;
 
         monitor_t (const monitor_t&);
         const monitor_t &operator = (const monitor_t&);

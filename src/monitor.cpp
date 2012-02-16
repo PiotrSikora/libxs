@@ -46,6 +46,9 @@ void zmq::monitor_t::stop ()
 
 void zmq::monitor_t::log (int sid_, const char *text_)
 {
+    sync.lock ();
+    text = text_;
+    sync.unlock ();
 }
 
 void zmq::monitor_t::process_plug ()
@@ -65,7 +68,10 @@ void zmq::monitor_t::timer_event (int id_)
 {
     zmq_assert (id_ == timer_id);
 
-    //  TODO: Send the snapshot here!
+    //  Send the snapshot here!
+    sync.lock ();
+    publish_logs (text.c_str ());
+    sync.unlock ();
 
     //  Wait before sending next snapshot.
     add_timer (500 + (generate_random () % 1000), timer_id);

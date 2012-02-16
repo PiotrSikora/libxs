@@ -93,8 +93,9 @@ namespace zmq
         void unregister_endpoints (zmq::socket_base_t *socket_);
         endpoint_t find_endpoint (const char *addr_);
 
-        //  Logging.
+        //  Logging related functions.
         void log (int sid_, const char *text_);
+        void publish_logs (const char *text_);
 
         enum {
             term_tid = 0,
@@ -153,6 +154,11 @@ namespace zmq
 
         //  Maximum socket ID.
         static atomic_counter_t max_socket_id;
+
+        //  PUB socket for logging. The socket is shared among all the threads,
+        //  thus it is synchronised by a mutex.
+        zmq::socket_base_t *log_socket;
+        mutex_t log_sync;
 
         ctx_t (const ctx_t&);
         const ctx_t &operator = (const ctx_t&);
