@@ -86,8 +86,8 @@ namespace xs
 
         //  i_poll_events implementation. This interface is used when socket
         //  is handled by the poller in the reaper thread.
-        void in_event ();
-        void out_event ();
+        void in_event (fd_t fd_);
+        void out_event (fd_t fd_);
         void timer_event (int id_);
 
         //  i_pipe_events interface implementation.

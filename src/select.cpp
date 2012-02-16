@@ -182,15 +182,15 @@ void xs::select_t::loop ()
             if (fds [i].fd == retired_fd)
                 continue;
             if (FD_ISSET (fds [i].fd, &exceptfds))
-                fds [i].events->in_event ();
+                fds [i].events->in_event (fds [i].fd);
             if (fds [i].fd == retired_fd)
                 continue;
             if (FD_ISSET (fds [i].fd, &writefds))
-                fds [i].events->out_event ();
+                fds [i].events->out_event (fds [i].fd);
             if (fds [i].fd == retired_fd)
                 continue;
             if (FD_ISSET (fds [i].fd, &readfds))
-                fds [i].events->in_event ();
+                fds [i].events->in_event (fds [i].fd);
         }
 
         //  Destroy retired event sources.

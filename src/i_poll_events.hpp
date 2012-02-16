@@ -21,7 +21,9 @@
  
 #ifndef __XS_I_POLL_EVENTS_HPP_INCLUDED__
 #define __XS_I_POLL_EVENTS_HPP_INCLUDED__
- 
+
+#include "fd.hpp"
+
 namespace xs
 {
  
@@ -33,10 +35,10 @@ namespace xs
         virtual ~i_poll_events () {}
  
         // Called by I/O thread when file descriptor is ready for reading.
-        virtual void in_event () = 0;
+        virtual void in_event (fd_t fd_) = 0;
  
         // Called by I/O thread when file descriptor is ready for writing.
-        virtual void out_event () = 0;
+        virtual void out_event (fd_t fd_) = 0;
  
         // Called when timer expires.
         virtual void timer_event (int id_) = 0;

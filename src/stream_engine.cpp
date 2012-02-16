@@ -124,7 +124,7 @@ void xs::stream_engine_t::plug (io_thread_t *io_thread_,
     set_pollout (handle);
 
     //  Flush all the data that may have been already received downstream.
-    in_event ();
+    in_event (s);
 }
 
 void xs::stream_engine_t::unplug ()
@@ -151,7 +151,7 @@ void xs::stream_engine_t::terminate ()
     delete this;
 }
 
-void xs::stream_engine_t::in_event ()
+void xs::stream_engine_t::in_event (fd_t fd_)
 {
     bool disconnection = false;
 
@@ -206,7 +206,7 @@ void xs::stream_engine_t::in_event ()
         error ();
 }
 
-void xs::stream_engine_t::out_event ()
+void xs::stream_engine_t::out_event (fd_t fd_)
 {
     bool more_data = true;
 
@@ -260,7 +260,7 @@ void xs::stream_engine_t::activate_out ()
     //  was sent by the user the socket is probably available for writing.
     //  Thus we try to write the data to socket avoiding polling for POLLOUT.
     //  Consequently, the latency should be better in request/reply scenarios.
-    out_event ();
+    out_event (s);
 }
 
 void xs::stream_engine_t::activate_in ()
@@ -268,7 +268,7 @@ void xs::stream_engine_t::activate_in ()
     set_pollin (handle);
 
     //  Speculative read.
-    in_event ();
+    in_event (s);
 }
 
 void xs::stream_engine_t::error ()

@@ -132,7 +132,7 @@ void xs::pgm_sender_t::terminate ()
 void xs::pgm_sender_t::activate_out ()
 {
     set_pollout (handle);
-    out_event ();
+    out_event (retired_fd);
 }
 
 void xs::pgm_sender_t::activate_in ()
@@ -148,7 +148,7 @@ xs::pgm_sender_t::~pgm_sender_t ()
     }
 }
 
-void xs::pgm_sender_t::in_event ()
+void xs::pgm_sender_t::in_event (fd_t fd_)
 {
     if (has_rx_timer) {
         cancel_timer (rx_timer_id);
@@ -164,7 +164,7 @@ void xs::pgm_sender_t::in_event ()
     }
 }
 
-void xs::pgm_sender_t::out_event ()
+void xs::pgm_sender_t::out_event (fd_t fd_)
 {
     //  POLLOUT event from send socket. If write buffer is empty, 
     //  try to read new data from the encoder.
@@ -217,10 +217,10 @@ void xs::pgm_sender_t::timer_event (int token)
     //  Timer cancels on return by poller_base.
     if (token == rx_timer_id) {
         has_rx_timer = false;
-        in_event ();
+        in_event (retired_fd);
     } else if (token == tx_timer_id) {
         has_tx_timer = false;
-        out_event ();
+        out_event (retired_fd);
     } else
         xs_assert (false);
 }

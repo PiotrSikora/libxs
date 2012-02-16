@@ -82,15 +82,15 @@ void xs::tcp_connecter_t::process_plug ()
         start_connecting ();
 }
 
-void xs::tcp_connecter_t::in_event ()
+void xs::tcp_connecter_t::in_event (fd_t fd_)
 {
     //  We are not polling for incomming data, so we are actually called
     //  because of error here. However, we can get error on out event as well
     //  on some platforms, so we'll simply handle both events in the same way.
-    out_event ();
+    out_event (s);
 }
 
-void xs::tcp_connecter_t::out_event ()
+void xs::tcp_connecter_t::out_event (fd_t fd_)
 {
     fd_t fd = connect ();
     rm_fd (handle);
@@ -133,7 +133,7 @@ void xs::tcp_connecter_t::start_connecting ()
     if (rc == 0) {
         handle = add_fd (s);
         handle_valid = true;
-        out_event ();
+        out_event (s);
         return;
     }
 

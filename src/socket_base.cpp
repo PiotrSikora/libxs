@@ -792,7 +792,7 @@ void xs::socket_base_t::xhiccuped (pipe_t *pipe_)
     xs_assert (false);
 }
 
-void xs::socket_base_t::in_event ()
+void xs::socket_base_t::in_event (fd_t fd_)
 {
     //  This function is invoked only once the socket is running in the context
     //  of the reaper thread. Process any commands from other threads/sockets
@@ -802,7 +802,7 @@ void xs::socket_base_t::in_event ()
     check_destroy ();
 }
 
-void xs::socket_base_t::out_event ()
+void xs::socket_base_t::out_event (fd_t fd_)
 {
     xs_assert (false);
 }

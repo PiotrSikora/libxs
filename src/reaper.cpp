@@ -55,7 +55,7 @@ void xs::reaper_t::stop ()
     send_stop ();
 }
 
-void xs::reaper_t::in_event ()
+void xs::reaper_t::in_event (fd_t fd_)
 {
     while (true) {
 
@@ -73,7 +73,7 @@ void xs::reaper_t::in_event ()
     }
 }
 
-void xs::reaper_t::out_event ()
+void xs::reaper_t::out_event (fd_t fd_)
 {
     xs_assert (false);
 }

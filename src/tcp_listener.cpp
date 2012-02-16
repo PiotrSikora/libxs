@@ -77,7 +77,7 @@ void xs::tcp_listener_t::process_term (int linger_)
     own_t::process_term (linger_);
 }
 
-void xs::tcp_listener_t::in_event ()
+void xs::tcp_listener_t::in_event (fd_t fd_)
 {
     fd_t fd = accept ();
 

@@ -150,15 +150,15 @@ void xs::epoll_t::loop ()
             if (pe->fd == retired_fd)
                 continue;
             if (ev_buf [i].events & (EPOLLERR | EPOLLHUP))
-                pe->events->in_event ();
+                pe->events->in_event (pe->fd);
             if (pe->fd == retired_fd)
                continue;
             if (ev_buf [i].events & EPOLLOUT)
-                pe->events->out_event ();
+                pe->events->out_event (pe->fd);
             if (pe->fd == retired_fd)
                 continue;
             if (ev_buf [i].events & EPOLLIN)
-                pe->events->in_event ();
+                pe->events->in_event (pe->fd);
         }
 
         //  Destroy retired event sources.

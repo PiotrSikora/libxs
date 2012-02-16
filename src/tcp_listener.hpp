@@ -52,7 +52,7 @@ namespace xs
         void process_term (int linger_);
 
         //  Handlers for I/O events.
-        void in_event ();
+        void in_event (fd_t fd_);
 
         //  Close the listening socket.
         void close ();

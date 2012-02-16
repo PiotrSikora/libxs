@@ -62,7 +62,7 @@ int xs::io_thread_t::get_load ()
     return poller->get_load ();
 }
 
-void xs::io_thread_t::in_event ()
+void xs::io_thread_t::in_event (fd_t fd_)
 {
     //  TODO: Do we want to limit number of commands I/O thread can
     //  process in a single go?
@@ -83,7 +83,7 @@ void xs::io_thread_t::in_event ()
     }
 }
 
-void xs::io_thread_t::out_event ()
+void xs::io_thread_t::out_event (fd_t fd_)
 {
     //  We are never polling for POLLOUT here. This function is never called.
     xs_assert (false);

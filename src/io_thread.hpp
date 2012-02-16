@@ -58,8 +58,8 @@ namespace xs
         mailbox_t *get_mailbox ();
 
         //  i_poll_events implementation.
-        void in_event ();
-        void out_event ();
+        void in_event (fd_t fd_);
+        void out_event (fd_t fd_);
         void timer_event (int id_);
 
         //  Used by io_objects to retrieve the assciated poller object.

@@ -56,8 +56,8 @@ namespace xs
         void activate_out ();
 
         //  i_poll_events interface implementation.
-        void in_event ();
-        void out_event ();
+        void in_event (fd_t fd_);
+        void out_event (fd_t fd_);
 
     private:
 

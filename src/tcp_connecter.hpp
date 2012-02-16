@@ -54,8 +54,8 @@ namespace xs
         void process_plug ();
 
         //  Handlers for I/O events.
-        void in_event ();
-        void out_event ();
+        void in_event (fd_t fd_);
+        void out_event (fd_t fd_);
         void timer_event (int id_);
 
         //  Internal function to start the actual connection establishment.

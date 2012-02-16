@@ -145,10 +145,10 @@ void xs::pgm_receiver_t::activate_in ()
     set_pollin (pipe_handle);
     set_pollin (socket_handle);
 
-    in_event ();
+    in_event (retired_fd);
 }
 
-void xs::pgm_receiver_t::in_event ()
+void xs::pgm_receiver_t::in_event (fd_t fd_)
 {
     // Read data from the underlying pgm_socket.
     unsigned char *data = NULL;
@@ -269,7 +269,7 @@ void xs::pgm_receiver_t::timer_event (int token)
 
     //  Timer cancels on return by poller_base.
     has_rx_timer = false;
-    in_event ();
+    in_event (retired_fd);
 }
 
 void xs::pgm_receiver_t::drop_subscriptions ()

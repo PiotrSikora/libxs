@@ -141,15 +141,15 @@ void xs::poll_t::loop ()
             if (pollset [i].fd == retired_fd)
                continue;
             if (pollset [i].revents & (POLLERR | POLLHUP))
-                fd_table [pollset [i].fd].events->in_event ();
+                fd_table [pollset [i].fd].events->in_event (pollset [i].fd);
             if (pollset [i].fd == retired_fd)
                continue;
             if (pollset [i].revents & POLLOUT)
-                fd_table [pollset [i].fd].events->out_event ();
+                fd_table [pollset [i].fd].events->out_event (pollset [i].fd);
             if (pollset [i].fd == retired_fd)
                continue;
             if (pollset [i].revents & POLLIN)
-                fd_table [pollset [i].fd].events->in_event ();
+                fd_table [pollset [i].fd].events->in_event (pollset [i].fd);
         }
 
         //  Clean up the pollset and update the fd_table accordingly.

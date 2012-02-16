@@ -169,15 +169,15 @@ void xs::devpoll_t::loop ()
             if (!fd_ptr->valid || !fd_ptr->accepted)
                 continue;
             if (ev_buf [i].revents & (POLLERR | POLLHUP))
-                fd_ptr->reactor->in_event ();
+                fd_ptr->reactor->in_event (ev_buf [i].fd);
             if (!fd_ptr->valid || !fd_ptr->accepted)
                 continue;
             if (ev_buf [i].revents & POLLOUT)
-                fd_ptr->reactor->out_event ();
+                fd_ptr->reactor->out_event (ev_buf [i].fd);
             if (!fd_ptr->valid || !fd_ptr->accepted)
                 continue;
             if (ev_buf [i].revents & POLLIN)
-                fd_ptr->reactor->in_event ();
+                fd_ptr->reactor->in_event (ev_buf [i].fd);
         }
     }
 }

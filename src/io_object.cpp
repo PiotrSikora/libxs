@@ -92,12 +92,12 @@ void xs::io_object_t::cancel_timer (int id_)
     poller->cancel_timer (this, id_);
 }
 
-void xs::io_object_t::in_event ()
+void xs::io_object_t::in_event (fd_t fd_)
 {
     xs_assert (false);
 }
 
-void xs::io_object_t::out_event ()
+void xs::io_object_t::out_event (fd_t fd_)
 {
     xs_assert (false);
 }

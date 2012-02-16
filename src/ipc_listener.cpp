@@ -68,7 +68,7 @@ void xs::ipc_listener_t::process_term (int linger_)
     own_t::process_term (linger_);
 }
 
-void xs::ipc_listener_t::in_event ()
+void xs::ipc_listener_t::in_event (fd_t fd_)
 {
     fd_t fd = accept ();
 

@@ -173,15 +173,15 @@ void xs::kqueue_t::loop ()
             if (pe->fd == retired_fd)
                 continue;
             if (ev_buf [i].flags & EV_EOF)
-                pe->reactor->in_event ();
+                pe->reactor->in_event (pe->fd);
             if (pe->fd == retired_fd)
                 continue;
             if (ev_buf [i].filter == EVFILT_WRITE)
-                pe->reactor->out_event ();
+                pe->reactor->out_event (pe->fd);
             if (pe->fd == retired_fd)
                 continue;
             if (ev_buf [i].filter == EVFILT_READ)
-                pe->reactor->in_event ();
+                pe->reactor->in_event (pe->fd);
         }
 
         //  Destroy retired event sources.
