@@ -4,7 +4,7 @@ MAN3 = xs_bind.3 xs_close.3 xs_connect.3 xs_init.3 \
     xs_poll.3 xs_recv.3 xs_send.3 xs_setsockopt.3 xs_socket.3 \
     xs_strerror.3 xs_term.3 xs_version.3 xs_getsockopt.3 xs_errno.3 \
     xs_sendmsg.3 xs_recvmsg.3 xs_getmsgopt.3
-MAN7 = xs.7 xs_tcp.7 xs_pgm.7 xs_epgm.7 xs_inproc.7 xs_ipc.7
+MAN7 = xs.7 xs_tcp.7 xs_pgm.7 xs_inproc.7 xs_ipc.7
 
 MAN_DOC = $(MAN1) $(MAN3) $(MAN7)
 
@@ -40,6 +40,4 @@ SUFFIXES=.html .txt .xml .3 .7
 	xmlto man $<
 .xml.7:
 	xmlto man $<
-xs_epgm.7: xs_pgm.7
-	cp xs_pgm.7 $@
 endif
