@@ -2,10 +2,10 @@ LIBXS_DIST = libxs/libxs.vcxproj \
              libxs/libxs.vcxproj.filters \
              platform.hpp msvc10.sln
 
-PERF_DIST = c_local_thr/c_local_thr.vcxproj \
-            c_remote_thr/c_remote_thr.vcxproj \
-            c_local_lat/c_local_lat.vcxproj \
-            c_remote_lat/c_remote_lat.vcxproj \
+PERF_DIST = local_thr/local_thr.vcxproj \
+            remote_thr/remote_thr.vcxproj \
+            local_lat/local_lat.vcxproj \
+            remote_lat/remote_lat.vcxproj \
             inproc_lat/inproc_lat.vcxproj \
             inproc_thr/inproc_thr.vcxproj
 

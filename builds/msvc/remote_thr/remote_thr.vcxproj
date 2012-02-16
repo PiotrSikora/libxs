@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>local_thr</ProjectName>
-    <ProjectGuid>{8EF2DF6B-6646-460F-8032-913B70FE0E94}</ProjectGuid>
-    <RootNamespace>c_local_thr</RootNamespace>
+    <ProjectName>remote_thr</ProjectName>
+    <ProjectGuid>{B15E059C-0CBB-4A82-8C42-6567FB650802}</ProjectGuid>
+    <RootNamespace>remote_thr</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -73,7 +73,7 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\perf\local_thr.cpp" />
+    <ClCompile Include="..\..\..\perf\remote_thr.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libxs\libxs.vcxproj">

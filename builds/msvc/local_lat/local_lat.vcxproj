@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectName>local_lat</ProjectName>
     <ProjectGuid>{4FDB8C73-9D4A-4D87-A4A9-A7FC06DFEA57}</ProjectGuid>
-    <RootNamespace>c_local_lat</RootNamespace>
+    <RootNamespace>local_lat</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
