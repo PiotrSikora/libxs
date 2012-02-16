@@ -130,6 +130,7 @@ int xs::ctx_t::terminate ()
     //  restarted.
     slot_sync.lock ();
     bool restarted = terminating;
+    terminating = true;
     slot_sync.unlock ();
 
     //  First attempt to terminate the context.
@@ -153,7 +154,6 @@ int xs::ctx_t::terminate ()
         //  can be interrupted. If there are no sockets we can ask reaper
         //  thread to stop.
         slot_sync.lock ();
-        terminating = true;
         for (sockets_t::size_type i = 0; i != sockets.size (); i++)
             sockets [i]->stop ();
         if (sockets.empty ())
