@@ -20,7 +20,8 @@
 */
 
 #include "select.hpp"
-#if defined XS_USE_SELECT
+
+#if defined XS_HAVE_SELECT
 
 #include "platform.hpp"
 #if defined XS_HAVE_WINDOWS

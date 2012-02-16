@@ -20,7 +20,8 @@
 */
 
 #include "poll.hpp"
-#if defined XS_USE_POLL
+
+#if defined XS_HAVE_POLL
 
 #include <sys/types.h>
 #include <sys/time.h>

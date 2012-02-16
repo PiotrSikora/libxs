@@ -767,7 +767,7 @@ AC_DEFUN([LIBXS_CHECK_POLLER], [{
       ;;
     esac
 
-    libxs_cv_poller_flag=`echo "XS_FORCE_${libxs_cv_poller}" | tr a-z A-Z`
+    libxs_cv_poller_flag=`echo "XS_HAVE_${libxs_cv_poller}" | tr a-z A-Z`
 
     AS_IF([test "x${libxs_cv_poller}" != "x"],
           [AC_MSG_RESULT([using $libxs_cv_poller]) ; $1], [AC_MSG_RESULT(no suitable polling system found) ; $2])

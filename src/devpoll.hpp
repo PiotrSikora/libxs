@@ -22,9 +22,9 @@
 #ifndef __XS_DEVPOLL_HPP_INCLUDED__
 #define __XS_DEVPOLL_HPP_INCLUDED__
 
-//  poller.hpp decides which polling mechanism to use.
-#include "poller.hpp"
-#if defined XS_USE_DEVPOLL
+#include "platform.hpp"
+
+#if defined XS_HAVE_DEVPOLL
 
 #include <vector>
 

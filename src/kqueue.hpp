@@ -22,9 +22,8 @@
 #ifndef __XS_KQUEUE_HPP_INCLUDED__
 #define __XS_KQUEUE_HPP_INCLUDED__
 
-//  poller.hpp decides which polling mechanism to use.
-#include "poller.hpp"
-#if defined XS_USE_KQUEUE
+#include "platform.hpp"
+#if defined XS_HAVE_KQUEUE
 
 #include <vector>
 

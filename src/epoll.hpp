@@ -22,9 +22,9 @@
 #ifndef __XS_EPOLL_HPP_INCLUDED__
 #define __XS_EPOLL_HPP_INCLUDED__
 
-//  poller.hpp decides which polling mechanism to use.
-#include "poller.hpp"
-#if defined XS_USE_EPOLL
+#include "platform.hpp"
+
+#if defined XS_HAVE_EPOLL
 
 #include <vector>
 #include <sys/epoll.h>

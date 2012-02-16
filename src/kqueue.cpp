@@ -20,7 +20,8 @@
 */
 
 #include "kqueue.hpp"
-#if defined XS_USE_KQUEUE
+
+#if defined XS_HAVE_KQUEUE
 
 #include <sys/time.h>
 #include <sys/types.h>

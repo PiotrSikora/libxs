@@ -22,61 +22,15 @@
 #ifndef __XS_POLLER_HPP_INCLUDED__
 #define __XS_POLLER_HPP_INCLUDED__
 
-#include "platform.hpp"
+namespace xs
+{
+    typedef void* handle_t;
+}
 
-#if defined XS_FORCE_SELECT
-#define XS_USE_SELECT
-#include "select.hpp"
-#elif defined XS_FORCE_POLL
-#define XS_USE_POLL
-#include "poll.hpp"
-#elif defined XS_FORCE_EPOLL
-#define XS_USE_EPOLL
+#include "devpoll.hpp"
 #include "epoll.hpp"
-#elif defined XS_FORCE_DEVPOLL
-#define XS_USE_DEVPOLL
-#include "devpoll.hpp"
-#elif defined XS_FORCE_KQUEUE
-#define XS_USE_KQUEUE
 #include "kqueue.hpp"
-#elif defined XS_HAVE_LINUX
-#define XS_USE_EPOLL
-#include "epoll.hpp"
-#elif defined XS_HAVE_WINDOWS
-#define XS_USE_SELECT
-#include "select.hpp"
-#elif defined XS_HAVE_FREEBSD
-#define XS_USE_KQUEUE
-#include "kqueue.hpp"
-#elif defined XS_HAVE_OPENBSD
-#define XS_USE_KQUEUE
-#include "kqueue.hpp"
-#elif defined XS_HAVE_NETBSD
-#define XS_USE_KQUEUE
-#include "kqueue.hpp"
-#elif defined XS_HAVE_SOLARIS
-#define XS_USE_DEVPOLL
-#include "devpoll.hpp"
-#elif defined XS_HAVE_OSX
-#define XS_USE_KQUEUE
-#include "kqueue.hpp"
-#elif defined XS_HAVE_QNXNTO
-#define XS_USE_POLL
 #include "poll.hpp"
-#elif defined XS_HAVE_AIX
-#define XS_USE_POLL
-#include "poll.hpp"
-#elif defined XS_HAVE_HPUX
-#define XS_USE_DEVPOLL
-#include "devpoll.hpp"
-#elif defined XS_HAVE_OPENVMS
-#define XS_USE_SELECT
 #include "select.hpp"
-#elif defined XS_HAVE_CYGWIN
-#define XS_USE_SELECT
-#include "select.hpp"
-#else
-#error Unsupported platform
-#endif
 
 #endif

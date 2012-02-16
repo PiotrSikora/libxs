@@ -20,7 +20,8 @@
 */
 
 #include "devpoll.hpp"
-#if defined XS_USE_DEVPOLL
+
+#if defined XS_HAVE_DEVPOLL
 
 #include <sys/devpoll.h>
 #include <sys/time.h>
