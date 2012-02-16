@@ -56,10 +56,12 @@
 #include <unistd.h>
 #endif
 
+#include <limits.h>
+
 int xs::upoll (xs_pollitem_t *items_, int nitems_, long timeout_)
 {
 #if defined XS_POLL_BASED_ON_POLL
-    if (unlikely (nitems_ < 0)) {
+    if (unlikely (nitems_ < 0 || timeout_ > INT_MAX)) {
         errno = EINVAL;
         return -1;
     }
