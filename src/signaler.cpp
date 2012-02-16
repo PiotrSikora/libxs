@@ -265,7 +265,7 @@ int xs::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
         (char *)&tcp_nodelay, sizeof (tcp_nodelay));
     wsa_assert (rc != SOCKET_ERROR);
 
-    //  Bind listening socket to any free local port.
+    //  Bind listening socket to the local port.
     struct sockaddr_in addr;
     memset (&addr, 0, sizeof (addr));
     addr.sin_family = AF_INET;
