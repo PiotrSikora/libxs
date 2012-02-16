@@ -29,4 +29,6 @@
 
 #define XS_HAVE_WINDOWS
 
+#define XS_HAVE_SELECT
+
 #endif

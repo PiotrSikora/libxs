@@ -165,6 +165,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\include\xs.h" />
     <ClInclude Include="..\..\..\include\xs_utils.h" />
+    <ClInclude Include="..\..\..\include\zmq.h" />
     <ClInclude Include="..\..\..\src\array.hpp" />
     <ClInclude Include="..\..\..\src\atomic_counter.hpp" />
     <ClInclude Include="..\..\..\src\atomic_ptr.hpp" />
@@ -204,7 +205,6 @@
     <ClInclude Include="..\..\..\src\pgm_sender.hpp" />
     <ClInclude Include="..\..\..\src\pgm_socket.hpp" />
     <ClInclude Include="..\..\..\src\pipe.hpp" />
-    <ClInclude Include="..\..\..\src\platform.hpp" />
     <ClInclude Include="..\..\..\src\poll.hpp" />
     <ClInclude Include="..\..\..\src\poller.hpp" />
     <ClInclude Include="..\..\..\src\poller_base.hpp" />
@@ -236,6 +236,7 @@
     <ClInclude Include="..\..\..\src\xsub.hpp" />
     <ClInclude Include="..\..\..\src\ypipe.hpp" />
     <ClInclude Include="..\..\..\src\yqueue.hpp" />
+    <ClInclude Include="..\platform.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

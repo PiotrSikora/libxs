@@ -301,9 +301,6 @@
     <ClInclude Include="..\..\..\src\pipe.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\platform.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\poll.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -398,6 +395,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\monitor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\zmq.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\platform.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
