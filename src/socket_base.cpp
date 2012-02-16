@@ -129,9 +129,6 @@ xs::socket_base_t::socket_base_t (ctx_t *parent_, uint32_t tid_, int sid_) :
 xs::socket_base_t::~socket_base_t ()
 {
     xs_assert (destroyed);
-
-    //  Mark the socket as dead.
-    tag = 0xdeadbeef;
 }
 
 xs::mailbox_t *xs::socket_base_t::get_mailbox ()
@@ -623,6 +620,9 @@ int xs::socket_base_t::recv (msg_t *msg_, int flags_)
 
 int xs::socket_base_t::close ()
 {
+    //  Mark the socket as dead.
+    tag = 0xdeadbeef;
+
     //  Transfer the ownership of the socket from this application thread
     //  to the reaper thread which will take care of the rest of shutdown
     //  process.
