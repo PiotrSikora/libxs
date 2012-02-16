@@ -102,9 +102,9 @@ namespace xs
             reaper_tid = 1
         };
 
-    private:
-
         ~ctx_t ();
+
+    private:
 
         //  Used to check whether the object is a context.
         uint32_t tag;
