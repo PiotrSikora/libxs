@@ -73,7 +73,7 @@ namespace xs
         bool is_redundant () const;
 
         typedef std::set <xs::pipe_t*> pipes_t;
-        pipes_t pipes;
+        pipes_t *pipes;
 
         unsigned char min;
         unsigned short count;

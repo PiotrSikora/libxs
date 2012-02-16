@@ -34,6 +34,7 @@
 #include "mtrie.hpp"
 
 xs::mtrie_t::mtrie_t () :
+    pipes (0),
     min (0),
     count (0),
     live_nodes (0)
@@ -42,6 +43,11 @@ xs::mtrie_t::mtrie_t () :
 
 xs::mtrie_t::~mtrie_t ()
 {
+    if (pipes) {
+        delete pipes;
+        pipes = 0;
+    }
+
     if (count == 1) {
         xs_assert (next.node);
         delete next.node;
@@ -65,8 +71,12 @@ bool xs::mtrie_t::add_helper (unsigned char *prefix_, size_t size_,
 {
     //  We are at the node corresponding to the prefix. We are done.
     if (!size_) {
-        bool result = pipes.empty ();
-        pipes.insert (pipe_);
+        bool result = !pipes;
+        if (!pipes) {
+            pipes = new (std::nothrow) pipes_t;
+            alloc_assert (pipes);
+        }
+        pipes->insert (pipe_);
         return result;
     }
 
@@ -154,8 +164,11 @@ void xs::mtrie_t::rm_helper (pipe_t *pipe_, unsigned char **buff_,
     void *arg_)
 {
     //  Remove the subscription from this node.
-    if (pipes.erase (pipe_) && pipes.empty ())
+    if (pipes && pipes->erase (pipe_) && pipes->empty ()) {
         func_ (*buff_, buffsize_, arg_);
+        delete pipes;
+        pipes = 0;
+    }
 
     //  Adjust the buffer.
     if (buffsize_ >= maxbuffsize_) {
@@ -207,9 +220,15 @@ bool xs::mtrie_t::rm_helper (unsigned char *prefix_, size_t size_,
     pipe_t *pipe_)
 {
     if (!size_) {
-        pipes_t::size_type erased = pipes.erase (pipe_);
-        xs_assert (erased == 1);
-        return pipes.empty ();
+        if (pipes) {
+            pipes_t::size_type erased = pipes->erase (pipe_);
+            xs_assert (erased == 1);
+            if (pipes->empty ()) {
+                delete pipes;
+                pipes = 0;
+            }
+        }
+        return !pipes;
     }
 
     unsigned char c = *prefix_;
@@ -245,9 +264,11 @@ void xs::mtrie_t::match (unsigned char *data_, size_t size_,
     while (true) {
 
         //  Signal the pipes attached to this node.
-        for (pipes_t::iterator it = current->pipes.begin ();
-              it != current->pipes.end (); ++it)
-            func_ (*it, arg_);
+        if (current->pipes) {
+            for (pipes_t::iterator it = current->pipes->begin ();
+                  it != current->pipes->end (); ++it)
+                func_ (*it, arg_);
+        }
 
         //  If we are at the end of the message, there's nothing more to match.
         if (!size_)
@@ -281,6 +302,6 @@ void xs::mtrie_t::match (unsigned char *data_, size_t size_,
 
 bool xs::mtrie_t::is_redundant () const
 {
-    return pipes.empty () && live_nodes == 0;
+    return !pipes && live_nodes == 0;
 }
 
