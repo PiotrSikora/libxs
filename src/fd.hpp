@@ -60,7 +60,7 @@ namespace xs
     enum {retired_fd = -1};
     inline void *fdtoptr (fd_t fd_)
     {
-        return (void*) (fd_ + 1);
+        return (void*) (((char*) 0) + fd_ + 1);
     }
     inline fd_t ptrtofd (void *ptr_)
     {
