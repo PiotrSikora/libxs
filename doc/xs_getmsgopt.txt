@@ -26,6 +26,9 @@ The following options can be retrieved with the _xs_getmsgopt()_ function:
 
 *XS_MORE*::
 Indicates that there are more message parts to follow after the 'message'.
+The type of this option is int. 0 means that this is the last message part
+of a multipart message. 1 means that more message parts will follow.
+
 
 RETURN VALUE
 ------------
