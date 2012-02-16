@@ -37,7 +37,7 @@ tests/msg_flags
 tests/reconnect
 tests/linger
 tests/max_sockets
-tests/reentrant
+tests/polltimeo
 src/platform.hpp*
 src/stamp-h1
 perf/local_lat
