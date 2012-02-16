@@ -357,6 +357,7 @@ void xs::session_base_t::timer_event (handle_t handle_)
     //  Linger period expired. We can proceed with termination even though
     //  there are still pending messages to be sent.
     xs_assert (handle_ == linger_timer);
+    linger_timer = NULL;
 
     //  Ask pipe to terminate even though there may be pending messages in it.
     xs_assert (pipe);
