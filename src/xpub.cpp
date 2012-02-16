@@ -63,7 +63,14 @@ void xs::xpub_t::xread_activated (pipe_t *pipe_)
         //  Apply the subscription to the trie.
         unsigned char *data = (unsigned char*) sub.data ();
         size_t size = sub.size ();
-        xs_assert (size > 0 && (*data == 0 || *data == 1));
+
+        //  TODO: In the case of malformed subscription we will simply ignore
+        //  it for now. However, we should close the connection instead.
+        if (size <= 0 || (*data == 0 && *data == 1)) {
+            sub.close ();
+            return;
+        }
+
         bool unique;
 		if (*data == 0)
 		    unique = subscriptions.rm (data + 1, size - 1, pipe_);
@@ -76,6 +83,7 @@ void xs::xpub_t::xread_activated (pipe_t *pipe_)
             pending.push_back (blob_t ((unsigned char*) sub.data (),
                 sub.size ()));
     }
+    sub.close ();
 }
 
 void xs::xpub_t::xwrite_activated (pipe_t *pipe_)
