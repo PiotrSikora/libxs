@@ -87,6 +87,14 @@
 #include "timeo.cpp"
 #undef XS_TEST_MAIN
 
+#define XS_TEST_MAIN max_sockets
+#include "max_sockets.cpp"
+#undef XS_TEST_MAIN
+
+#define XS_TEST_MAIN reentrant
+#include "reentrant.cpp"
+#undef XS_TEST_MAIN
+
 int main ()
 {
     int rc;
@@ -118,6 +126,10 @@ int main ()
     rc = sub_forward ();
     assert (rc == 0);
     rc = timeo ();
+    assert (rc == 0);
+    rc = max_sockets ();
+    assert (rc == 0);
+    rc = reentrant ();
     assert (rc == 0);
 
     fprintf (stderr, "SUCCESS\n");

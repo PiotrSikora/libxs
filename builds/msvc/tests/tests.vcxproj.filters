@@ -47,6 +47,12 @@
     <ClCompile Include="..\..\..\tests\timeo.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\tests\reentrant.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\tests\max_sockets.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
