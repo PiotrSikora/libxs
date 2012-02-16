@@ -40,59 +40,11 @@
 
 xs::ctx_t::ctx_t (uint32_t io_threads_) :
     tag (0xbadcafe0),
-    terminating (false)
+    starting (true),
+    terminating (false),
+    max_sockets (512),
+    io_thread_count (io_threads_)
 {
-    //  Initialise the array of mailboxes. Additional three slots are for
-    //  xs_term thread and reaper thread.
-    slot_count = max_sockets + io_threads_ + 3;
-    slots = (mailbox_t**) malloc (sizeof (mailbox_t*) * slot_count);
-    alloc_assert (slots);
-
-    //  Initialise the infrastructure for xs_term thread.
-    slots [term_tid] = &term_mailbox;
-
-    //  Create the reaper thread.
-    reaper = new (std::nothrow) reaper_t (this, reaper_tid);
-    alloc_assert (reaper);
-    slots [reaper_tid] = reaper->get_mailbox ();
-    reaper->start ();
-
-    //  Create I/O thread objects and launch them.
-    for (uint32_t i = 2; i != io_threads_ + 2; i++) {
-        io_thread_t *io_thread = new (std::nothrow) io_thread_t (this, i);
-        alloc_assert (io_thread);
-        io_threads.push_back (io_thread);
-        slots [i] = io_thread->get_mailbox ();
-        io_thread->start ();
-    }
-
-    //  In the unused part of the slot array, create a list of empty slots.
-    for (int32_t i = (int32_t) slot_count - 1;
-          i >= (int32_t) io_threads_ + 2; i--) {
-        empty_slots.push_back (i);
-        slots [i] = NULL;
-    }
-
-    //  Create the socket to send logs to.
-    log_socket = create_socket (XS_PUB);
-    xs_assert (log_socket);
-    int linger = 0;
-    int rc = log_socket->setsockopt (XS_LINGER, &linger, sizeof (linger));
-    errno_assert (rc == 0);
-    int hwm = 1;
-    rc = log_socket->setsockopt (XS_SNDHWM, &hwm, sizeof (hwm));
-    errno_assert (rc == 0);
-#if !defined XS_HAVE_WINDOWS
-    rc = log_socket->connect ("ipc:///tmp/xslogs.ipc");
-    errno_assert (rc == 0);
-#endif
-
-    //  Create the monitor object.
-    io_thread_t *io_thread = choose_io_thread (0);
-    xs_assert (io_thread);
-    monitor = new (std::nothrow) monitor_t (io_thread);
-    alloc_assert (monitor);
-    monitor->start ();
 }
 
 bool xs::ctx_t::check_tag ()
@@ -128,51 +80,54 @@ xs::ctx_t::~ctx_t ()
 
 int xs::ctx_t::terminate ()
 {
-    //  Check whether termination was already underway, but interrupted and now
-    //  restarted.
-    slot_sync.lock ();
-    bool restarted = terminating;
-    terminating = true;
-    slot_sync.unlock ();
+    if (!starting) {
 
-    //  First attempt to terminate the context.
-    if (!restarted) {
+        //  Check whether termination was already underway, but interrupted and now
+        //  restarted.
+        slot_sync.lock ();
+        bool restarted = terminating;
+        terminating = true;
+        slot_sync.unlock ();
 
-        //  Close the monitor object. Wait for done command from the monitor.
-        monitor->stop ();
+        //  First attempt to terminate the context.
+        if (!restarted) {
+
+            //  Close the monitor object. Wait for done command from the monitor.
+            monitor->stop ();
+            command_t cmd;
+            int rc = term_mailbox.recv (&cmd, -1);
+            xs_assert (rc == 0);
+            xs_assert (cmd.type == command_t::done);
+
+            //  Close the logging socket.
+            log_sync.lock ();
+            rc = log_socket->close ();
+            xs_assert (rc == 0);
+            log_socket = NULL;
+            log_sync.unlock ();
+
+            //  First send stop command to sockets so that any blocking calls
+            //  can be interrupted. If there are no sockets we can ask reaper
+            //  thread to stop.
+            slot_sync.lock ();
+            for (sockets_t::size_type i = 0; i != sockets.size (); i++)
+                sockets [i]->stop ();
+            if (sockets.empty ())
+                reaper->stop ();
+            slot_sync.unlock ();
+        }
+
+        //  Wait till reaper thread closes all the sockets.
         command_t cmd;
         int rc = term_mailbox.recv (&cmd, -1);
+        if (rc == -1 && errno == EINTR)
+            return -1;
         xs_assert (rc == 0);
         xs_assert (cmd.type == command_t::done);
-
-        //  Close the logging socket.
-        log_sync.lock ();
-        rc = log_socket->close ();
-        xs_assert (rc == 0);
-        log_socket = NULL;
-        log_sync.unlock ();
-
-        //  First send stop command to sockets so that any blocking calls
-        //  can be interrupted. If there are no sockets we can ask reaper
-        //  thread to stop.
         slot_sync.lock ();
-        for (sockets_t::size_type i = 0; i != sockets.size (); i++)
-            sockets [i]->stop ();
-        if (sockets.empty ())
-            reaper->stop ();
+        xs_assert (sockets.empty ());
         slot_sync.unlock ();
     }
-
-    //  Wait till reaper thread closes all the sockets.
-    command_t cmd;
-    int rc = term_mailbox.recv (&cmd, -1);
-    if (rc == -1 && errno == EINTR)
-        return -1;
-    xs_assert (rc == 0);
-    xs_assert (cmd.type == command_t::done);
-    slot_sync.lock ();
-    xs_assert (sockets.empty ());
-    slot_sync.unlock ();
 
     //  Deallocate the resources.
     delete this;
@@ -180,8 +135,87 @@ int xs::ctx_t::terminate ()
     return 0;
 }
 
+int xs::ctx_t::setctxopt (int option_, const void *optval_, size_t optvallen_)
+{
+    switch (option_) {
+    case XS_CTX_MAX_SOCKETS:
+        if (optvallen_ != sizeof (int) || *((int*) optval_) < 0) {
+            errno = EINVAL;
+            return -1;
+        }
+        opt_sync.lock ();
+        max_sockets = *((int*) optval_);
+        opt_sync.unlock ();
+        break;
+    default:
+        errno = EINVAL;
+        return -1;
+    }
+    return 0;
+}
+
 xs::socket_base_t *xs::ctx_t::create_socket (int type_)
 {
+    if (unlikely (starting)) {
+
+        starting = false;
+
+        //  Initialise the array of mailboxes. Additional three slots are for
+        //  xs_term thread and reaper thread.
+        opt_sync.lock ();
+        int maxs = max_sockets;
+        opt_sync.unlock ();
+        slot_count = maxs + io_thread_count + 3;
+        slots = (mailbox_t**) malloc (sizeof (mailbox_t*) * slot_count);
+        alloc_assert (slots);
+
+        //  Initialise the infrastructure for xs_term thread.
+        slots [term_tid] = &term_mailbox;
+
+        //  Create the reaper thread.
+        reaper = new (std::nothrow) reaper_t (this, reaper_tid);
+        alloc_assert (reaper);
+        slots [reaper_tid] = reaper->get_mailbox ();
+        reaper->start ();
+
+        //  Create I/O thread objects and launch them.
+        for (uint32_t i = 2; i != io_thread_count + 2; i++) {
+            io_thread_t *io_thread = new (std::nothrow) io_thread_t (this, i);
+            alloc_assert (io_thread);
+            io_threads.push_back (io_thread);
+            slots [i] = io_thread->get_mailbox ();
+            io_thread->start ();
+        }
+
+        //  In the unused part of the slot array, create a list of empty slots.
+        for (int32_t i = (int32_t) slot_count - 1;
+              i >= (int32_t) io_thread_count + 2; i--) {
+            empty_slots.push_back (i);
+            slots [i] = NULL;
+        }
+
+        //  Create the socket to send logs to.
+        log_socket = create_socket (XS_PUB);
+        xs_assert (log_socket);
+        int linger = 0;
+        int rc = log_socket->setsockopt (XS_LINGER, &linger, sizeof (linger));
+        errno_assert (rc == 0);
+        int hwm = 1;
+        rc = log_socket->setsockopt (XS_SNDHWM, &hwm, sizeof (hwm));
+        errno_assert (rc == 0);
+    #if !defined XS_HAVE_WINDOWS
+        rc = log_socket->connect ("ipc:///tmp/xslogs.ipc");
+        errno_assert (rc == 0);
+    #endif
+
+        //  Create the monitor object.
+        io_thread_t *io_thread = choose_io_thread (0);
+        xs_assert (io_thread);
+        monitor = new (std::nothrow) monitor_t (io_thread);
+        alloc_assert (monitor);
+        monitor->start ();
+    }
+
     slot_sync.lock ();
 
     //  Once xs_term() was called, we can't create new sockets.

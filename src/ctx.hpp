@@ -73,6 +73,9 @@ namespace xs
         //  after the last one is closed.
         int terminate ();
 
+        //  Set context option.
+        int setctxopt (int option_, const void *optval_, size_t optvallen_);
+
         //  Create and destroy a socket.
         xs::socket_base_t *create_socket (int type_);
         void destroy_socket (xs::socket_base_t *socket_);
@@ -119,6 +122,10 @@ namespace xs
         typedef std::vector <uint32_t> emtpy_slots_t;
         emtpy_slots_t empty_slots;
 
+        //  If true, xs_init has been called but no socket have been created
+        //  yes. Launching of I/O threads is delayed.
+        bool starting;
+
         //  If true, xs_term was already called.
         bool terminating;
 
@@ -159,6 +166,15 @@ namespace xs
         //  thus it is synchronised by a mutex.
         xs::socket_base_t *log_socket;
         mutex_t log_sync;
+
+        //  Maximum number of sockets that can be opened at the same time.
+        int max_sockets;
+
+        //  Number of I/O threads to launch.
+        uint32_t io_thread_count;
+
+        //  Synchronisation of access to context options.
+        mutex_t opt_sync;
 
         ctx_t (const ctx_t&);
         const ctx_t &operator = (const ctx_t&);

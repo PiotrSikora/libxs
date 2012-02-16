@@ -169,6 +169,17 @@ int xs_term (void *ctx_)
     return rc;
 }
 
+int xs_setctxopt (void *ctx_, int option_, const void *optval_,
+    size_t optvallen_)
+{
+    if (!ctx_ || !((xs::ctx_t*) ctx_)->check_tag ()) {
+        errno = EFAULT;
+        return -1;
+    }
+
+    return ((xs::ctx_t*) ctx_)->setctxopt (option_, optval_, optvallen_);
+}
+
 void *xs_socket (void *ctx_, int type_)
 {
     if (!ctx_ || !((xs::ctx_t*) ctx_)->check_tag ()) {

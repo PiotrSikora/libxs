@@ -22,37 +22,30 @@
 
 int XS_TEST_MAIN ()
 {
-    fprintf (stderr, "linger test running...\n");
+    fprintf (stderr, "max_sockets test running...\n");
 
-    //  Create socket.
+    //  Create context and set MAX_SOCKETS to 1.
     void *ctx = xs_init (1);
     assert (ctx);
-    void *s = xs_socket (ctx, XS_PUSH);
-    assert (s);
-
-    //  Set linger to 0.1 second.
-    int linger = 100;
-    int rc = xs_setsockopt (s, XS_LINGER, &linger, sizeof (int));
-
-    //  Connect to non-existent endpoing.
-    assert (rc == 0);
-    rc = xs_connect (s, "tcp://127.0.0.1:5560");
+    int max_sockets = 1;
+    int rc = xs_setctxopt (ctx, XS_CTX_MAX_SOCKETS, &max_sockets,
+        sizeof (max_sockets));
     assert (rc == 0);
 
-    //  Send a message.
-    rc = xs_send (s, "r", 1, 0);
-    assert (rc == 1);
+    //  First socket should be created OK.
+    void *s1 = xs_socket (ctx, XS_PUSH);
+    assert (s1);
 
-    //  Close the socket.
-    rc = xs_close (s);
+    //  Creation of second socket should fail.
+    void *s2 = xs_socket (ctx, XS_PUSH);
+    assert (!s2 && errno == EMFILE);
+
+    //  Clean up.
+    rc = xs_close (s1);
     assert (rc == 0);
-
-    //  Terminate the context. This should take 0.1 second.
-    void *watch = xs_stopwatch_start ();
     rc = xs_term (ctx);
     assert (rc == 0);
-    int ms = (int) xs_stopwatch_stop (watch) / 1000;
-    assert (ms > 50 && ms < 150);
 
     return 0;
 }
+
