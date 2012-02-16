@@ -226,8 +226,8 @@ int xs::xrep_t::xrecv (msg_t *msg_, int flags_)
                     pipe->set_identity (identity);
                     outpipes.erase (it);
                     outpipe_t outpipe = {pipe, true};
-                    outpipes.insert (outpipes_t::value_type (identity,
-                        outpipe));
+                    it = outpipes.insert (outpipes_t::value_type (identity,
+                        outpipe)).first;
                     break;
                 }
                 ++it;
