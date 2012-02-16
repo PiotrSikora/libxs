@@ -95,6 +95,10 @@
 #include "reentrant.cpp"
 #undef XS_TEST_MAIN
 
+#define XS_TEST_MAIN emptyctx
+#include "emptyctx.cpp"
+#undef XS_TEST_MAIN
+
 int main ()
 {
     int rc;
@@ -130,6 +134,8 @@ int main ()
     rc = max_sockets ();
     assert (rc == 0);
     rc = reentrant ();
+    assert (rc == 0);
+    rc = emptyctx ();
     assert (rc == 0);
 
     fprintf (stderr, "SUCCESS\n");
