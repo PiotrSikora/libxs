@@ -31,6 +31,8 @@ namespace xs
 
     struct i_poll_events;
 
+    typedef void* handle_t;
+
     class poller_base_t
     {
     public:

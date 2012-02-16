@@ -44,8 +44,6 @@ namespace xs
     {
     public:
 
-        typedef void* handle_t;
-
         kqueue_t ();
         ~kqueue_t ();
 

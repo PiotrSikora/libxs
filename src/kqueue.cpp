@@ -76,7 +76,7 @@ void xs::kqueue_t::kevent_delete (fd_t fd_, short filter_)
     errno_assert (rc != -1);
 }
 
-xs::kqueue_t::handle_t xs::kqueue_t::add_fd (fd_t fd_,
+xs::handle_t xs::kqueue_t::add_fd (fd_t fd_,
     i_poll_events *reactor_)
 {
     poll_entry_t *pe = new (std::nothrow) poll_entry_t;

@@ -52,7 +52,7 @@ void xs::io_object_t::unplug ()
     poller = NULL;
 }
 
-xs::io_object_t::handle_t xs::io_object_t::add_fd (fd_t fd_)
+xs::handle_t xs::io_object_t::add_fd (fd_t fd_)
 {
     return poller->add_fd (fd_, this);
 }

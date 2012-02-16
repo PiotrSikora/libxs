@@ -51,8 +51,6 @@ namespace xs
 
     protected:
 
-        typedef poller_t::handle_t handle_t;
-
         //  Methods to access underlying poller object.
         handle_t add_fd (fd_t fd_);
         void rm_fd (handle_t handle_);

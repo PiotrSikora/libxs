@@ -43,7 +43,7 @@ xs::poll_t::~poll_t ()
     worker.stop ();
 }
 
-xs::poll_t::handle_t xs::poll_t::add_fd (fd_t fd_, i_poll_events *events_)
+xs::handle_t xs::poll_t::add_fd (fd_t fd_, i_poll_events *events_)
 {
     //  If the file descriptor table is too small expand it.
     fd_table_t::size_type sz = fd_table.size ();
@@ -65,17 +65,17 @@ xs::poll_t::handle_t xs::poll_t::add_fd (fd_t fd_, i_poll_events *events_)
     //  Increase the load metric of the thread.
     adjust_load (1);
 
-    return fd_;
+    return fdtoptr (fd_);
 }
 
 void xs::poll_t::rm_fd (handle_t handle_)
 {
-    fd_t index = fd_table [handle_].index;
+    int index = fd_table [ptrtofd (handle_)].index;
     assert (index != retired_fd);
 
     //  Mark the fd as unused.
     pollset [index].fd = retired_fd;
-    fd_table [handle_].index = retired_fd;
+    fd_table [ptrtofd (handle_)].index = retired_fd;
     retired = true;
 
     //  Decrease the load metric of the thread.
@@ -84,25 +84,25 @@ void xs::poll_t::rm_fd (handle_t handle_)
 
 void xs::poll_t::set_pollin (handle_t handle_)
 {
-    int index = fd_table [handle_].index;
+    int index = fd_table [ptrtofd (handle_)].index;
     pollset [index].events |= POLLIN;
 }
 
 void xs::poll_t::reset_pollin (handle_t handle_)
 {
-    int index = fd_table [handle_].index;
+    int index = fd_table [ptrtofd (handle_)].index;
     pollset [index].events &= ~((short) POLLIN);
 }
 
 void xs::poll_t::set_pollout (handle_t handle_)
 {
-    int index = fd_table [handle_].index;
+    int index = fd_table [ptrtofd (handle_)].index;
     pollset [index].events |= POLLOUT;
 }
 
 void xs::poll_t::reset_pollout (handle_t handle_)
 {
-    int index = fd_table [handle_].index;
+    int index = fd_table [ptrtofd (handle_)].index;
     pollset [index].events &= ~((short) POLLOUT);
 }
 

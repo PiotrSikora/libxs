@@ -46,8 +46,6 @@ namespace xs
     {
     public:
 
-        typedef fd_t handle_t;
-
         poll_t ();
         ~poll_t ();
 
@@ -71,7 +69,7 @@ namespace xs
 
         struct fd_entry_t
         {
-            fd_t index;
+            int index;
             xs::i_poll_events *events;
         };
 

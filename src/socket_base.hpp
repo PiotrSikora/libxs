@@ -181,7 +181,7 @@ namespace xs
 
         //  Reaper's poller and handle of this socket within it.
         poller_t *poller;
-        poller_t::handle_t handle;
+        handle_t handle;
 
         //  Timestamp of when commands were processed the last time.
         uint64_t last_tsc;

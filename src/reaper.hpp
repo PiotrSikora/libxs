@@ -60,7 +60,7 @@ namespace xs
         mailbox_t mailbox;
 
         //  Handle associated with mailbox' file descriptor.
-        poller_t::handle_t mailbox_handle;
+        handle_t mailbox_handle;
 
         //  I/O multiplexing is performed using a poller object.
         poller_t *poller;

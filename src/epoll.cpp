@@ -51,7 +51,7 @@ xs::epoll_t::~epoll_t ()
         delete *it;
 }
 
-xs::epoll_t::handle_t xs::epoll_t::add_fd (fd_t fd_, i_poll_events *events_)
+xs::handle_t xs::epoll_t::add_fd (fd_t fd_, i_poll_events *events_)
 {
     poll_entry_t *pe = new (std::nothrow) poll_entry_t;
     alloc_assert (pe);

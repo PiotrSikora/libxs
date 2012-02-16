@@ -45,8 +45,6 @@ namespace xs
     {
     public:
 
-        typedef void* handle_t;
-
         epoll_t ();
         ~epoll_t ();
 

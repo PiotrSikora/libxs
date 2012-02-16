@@ -59,7 +59,7 @@ xs::select_t::~select_t ()
     worker.stop ();
 }
 
-xs::select_t::handle_t xs::select_t::add_fd (fd_t fd_, i_poll_events *events_)
+xs::handle_t xs::select_t::add_fd (fd_t fd_, i_poll_events *events_)
 {
     //  Store the file descriptor.
     fd_entry_t entry = {fd_, events_};
@@ -79,33 +79,35 @@ xs::select_t::handle_t xs::select_t::add_fd (fd_t fd_, i_poll_events *events_)
     //  Increase the load metric of the thread.
     adjust_load (1);
 
-    return fd_;
+    return fdtoptr (fd_);
 }
 
 void xs::select_t::rm_fd (handle_t handle_)
 {
+    int fd = ptrtofd (handle_);
+
     //  Mark the descriptor as retired.
     fd_set_t::iterator it;
     for (it = fds.begin (); it != fds.end (); ++it)
-        if (it->fd == handle_)
+        if (it->fd == fd)
             break;
     xs_assert (it != fds.end ());
     it->fd = retired_fd;
     retired = true;
 
     //  Stop polling on the descriptor.
-    FD_CLR (handle_, &source_set_in);
-    FD_CLR (handle_, &source_set_out);
-    FD_CLR (handle_, &source_set_err);
+    FD_CLR (fd, &source_set_in);
+    FD_CLR (fd, &source_set_out);
+    FD_CLR (fd, &source_set_err);
 
     //  Discard all events generated on this file descriptor.
-    FD_CLR (handle_, &readfds);
-    FD_CLR (handle_, &writefds);
-    FD_CLR (handle_, &exceptfds);
+    FD_CLR (fd, &readfds);
+    FD_CLR (fd, &writefds);
+    FD_CLR (fd, &exceptfds);
 
     //  Adjust the maxfd attribute if we have removed the
     //  highest-numbered file descriptor.
-    if (handle_ == maxfd) {
+    if (fd == maxfd) {
         maxfd = retired_fd;
         for (fd_set_t::iterator it = fds.begin (); it != fds.end (); ++it)
             if (it->fd > maxfd)
@@ -118,22 +120,22 @@ void xs::select_t::rm_fd (handle_t handle_)
 
 void xs::select_t::set_pollin (handle_t handle_)
 {
-    FD_SET (handle_, &source_set_in);
+    FD_SET (ptrtofd (handle_), &source_set_in);
 }
 
 void xs::select_t::reset_pollin (handle_t handle_)
 {
-    FD_CLR (handle_, &source_set_in);
+    FD_CLR (ptrtofd (handle_), &source_set_in);
 }
 
 void xs::select_t::set_pollout (handle_t handle_)
 {
-    FD_SET (handle_, &source_set_out);
+    FD_SET (ptrtofd (handle_), &source_set_out);
 }
 
 void xs::select_t::reset_pollout (handle_t handle_)
 {
-    FD_CLR (handle_, &source_set_out);
+    FD_CLR (ptrtofd (handle_), &source_set_out);
 }
 
 void xs::select_t::start ()

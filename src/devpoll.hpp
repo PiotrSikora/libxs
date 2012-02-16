@@ -43,8 +43,6 @@ namespace xs
     {
     public:
 
-        typedef fd_t handle_t;
-
         devpoll_t ();
         ~devpoll_t ();
 

@@ -56,8 +56,6 @@ namespace xs
     {
     public:
 
-        typedef fd_t handle_t;
-
         select_t ();
         ~select_t ();
 

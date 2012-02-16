@@ -57,7 +57,7 @@ void xs::devpoll_t::devpoll_ctl (fd_t fd_, short events_)
     xs_assert (rc == sizeof pfd);
 }
 
-xs::devpoll_t::handle_t xs::devpoll_t::add_fd (fd_t fd_,
+xs::handle_t xs::devpoll_t::add_fd (fd_t fd_,
     i_poll_events *reactor_)
 {
     //  If the file descriptor table is too small expand it.
