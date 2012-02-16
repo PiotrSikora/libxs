@@ -53,7 +53,7 @@ int XS_TEST_MAIN ()
     int rc;
     pthread_t threads [THREAD_COUNT];
 
-    fprintf (stderr, "test_shutdown_stress running...\n");
+    fprintf (stderr, "shutdown_stress test running...\n");
 
     for (j = 0; j != 10; j++) {
 

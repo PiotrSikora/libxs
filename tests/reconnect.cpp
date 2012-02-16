@@ -22,7 +22,7 @@
 
 int XS_TEST_MAIN ()
 {
-    fprintf (stderr, "test_reconnect running...\n");
+    fprintf (stderr, "reconnect test running...\n");
 
     //  Create the basic infrastructure.
     void *ctx = xs_init (1);

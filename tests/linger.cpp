@@ -1,6 +1,6 @@
 /*
-    Copyright (c) 2010-2012 250bpm s.r.o.
-    Copyright (c) 2010-2011 Other contributors as noted in the AUTHORS file
+    Copyright (c) 2012 250bpm s.r.o.
+    Copyright (c) 2012 Other contributors as noted in the AUTHORS file
 
     This file is part of Crossroads project.
 
@@ -22,31 +22,38 @@
 
 int XS_TEST_MAIN ()
 {
-    fprintf (stderr, "test_reqrep_inproc running...\n");
+    fprintf (stderr, "linger test running...\n");
 
+    //  Create REQ/XREP wiring.
     void *ctx = xs_init (1);
     assert (ctx);
+    void *s = xs_socket (ctx, XS_PUSH);
+    assert (s);
 
-    void *sb = xs_socket (ctx, XS_REP);
-    assert (sb);
-    int rc = xs_bind (sb, "inproc://a");
+    //  Set linger to 0.1 second.
+    int linger = 100;
+    int rc = xs_setsockopt (s, XS_LINGER, &linger, sizeof (int));
+
+    //  Connect to non-existent endpoing.
+    assert (rc == 0);
+    rc = xs_connect (s, "ipc:///tmp/this-file-does-not-exist");
     assert (rc == 0);
 
-    void *sc = xs_socket (ctx, XS_REQ);
-    assert (sc);
-    rc = xs_connect (sc, "inproc://a");
-    assert (rc == 0);
-    
-    bounce (sb, sc);
+    //  Send a message.
+    rc = xs_send (s, "r", 1, 0);
+    assert (rc == 1);
 
-    rc = xs_close (sc);
+    //  Close the socket.
+    rc = xs_close (s);
     assert (rc == 0);
 
-    rc = xs_close (sb);
-    assert (rc == 0);
-
+    //  Terminate the context. This should take 0.1 second.
+    void *watch = xs_stopwatch_start ();
     rc = xs_term (ctx);
     assert (rc == 0);
+    int ms = (int) xs_stopwatch_stop (watch) / 1000;
+    assert (ms > 50 && ms < 150);
 
-    return 0 ;
+    return 0;
 }
+

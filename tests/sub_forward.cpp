@@ -23,7 +23,7 @@
 
 int XS_TEST_MAIN ()
 {
-    fprintf (stderr, "test_sub_forward running...\n");
+    fprintf (stderr, "sub_forward test running...\n");
 
     void *ctx = xs_init (1);
     assert (ctx);

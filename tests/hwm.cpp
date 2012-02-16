@@ -22,22 +22,51 @@
 
 int XS_TEST_MAIN ()
 {
-    fprintf (stderr, "test_pair_inproc running...\n");
+    fprintf (stderr, "hwm test running...\n");
 
     void *ctx = xs_init (1);
     assert (ctx);
 
-    void *sb = xs_socket (ctx, XS_PAIR);
+    //  Create pair of socket, each with high watermark of 2. Thus the total
+    //  buffer space should be 4 messages.
+    void *sb = xs_socket (ctx, XS_PULL);
     assert (sb);
-    int rc = xs_bind (sb, "inproc://a");
+    int hwm = 2;
+    int rc = xs_setsockopt (sb, XS_RCVHWM, &hwm, sizeof (hwm));
+    assert (rc == 0);
+    rc = xs_bind (sb, "inproc://a");
     assert (rc == 0);
 
-    void *sc = xs_socket (ctx, XS_PAIR);
+    void *sc = xs_socket (ctx, XS_PUSH);
     assert (sc);
+    rc = xs_setsockopt (sc, XS_SNDHWM, &hwm, sizeof (hwm));
+    assert (rc == 0);
     rc = xs_connect (sc, "inproc://a");
     assert (rc == 0);
-    
-    bounce (sb, sc);
+
+    //  Try to send 10 messages. Only 4 should succeed.
+    for (int i = 0; i < 10; i++)
+    {
+        int rc = xs_send (sc, NULL, 0, XS_DONTWAIT);
+        if (i < 4)
+            assert (rc == 0);
+        else
+            assert (rc < 0 && errno == EAGAIN);
+    }
+
+    // There should be now 4 messages pending, consume them.
+    for (int i = 0; i != 4; i++) {
+        rc = xs_recv (sb, NULL, 0, 0);
+        assert (rc == 0);
+    }
+
+    // Now it should be possible to send one more.
+    rc = xs_send (sc, NULL, 0, 0);
+    assert (rc == 0);
+
+    //  Consume the remaining message.
+    rc = xs_recv (sb, NULL, 0, 0);
+    assert (rc == 0);
 
     rc = xs_close (sc);
     assert (rc == 0);
@@ -48,5 +77,5 @@ int XS_TEST_MAIN ()
     rc = xs_term (ctx);
     assert (rc == 0);
 
-    return 0 ;
+	return 0;
 }

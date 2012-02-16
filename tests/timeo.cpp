@@ -42,7 +42,7 @@ extern "C"
 
 int XS_TEST_MAIN ()
 {
-    fprintf (stderr, "test_timeo running...\n");
+    fprintf (stderr, "timeo test running...\n");
 
     void *ctx = xs_init (1);
     assert (ctx);

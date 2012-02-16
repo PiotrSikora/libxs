@@ -23,7 +23,7 @@
 
 int XS_TEST_MAIN ()
 {
-    fprintf (stderr, "test_reqrep_device running...\n");
+    fprintf (stderr, "reqrep_device test running...\n");
 
     void *ctx = xs_init (1);
     assert (ctx);

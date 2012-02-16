@@ -3,42 +3,42 @@ INCLUDES = -I$(top_builddir)/include \
 
 LDADD = $(top_builddir)/src/libxs.la
 
-noinst_PROGRAMS = test_pair_inproc \
-                  test_pair_tcp \
-                  test_reqrep_inproc \
-                  test_reqrep_tcp \
-                  test_hwm \
-                  test_reqrep_device \
-                  test_sub_forward \
-                  test_invalid_rep \
-                  test_msg_flags \
-                  test_reconnect \
-                  test_linger
+noinst_PROGRAMS = pair_inproc \
+                  pair_tcp \
+                  reqrep_inproc \
+                  reqrep_tcp \
+                  hwm \
+                  reqrep_device \
+                  sub_forward \
+                  invalid_rep \
+                  msg_flags \
+                  reconnect \
+                  linger
 
 if !ON_MINGW
-noinst_PROGRAMS += test_shutdown_stress \
-                   test_pair_ipc \
-                   test_reqrep_ipc \
-                   test_timeo
+noinst_PROGRAMS += shutdown_stress \
+                   pair_ipc \
+                   reqrep_ipc \
+                   timeo
 endif
 
-test_pair_inproc_SOURCES = test_pair_inproc.cpp testutil.hpp
-test_pair_tcp_SOURCES = test_pair_tcp.cpp testutil.hpp
-test_reqrep_inproc_SOURCES = test_reqrep_inproc.cpp testutil.hpp
-test_reqrep_tcp_SOURCES = test_reqrep_tcp.cpp testutil.hpp
-test_hwm_SOURCES = test_hwm.cpp
-test_reqrep_device_SOURCES = test_reqrep_device.cpp
-test_sub_forward_SOURCES = test_sub_forward.cpp
-test_invalid_rep_SOURCES = test_invalid_rep.cpp
-test_msg_flags_SOURCES = test_msg_flags.cpp
-test_reconnect_SOURCES = test_reconnect.cpp
-test_linger_SOURCES = test_linger.cpp
+pair_inproc_SOURCES = pair_inproc.cpp testutil.hpp
+pair_tcp_SOURCES = pair_tcp.cpp testutil.hpp
+reqrep_inproc_SOURCES = reqrep_inproc.cpp testutil.hpp
+reqrep_tcp_SOURCES = reqrep_tcp.cpp testutil.hpp
+hwm_SOURCES = hwm.cpp
+reqrep_device_SOURCES = reqrep_device.cpp
+sub_forward_SOURCES = sub_forward.cpp
+invalid_rep_SOURCES = invalid_rep.cpp
+msg_flags_SOURCES = msg_flags.cpp
+reconnect_SOURCES = reconnect.cpp
+linger_SOURCES = linger.cpp
 
 if !ON_MINGW
-test_shutdown_stress_SOURCES = test_shutdown_stress.cpp
-test_pair_ipc_SOURCES = test_pair_ipc.cpp testutil.hpp
-test_reqrep_ipc_SOURCES = test_reqrep_ipc.cpp testutil.hpp
-test_timeo_SOURCES = test_timeo.cpp
+shutdown_stress_SOURCES = shutdown_stress.cpp
+pair_ipc_SOURCES = pair_ipc.cpp testutil.hpp
+reqrep_ipc_SOURCES = reqrep_ipc.cpp testutil.hpp
+timeo_SOURCES = timeo.cpp
 endif
 
 TESTS = $(noinst_PROGRAMS)

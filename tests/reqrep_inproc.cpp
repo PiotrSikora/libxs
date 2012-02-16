@@ -22,19 +22,19 @@
 
 int XS_TEST_MAIN ()
 {
-    fprintf (stderr, "test_pair_ipc running...\n");
+    fprintf (stderr, "reqrep_inproc test running...\n");
 
     void *ctx = xs_init (1);
     assert (ctx);
 
-    void *sb = xs_socket (ctx, XS_PAIR);
+    void *sb = xs_socket (ctx, XS_REP);
     assert (sb);
-    int rc = xs_bind (sb, "ipc:///tmp/tester");
+    int rc = xs_bind (sb, "inproc://a");
     assert (rc == 0);
 
-    void *sc = xs_socket (ctx, XS_PAIR);
+    void *sc = xs_socket (ctx, XS_REQ);
     assert (sc);
-    rc = xs_connect (sc, "ipc:///tmp/tester");
+    rc = xs_connect (sc, "inproc://a");
     assert (rc == 0);
     
     bounce (sb, sc);

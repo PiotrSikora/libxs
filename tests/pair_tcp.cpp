@@ -1,5 +1,6 @@
 /*
     Copyright (c) 2010-2012 250bpm s.r.o.
+    Copyright (c) 2011 iMatix Corporation
     Copyright (c) 2010-2011 Other contributors as noted in the AUTHORS file
 
     This file is part of Crossroads project.
@@ -22,19 +23,19 @@
 
 int XS_TEST_MAIN ()
 {
-    fprintf (stderr, "test_reqrep_ipc running...\n");
+    fprintf (stderr, "pair_tcp test running...\n");
 
     void *ctx = xs_init (1);
     assert (ctx);
 
-    void *sb = xs_socket (ctx, XS_REP);
+    void *sb = xs_socket (ctx, XS_PAIR);
     assert (sb);
-    int rc = xs_bind (sb, "ipc:///tmp/tester");
+    int rc = xs_bind (sb, "tcp://127.0.0.1:5560");
     assert (rc == 0);
 
-    void *sc = xs_socket (ctx, XS_REQ);
+    void *sc = xs_socket (ctx, XS_PAIR);
     assert (sc);
-    rc = xs_connect (sc, "ipc:///tmp/tester");
+    rc = xs_connect (sc, "tcp://127.0.0.1:5560");
     assert (rc == 0);
     
     bounce (sb, sc);
