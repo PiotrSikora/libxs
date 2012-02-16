@@ -91,12 +91,12 @@
 #include "max_sockets.cpp"
 #undef XS_TEST_MAIN
 
-#define XS_TEST_MAIN reentrant
-#include "reentrant.cpp"
-#undef XS_TEST_MAIN
-
 #define XS_TEST_MAIN emptyctx
 #include "emptyctx.cpp"
+#undef XS_TEST_MAIN
+
+#define XS_TEST_MAIN polltimeo
+#include "polltimeo.cpp"
 #undef XS_TEST_MAIN
 
 int main ()
@@ -133,9 +133,9 @@ int main ()
     assert (rc == 0);
     rc = max_sockets ();
     assert (rc == 0);
-    rc = reentrant ();
-    assert (rc == 0);
     rc = emptyctx ();
+    assert (rc == 0);
+    rc = polltimeo ();
     assert (rc == 0);
 
     fprintf (stderr, "SUCCESS\n");
