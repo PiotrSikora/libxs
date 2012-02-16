@@ -19,13 +19,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
+#include "testutil.hpp"
 
-#include "../include/xs.h"
-
-int main (int argc, char *argv [])
+int XS_TEST_MAIN ()
 {
     fprintf (stderr, "test_reqrep_device running...\n");
 

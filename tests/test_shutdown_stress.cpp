@@ -19,11 +19,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/xs.h"
-#include <assert.h>
+#include "testutil.hpp"
+
 #include <pthread.h>
 #include <stddef.h>
-#include <stdio.h>
 
 #define THREAD_COUNT 100
 
@@ -44,7 +43,7 @@ extern "C"
     }
 }
 
-int main (int argc, char *argv [])
+int XS_TEST_MAIN ()
 {
     void *ctx;
     void *s1;

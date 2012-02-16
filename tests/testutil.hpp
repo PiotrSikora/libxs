@@ -24,8 +24,15 @@
 
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "../include/xs.h"
+#include "../include/xs_utils.h"
+#include "../src/platform.hpp"
+
+#if !defined XS_TEST_MAIN
+#define XS_TEST_MAIN main
+#endif
 
 inline void bounce (void *sb, void *sc)
 {

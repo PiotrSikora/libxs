@@ -19,11 +19,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/xs.h"
-#include <assert.h>
-#include <stdio.h>
+#include "testutil.hpp"
 
-int main (int argc, char *argv [])
+int XS_TEST_MAIN ()
 {
     fprintf (stderr, "test_invalid_rep running...\n");
 

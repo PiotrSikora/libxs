@@ -18,13 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
-#include <stdio.h>
+#include "testutil.hpp"
 
-#include "../include/xs.h"
-#include "../include/xs_utils.h"
-
-int main (int argc, char *argv [])
+int XS_TEST_MAIN ()
 {
     fprintf (stderr, "test_reconnect running...\n");
 
