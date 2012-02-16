@@ -29,6 +29,7 @@
 #include "mtrie.hpp"
 #include "array.hpp"
 #include "dist.hpp"
+#include "blob.hpp"
 
 namespace xs
 {
@@ -77,7 +78,6 @@ namespace xs
 
         //  List of pending (un)subscriptions, ie. those that were already
         //  applied to the trie, but not yet received by the user.
-        typedef std::basic_string <unsigned char> blob_t;
         typedef std::deque <blob_t> pending_t;
         pending_t pending;
 
