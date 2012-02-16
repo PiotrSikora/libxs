@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
+    Copyright (c) 2012 Lucina & Associates
     Copyright (c) 2010-2011 Miru Limited
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
@@ -98,8 +99,8 @@ void xs::pgm_sender_t::plug (io_thread_t *io_thread_, session_base_t *session_)
     msg_t msg;
     msg.init_size (1);
     *(unsigned char*) msg.data () = 1;
-    bool ok = session_->write (&msg);
-    xs_assert (ok);
+    int rc = session_->write (&msg);
+    errno_assert (rc == 0);
     session_->flush ();
 }
 
