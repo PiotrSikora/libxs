@@ -1,18 +1,12 @@
-LIBXS_DIST = libzmq/libzmq.vcproj libzmq/libzmq.vcxproj \
-              libzmq/libzmq.vcxproj.filters \
-              platform.hpp msvc.sln msvc10.sln
+LIBXS_DIST = libzmq/libzmq.vcxproj \
+             libzmq/libzmq.vcxproj.filters \
+             platform.hpp msvc10.sln
 
-PERF_DIST = c_local_thr/c_local_thr.vcproj \
-            c_local_thr/c_local_thr.vcxproj \
-            c_remote_thr/c_remote_thr.vcproj \
+PERF_DIST = c_local_thr/c_local_thr.vcxproj \
             c_remote_thr/c_remote_thr.vcxproj \
-            c_local_lat/c_local_lat.vcproj \
             c_local_lat/c_local_lat.vcxproj \
-            c_remote_lat/c_remote_lat.vcproj \
             c_remote_lat/c_remote_lat.vcxproj \
-            inproc_lat/inproc_lat.vcproj \
             inproc_lat/inproc_lat.vcxproj \
-            inproc_thr/inproc_thr.vcproj \
             inproc_thr/inproc_thr.vcxproj
 
 PROPERTIES_DIST = properties/Common.props \
