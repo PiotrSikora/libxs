@@ -31,14 +31,14 @@
 namespace xs
 {
 
-    class io_thread_t;
+    class poller_base_t;
     class socket_base_t;
 
     class tcp_listener_t : public own_t, public io_object_t
     {
     public:
 
-        tcp_listener_t (xs::io_thread_t *io_thread_,
+        tcp_listener_t (xs::poller_base_t *io_thread_,
             xs::socket_base_t *socket_, const options_t &options_);
         ~tcp_listener_t ();
 

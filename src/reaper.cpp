@@ -27,7 +27,7 @@ xs::reaper_t::reaper_t (class ctx_t *ctx_, uint32_t tid_) :
     sockets (0),
     terminating (false)
 {
-    poller = poller_base_t::create ();
+    poller = poller_base_t::create (ctx_, tid_);
     xs_assert (poller);
 
     mailbox_handle = poller->add_fd (mailbox.get_fd (), this);

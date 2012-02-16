@@ -30,8 +30,6 @@
 namespace xs
 {
 
-    class io_thread_t;
-
     //  Simple base class for objects that live in I/O threads.
     //  It makes communication with the poller object easier and
     //  makes defining unneeded event handlers unnecessary.
@@ -40,12 +38,12 @@ namespace xs
     {
     public:
 
-        io_object_t (xs::io_thread_t *io_thread_ = NULL);
+        io_object_t (xs::poller_base_t *io_thread_ = NULL);
         ~io_object_t ();
 
         //  When migrating an object from one I/O thread to another, first
         //  unplug it, then migrate it, then plug it to the new thread.
-        void plug (xs::io_thread_t *io_thread_);
+        void plug (xs::poller_base_t *io_thread_);
         void unplug ();
 
     protected:

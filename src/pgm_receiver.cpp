@@ -37,7 +37,7 @@
 #include "wire.hpp"
 #include "err.hpp"
 
-xs::pgm_receiver_t::pgm_receiver_t (class io_thread_t *parent_, 
+xs::pgm_receiver_t::pgm_receiver_t (class poller_base_t *parent_, 
       const options_t &options_) :
     io_object_t (parent_),
     pgm_socket (true, options_),
@@ -60,7 +60,7 @@ int xs::pgm_receiver_t::init (bool udp_encapsulation_, const char *network_)
     return pgm_socket.init (udp_encapsulation_, network_);
 }
 
-void xs::pgm_receiver_t::plug (io_thread_t *io_thread_,
+void xs::pgm_receiver_t::plug (poller_base_t *io_thread_,
     session_base_t *session_)
 {
     //  Retrieve PGM fds and start polling.

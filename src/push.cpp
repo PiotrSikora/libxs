@@ -60,7 +60,7 @@ bool xs::push_t::xhas_out ()
     return lb.has_out ();
 }
 
-xs::push_session_t::push_session_t (io_thread_t *io_thread_, bool connect_,
+xs::push_session_t::push_session_t (poller_base_t *io_thread_, bool connect_,
       socket_base_t *socket_, const options_t &options_,
       const char *protocol_, const char *address_) :
     session_base_t (io_thread_, connect_, socket_, options_, protocol_,

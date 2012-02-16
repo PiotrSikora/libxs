@@ -20,10 +20,10 @@
 */
 
 #include "io_object.hpp"
-#include "io_thread.hpp"
+#include "poller_base.hpp"
 #include "err.hpp"
 
-xs::io_object_t::io_object_t (io_thread_t *io_thread_) :
+xs::io_object_t::io_object_t (poller_base_t *io_thread_) :
     poller (NULL)
 {
     if (io_thread_)
@@ -34,13 +34,13 @@ xs::io_object_t::~io_object_t ()
 {
 }
 
-void xs::io_object_t::plug (io_thread_t *io_thread_)
+void xs::io_object_t::plug (poller_base_t *io_thread_)
 {
     xs_assert (io_thread_);
     xs_assert (!poller);
 
     //  Retrieve the poller from the thread we are running in.
-    poller = io_thread_->get_poller ();
+    poller = io_thread_;
 }
 
 void xs::io_object_t::unplug ()

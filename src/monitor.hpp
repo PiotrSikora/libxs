@@ -30,14 +30,14 @@
 namespace xs
 {
 
-    class io_thread_t;
+    class poller_base_t;
     class socket_base_t;
 
     class monitor_t : public own_t, public io_object_t
     {
     public:
 
-        monitor_t (xs::io_thread_t *io_thread_);
+        monitor_t (xs::poller_base_t *io_thread_);
         ~monitor_t ();
 
         void start ();

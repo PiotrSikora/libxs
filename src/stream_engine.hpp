@@ -34,7 +34,7 @@
 namespace xs
 {
 
-    class io_thread_t;
+    class poller_base_t;
     class session_base_t;
 
     //  This engine handles any socket with SOCK_STREAM semantics,
@@ -48,7 +48,7 @@ namespace xs
         ~stream_engine_t ();
 
         //  i_engine interface implementation.
-        void plug (xs::io_thread_t *io_thread_,
+        void plug (xs::poller_base_t *io_thread_,
            xs::session_base_t *session_);
         void unplug ();
         void terminate ();

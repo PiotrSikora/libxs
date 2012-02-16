@@ -34,7 +34,7 @@ namespace xs
     class pipe_t;
     class socket_base_t;
     class session_base_t;
-    class io_thread_t;
+    class poller_base_t;
     class own_t;
 
     //  Base class for all objects that participate in inter-thread
@@ -62,7 +62,7 @@ namespace xs
         void destroy_socket (xs::socket_base_t *socket_);
 
         //  Chooses least loaded I/O thread.
-        xs::io_thread_t *choose_io_thread (uint64_t affinity_);
+        xs::poller_base_t *choose_io_thread (uint64_t affinity_);
 
         //  Logging related functions.
         void log (int sid_, const char *text_);

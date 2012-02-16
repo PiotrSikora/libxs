@@ -113,7 +113,6 @@
     <ClCompile Include="..\..\..\src\err.cpp" />
     <ClCompile Include="..\..\..\src\fq.cpp" />
     <ClCompile Include="..\..\..\src\io_object.cpp" />
-    <ClCompile Include="..\..\..\src\io_thread.cpp" />
     <ClCompile Include="..\..\..\src\ip.cpp" />
     <ClCompile Include="..\..\..\src\ipc_address.cpp" />
     <ClCompile Include="..\..\..\src\ipc_connecter.cpp" />
@@ -184,7 +183,6 @@
     <ClInclude Include="..\..\..\src\fq.hpp" />
     <ClInclude Include="..\..\..\src\i_engine.hpp" />
     <ClInclude Include="..\..\..\src\io_object.hpp" />
-    <ClInclude Include="..\..\..\src\io_thread.hpp" />
     <ClInclude Include="..\..\..\src\ip.hpp" />
     <ClInclude Include="..\..\..\src\ipc_address.hpp" />
     <ClInclude Include="..\..\..\src\ipc_connecter.hpp" />

@@ -32,7 +32,7 @@ namespace xs
 
     class ctx_t;
     class pipe_t;
-    class io_thread_t;
+    class poller_base_t;
 
     class xsub_t :
         public socket_base_t
@@ -91,7 +91,7 @@ namespace xs
     {
     public:
 
-        xsub_session_t (class io_thread_t *io_thread_, bool connect_,
+        xsub_session_t (class poller_base_t *io_thread_, bool connect_,
             socket_base_t *socket_, const options_t &options_,
             const char *protocol_, const char *address_);
         ~xsub_session_t ();

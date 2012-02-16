@@ -43,7 +43,7 @@
 namespace xs
 {
 
-    class io_thread_t;
+    class poller_base_t;
     class session_base_t;
 
     class pgm_receiver_t : public io_object_t, public i_engine
@@ -51,13 +51,13 @@ namespace xs
     
     public:
 
-        pgm_receiver_t (xs::io_thread_t *parent_, const options_t &options_);
+        pgm_receiver_t (xs::poller_base_t *parent_, const options_t &options_);
         ~pgm_receiver_t ();
 
         int init (bool udp_encapsulation_, const char *network_);
 
         //  i_engine interface implementation.
-        void plug (xs::io_thread_t *io_thread_,
+        void plug (xs::poller_base_t *io_thread_,
             xs::session_base_t *session_);
         void unplug ();
         void terminate ();

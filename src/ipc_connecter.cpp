@@ -26,7 +26,7 @@
 #include <string>
 
 #include "stream_engine.hpp"
-#include "io_thread.hpp"
+#include "poller_base.hpp"
 #include "platform.hpp"
 #include "random.hpp"
 #include "err.hpp"
@@ -37,7 +37,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-xs::ipc_connecter_t::ipc_connecter_t (class io_thread_t *io_thread_,
+xs::ipc_connecter_t::ipc_connecter_t (class poller_base_t *io_thread_,
       class session_base_t *session_, const options_t &options_,
       const char *address_, bool wait_) :
     own_t (io_thread_, options_),

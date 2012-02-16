@@ -19,12 +19,12 @@
 */
 
 #include "monitor.hpp"
-#include "io_thread.hpp"
+#include "poller_base.hpp"
 #include "options.hpp"
 #include "random.hpp"
 #include "err.hpp"
 
-xs::monitor_t::monitor_t (xs::io_thread_t *io_thread_) :
+xs::monitor_t::monitor_t (xs::poller_base_t *io_thread_) :
     own_t (io_thread_, options_t ()),
     io_object_t (io_thread_),
     timer (NULL)

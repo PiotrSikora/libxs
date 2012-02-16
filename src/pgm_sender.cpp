@@ -31,14 +31,13 @@
 
 #include <stdlib.h>
 
-#include "io_thread.hpp"
 #include "pgm_sender.hpp"
 #include "session_base.hpp"
 #include "err.hpp"
 #include "wire.hpp"
 #include "stdint.hpp"
 
-xs::pgm_sender_t::pgm_sender_t (io_thread_t *parent_, 
+xs::pgm_sender_t::pgm_sender_t (poller_base_t *parent_, 
       const options_t &options_) :
     io_object_t (parent_),
     encoder (0),
@@ -65,7 +64,8 @@ int xs::pgm_sender_t::init (bool udp_encapsulation_, const char *network_)
     return rc;
 }
 
-void xs::pgm_sender_t::plug (io_thread_t *io_thread_, session_base_t *session_)
+void xs::pgm_sender_t::plug (poller_base_t *io_thread_,
+    session_base_t *session_)
 {
     //  Alocate 2 fds for PGM socket.
     fd_t downlink_socket_fd = retired_fd;

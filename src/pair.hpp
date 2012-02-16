@@ -63,7 +63,7 @@ namespace xs
     {
     public:
 
-        pair_session_t (xs::io_thread_t *io_thread_, bool connect_,
+        pair_session_t (xs::poller_base_t *io_thread_, bool connect_,
             socket_base_t *socket_, const options_t &options_,
             const char *protocol_, const char *address_);
         ~pair_session_t ();

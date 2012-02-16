@@ -112,7 +112,7 @@ bool xs::rep_t::xhas_out ()
     return xrep_t::xhas_out ();
 }
 
-xs::rep_session_t::rep_session_t (io_thread_t *io_thread_, bool connect_,
+xs::rep_session_t::rep_session_t (poller_base_t *io_thread_, bool connect_,
       socket_base_t *socket_, const options_t &options_,
       const char *protocol_, const char *address_) :
     xrep_session_t (io_thread_, connect_, socket_, options_, protocol_,

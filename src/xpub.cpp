@@ -182,7 +182,7 @@ void xs::xpub_t::send_unsubscription (unsigned char *data_, size_t size_,
     }
 }
 
-xs::xpub_session_t::xpub_session_t (io_thread_t *io_thread_, bool connect_,
+xs::xpub_session_t::xpub_session_t (poller_base_t *io_thread_, bool connect_,
       socket_base_t *socket_, const options_t &options_,
       const char *protocol_, const char *address_) :
     session_base_t (io_thread_, connect_, socket_, options_, protocol_,

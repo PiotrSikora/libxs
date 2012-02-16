@@ -33,7 +33,7 @@ namespace xs
 {
 
     class pipe_t;
-    class io_thread_t;
+    class poller_base_t;
     class socket_base_t;
     struct i_engine;
 
@@ -45,7 +45,7 @@ namespace xs
     public:
 
         //  Create a session of the particular type.
-        static session_base_t *create (xs::io_thread_t *io_thread_,
+        static session_base_t *create (xs::poller_base_t *io_thread_,
             bool connect_, xs::socket_base_t *socket_,
             const options_t &options_, const char *protocol_,
             const char *address_);
@@ -67,7 +67,7 @@ namespace xs
 
     protected:
 
-        session_base_t (xs::io_thread_t *io_thread_, bool connect_,
+        session_base_t (xs::poller_base_t *io_thread_, bool connect_,
             xs::socket_base_t *socket_, const options_t &options_,
             const char *protocol_, const char *address_);
         ~session_base_t ();
@@ -116,7 +116,7 @@ namespace xs
 
         //  I/O thread the session is living in. It will be used to plug in
         //  the engines into the same thread.
-        xs::io_thread_t *io_thread;
+        xs::poller_base_t *io_thread;
 
         //  If true, identity is to be sent/recvd from the network.
         bool send_identity;

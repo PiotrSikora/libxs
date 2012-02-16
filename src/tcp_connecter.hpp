@@ -31,7 +31,7 @@
 namespace xs
 {
 
-    class io_thread_t;
+    class poller_base_t;
     class session_base_t;
 
     class tcp_connecter_t : public own_t, public io_object_t
@@ -40,7 +40,7 @@ namespace xs
 
         //  If 'delay' is true connecter first waits for a while, then starts
         //  connection process.
-        tcp_connecter_t (xs::io_thread_t *io_thread_,
+        tcp_connecter_t (xs::poller_base_t *io_thread_,
             xs::session_base_t *session_, const options_t &options_,
             const char *address_, bool delay_);
         ~tcp_connecter_t ();

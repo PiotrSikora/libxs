@@ -36,6 +36,7 @@
 namespace xs
 {
 
+    class ctx_t;
     struct i_poll_events;
 
     //  This class implements socket polling mechanism using the Linux-specific
@@ -45,7 +46,7 @@ namespace xs
     {
     public:
 
-        epoll_t ();
+        epoll_t (xs::ctx_t *ctx_, uint32_t tid_);
         ~epoll_t ();
 
         //  "poller" concept.

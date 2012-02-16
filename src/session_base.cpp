@@ -43,7 +43,7 @@
 #include "pull.hpp"
 #include "pair.hpp"
 
-xs::session_base_t *xs::session_base_t::create (class io_thread_t *io_thread_,
+xs::session_base_t *xs::session_base_t::create (class poller_base_t *io_thread_,
     bool connect_, class socket_base_t *socket_, const options_t &options_,
     const char *protocol_, const char *address_)
 {
@@ -100,7 +100,7 @@ xs::session_base_t *xs::session_base_t::create (class io_thread_t *io_thread_,
     return s;
 }
 
-xs::session_base_t::session_base_t (class io_thread_t *io_thread_,
+xs::session_base_t::session_base_t (class poller_base_t *io_thread_,
       bool connect_, class socket_base_t *socket_, const options_t &options_,
       const char *protocol_, const char *address_) :
     own_t (io_thread_, options_),
@@ -387,7 +387,7 @@ void xs::session_base_t::start_connecting (bool wait_)
 
     //  Choose I/O thread to run connecter in. Given that we are already
     //  running in an I/O thread, there must be at least one available.
-    io_thread_t *io_thread = choose_io_thread (options.affinity);
+    poller_base_t *io_thread = choose_io_thread (options.affinity);
     xs_assert (io_thread);
 
     //  Create the connecter object.

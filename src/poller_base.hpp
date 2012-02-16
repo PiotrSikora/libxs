@@ -25,10 +25,14 @@
 
 #include "fd.hpp"
 #include "clock.hpp"
+#include "object.hpp"
+#include "mailbox.hpp"
 #include "atomic_counter.hpp"
 
 namespace xs
 {
+
+    class ctx_t;
 
     //  Handle of a file descriptor within a pollset.
     typedef void* handle_t;
@@ -50,12 +54,12 @@ namespace xs
         virtual void timer_event (handle_t handle_) = 0;
     };
 
-    class poller_base_t
+    class poller_base_t : public object_t, public i_poll_events
     {
     public:
 
         //  Create optimal poller mechanism for this environment.
-        static poller_base_t *create ();
+        static poller_base_t *create (xs::ctx_t *ctx_, uint32_t tid_);
 
         virtual ~poller_base_t ();
 
@@ -65,6 +69,9 @@ namespace xs
 
         void start ();
         void stop ();
+
+        //  Returns mailbox associated with this I/O poller.
+        mailbox_t *get_mailbox ();
 
         virtual handle_t add_fd (fd_t fd_, xs::i_poll_events *events_) = 0;
         virtual void rm_fd (handle_t handle_) = 0;
@@ -82,9 +89,14 @@ namespace xs
         //  Cancel the timer identified by the handle.
         void rm_timer (handle_t handle_);
 
+        //  i_poll_events implementation.
+        void in_event (fd_t fd_);
+        void out_event (fd_t fd_);
+        void timer_event (handle_t handle_);
+
     protected:
 
-        poller_base_t ();
+        poller_base_t (xs::ctx_t *ctx_, uint32_t tid_);
 
         //  Called by individual poller implementations to manage the load.
         void adjust_load (int amount_);
@@ -94,6 +106,8 @@ namespace xs
         uint64_t execute_timers ();
 
     private:
+
+        void process_stop ();
 
         //  Clock instance private to this I/O thread.
         clock_t clock;
@@ -110,6 +124,12 @@ namespace xs
         //  Load of the poller. Currently the number of file descriptors
         //  registered.
         atomic_counter_t load;
+
+        //  I/O thread accesses incoming commands via this mailbox.
+        mailbox_t mailbox;
+
+        //  Handle associated with mailbox' file descriptor.
+        handle_t mailbox_handle;
 
         poller_base_t (const poller_base_t&);
         const poller_base_t &operator = (const poller_base_t&);

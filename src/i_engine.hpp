@@ -25,7 +25,7 @@
 namespace xs
 {
 
-    class io_thread_t;
+    class poller_base_t;
 
     //  Abstract interface to be implemented by various engines.
 
@@ -34,7 +34,7 @@ namespace xs
         virtual ~i_engine () {}
 
         //  Plug the engine to the session.
-        virtual void plug (xs::io_thread_t *io_thread_,
+        virtual void plug (xs::poller_base_t *io_thread_,
             class session_base_t *session_) = 0;
 
         //  Unplug the engine from the session.

@@ -36,7 +36,7 @@
 #include <new>
 
 #include "stream_engine.hpp"
-#include "io_thread.hpp"
+#include "poller_base.hpp"
 #include "session_base.hpp"
 #include "config.hpp"
 #include "err.hpp"
@@ -103,7 +103,7 @@ xs::stream_engine_t::~stream_engine_t ()
     }
 }
 
-void xs::stream_engine_t::plug (io_thread_t *io_thread_,
+void xs::stream_engine_t::plug (poller_base_t *io_thread_,
     session_base_t *session_)
 {
     xs_assert (!plugged);
