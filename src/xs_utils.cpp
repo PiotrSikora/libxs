@@ -31,6 +31,7 @@
 
 #if !defined XS_HAVE_WINDOWS
 #include <unistd.h>
+#include <pthread.h>
 #else
 #include "windows.hpp"
 #endif
@@ -98,6 +99,44 @@ void xs_thread_join (void *thread_)
     win_assert (rc != WAIT_FAILED);
     BOOL rc2 = CloseHandle (arg->handle);
     win_assert (rc2 != 0);
+    free (arg);
+}
+
+#else
+
+struct arg_t
+{
+    pthread_t handle;
+    void (*fn) (void *arg);
+    void *arg;
+};
+
+extern "C"
+{
+    static void *thread_routine (void *arg_)
+    {
+        arg_t *arg = (arg_t*) arg_;
+        arg->fn (arg->arg);
+        return NULL;
+    }
+}
+
+void *xs_thread_create (void (*fn_) (void *arg_), void *arg_)
+{
+    arg_t *arg = (arg_t*) malloc (sizeof (arg_t));
+    alloc_assert (arg);
+    arg->fn = fn_;
+    arg->arg = arg_;
+    int rc = pthread_create (&arg->handle, NULL, thread_routine, (void*) arg);
+    posix_assert (rc);
+    return (void*) arg;
+}
+
+void xs_thread_join (void *thread_)
+{
+    arg_t *arg = (arg_t*) thread_;
+    int rc = pthread_join (arg->handle, NULL);
+    posix_assert (rc);
     free (arg);
 }
 
