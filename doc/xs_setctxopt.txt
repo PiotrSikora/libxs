@@ -24,9 +24,9 @@ The 'option_len' argument is the size of the option value in bytes.
 The following options can be set with the _xs_setctxopt()_ function:
 
 
-XS_CTX_MAX_SOCKETS: Set maximum number of sockets
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The 'XS_CTX_MAX_SOCKETS' option shall set specify the maximum nuber of sockets
+XS_MAX_SOCKETS: Set maximum number of sockets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The 'XS_MAX_SOCKETS' option shall set specify the maximum nuber of sockets
 that can be open at the same time.
 
 [horizontal]
@@ -34,9 +34,9 @@ Option value type:: int
 Option value unit:: sockets
 Default value:: 512
 
-XS_CTX_REENTRANT: Specify whether sockets should be thread-safe
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If 'XS_CTX_REENTRANT' option is set to 1 it is safe to access single Crossroads
+XS_REENTRANT: Specify whether sockets should be thread-safe
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If 'XS_REENTRANT' option is set to 1 it is safe to access single Crossroads
 socket from multiple threads in parallel. If it is set to 0 it can be accessed
 by at most one thread at any single point of time.
 

@@ -28,7 +28,7 @@ int XS_TEST_MAIN ()
     void *ctx = xs_init (1);
     assert (ctx);
     int val = 1;
-    int rc = xs_setctxopt (ctx, XS_CTX_REENTRANT, &val, sizeof (val));
+    int rc = xs_setctxopt (ctx, XS_REENTRANT, &val, sizeof (val));
     assert (rc == 0);
 
     //  Do a set of operations to make sure that REENTRANT option doesn't

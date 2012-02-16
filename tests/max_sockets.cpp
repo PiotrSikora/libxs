@@ -28,7 +28,7 @@ int XS_TEST_MAIN ()
     void *ctx = xs_init (1);
     assert (ctx);
     int max_sockets = 1;
-    int rc = xs_setctxopt (ctx, XS_CTX_MAX_SOCKETS, &max_sockets,
+    int rc = xs_setctxopt (ctx, XS_MAX_SOCKETS, &max_sockets,
         sizeof (max_sockets));
     assert (rc == 0);
 

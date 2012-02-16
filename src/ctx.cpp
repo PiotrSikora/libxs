@@ -139,7 +139,7 @@ int xs::ctx_t::terminate ()
 int xs::ctx_t::setctxopt (int option_, const void *optval_, size_t optvallen_)
 {
     switch (option_) {
-    case XS_CTX_MAX_SOCKETS:
+    case XS_MAX_SOCKETS:
         if (optvallen_ != sizeof (int) || *((int*) optval_) < 0) {
             errno = EINVAL;
             return -1;
@@ -148,7 +148,7 @@ int xs::ctx_t::setctxopt (int option_, const void *optval_, size_t optvallen_)
         max_sockets = *((int*) optval_);
         opt_sync.unlock ();
         break;
-    case XS_CTX_REENTRANT:
+    case XS_REENTRANT:
         if (optvallen_ != sizeof (int) || (*((int*) optval_) != 0 &&
               *((int*) optval_) != 1)) {
             errno = EINVAL;

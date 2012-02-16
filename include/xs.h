@@ -146,8 +146,8 @@ XS_EXPORT int xs_getmsgopt (xs_msg_t *msg, int option, void *optval,
 /*  Crossroads context definition.                                            */
 /******************************************************************************/
 
-#define XS_CTX_MAX_SOCKETS 1
-#define XS_CTX_REENTRANT 2
+#define XS_MAX_SOCKETS 1
+#define XS_REENTRANT 2
 
 XS_EXPORT void *xs_init (int io_threads);
 XS_EXPORT int xs_term (void *context);
