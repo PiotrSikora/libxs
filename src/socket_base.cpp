@@ -861,6 +861,7 @@ void xs::socket_base_t::terminated (pipe_t *pipe_)
 void xs::socket_base_t::extract_flags (msg_t *msg_)
 {
     //  Test whether IDENTITY flag is valid for this socket type.
+    //  TODO: Connection should be closed here!
     if (unlikely (msg_->flags () & msg_t::identity))
         xs_assert (options.recv_identity);
   
