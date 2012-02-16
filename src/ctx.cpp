@@ -307,6 +307,13 @@ zmq::endpoint_t zmq::ctx_t::find_endpoint (const char *addr_)
      return *endpoint;
 }
 
-//  The last used socket ID, or 0 if no socket was used so far.
+void zmq::ctx_t::log (int sid_, const char *text_)
+{
+    monitor->log (sid_, text_);
+}
+
+//  The last used socket ID, or 0 if no socket was used so far. Note that this
+//  is a global variable. Thus, even sockets created in different contexts have
+//  unique IDs.
 zmq::atomic_counter_t zmq::ctx_t::max_socket_id;
 

@@ -93,6 +93,9 @@ namespace zmq
         void unregister_endpoints (zmq::socket_base_t *socket_);
         endpoint_t find_endpoint (const char *addr_);
 
+        //  Logging.
+        void log (int sid_, const char *text_);
+
         enum {
             term_tid = 0,
             reaper_tid = 1

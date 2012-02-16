@@ -64,6 +64,9 @@ namespace zmq
         //  Chooses least loaded I/O thread.
         zmq::io_thread_t *choose_io_thread (uint64_t affinity_);
 
+        //  Log a message.
+        void log (int sid_, const char *text_);
+
         //  Derived object can use these functions to send commands
         //  to other objects.
         void send_stop ();
