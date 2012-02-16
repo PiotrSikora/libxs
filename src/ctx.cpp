@@ -42,6 +42,11 @@ xs::ctx_t::ctx_t (uint32_t io_threads_) :
     tag (0xbadcafe0),
     starting (true),
     terminating (false),
+    reaper (NULL),
+    slot_count (0),
+    slots (NULL),
+    monitor (NULL),
+    log_socket (NULL),
     max_sockets (512),
     io_thread_count (io_threads_),
     reentrant (false)
@@ -68,12 +73,14 @@ xs::ctx_t::~ctx_t ()
         delete io_threads [i];
 
     //  Deallocate the reaper thread object.
-    delete reaper;
+    if (reaper)
+        delete reaper;
 
     //  Deallocate the array of mailboxes. No special work is
     //  needed as mailboxes themselves were deallocated with their
     //  corresponding io_thread/socket objects.
-    free (slots);
+    if (slots)
+        free (slots);
 
     //  Remove the tag, so that the object is considered dead.
     tag = 0xdeadbeef;
