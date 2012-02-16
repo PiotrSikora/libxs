@@ -34,22 +34,6 @@ Option value type:: int
 Option value unit:: sockets
 Default value:: 512
 
-XS_REENTRANT: Specify whether sockets should be thread-safe
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If 'XS_REENTRANT' option is set to 1 it is safe to access single Crossroads
-socket from multiple threads in parallel. If it is set to 0 it can be accessed
-by at most one thread at any single point of time.
-
-Note: By default Crossroads sockets are non-reentrant. If possible, try to use
-the socket from the thread it was created in. If communication between threads
-is needed use inproc transport. Not following this advice can introduce
-scalability problems.
-
-[horizontal]
-Option value type:: int
-Option value unit:: boolean
-Default value:: 0
-
 RETURN VALUE
 ------------
 The _xs_setctxopt()_ function shall return zero if successful. Otherwise it

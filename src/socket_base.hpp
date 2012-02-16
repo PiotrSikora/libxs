@@ -65,10 +65,6 @@ namespace xs
         //  This function can be called from a different thread!
         void stop ();
 
-        //  Synchronise access of application threads to the socket.
-        void lock ();
-        void unlock ();
-
         //  Interface for communication with the API layer.
         int setsockopt (int option_, const void *optval_, size_t optvallen_);
         int getsockopt (int option_, void *optval_, size_t *optvallen_);
@@ -144,11 +140,6 @@ namespace xs
 
         //  Used to check whether the object is a socket.
         uint32_t tag;
-
-        //  Synchronisation of access to the socket. If Crossroads are running
-        //  in non-reentrant mode, it is a dummy mutex-like object.
-        bool reentrant;
-        mutex_t sync;
 
         //  If true, associated context was already terminated.
         bool ctx_terminated;

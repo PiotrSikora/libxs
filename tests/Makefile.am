@@ -19,7 +19,6 @@ noinst_PROGRAMS = pair_inproc \
                   reqrep_ipc \
                   timeo \
                   max_sockets \
-                  reentrant \
                   emptyctx
 
 pair_inproc_SOURCES = pair_inproc.cpp testutil.hpp
@@ -38,7 +37,6 @@ pair_ipc_SOURCES = pair_ipc.cpp testutil.hpp
 reqrep_ipc_SOURCES = reqrep_ipc.cpp testutil.hpp
 timeo_SOURCES = timeo.cpp
 max_sockets_SOURCES = max_sockets.cpp
-reentrant_SOURCES = reentrant.cpp testutil.hpp
 emptyctx_SOURCES = emptyctx.cpp
 
 TESTS = $(noinst_PROGRAMS)

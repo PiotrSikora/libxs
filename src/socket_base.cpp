@@ -117,7 +117,6 @@ xs::socket_base_t *xs::socket_base_t::create (int type_, class ctx_t *parent_,
 xs::socket_base_t::socket_base_t (ctx_t *parent_, uint32_t tid_, int sid_) :
     own_t (parent_, tid_),
     tag (0xbaddecaf),
-    reentrant (parent_->is_reentrant ()),
     ctx_terminated (false),
     destroyed (false),
     last_tsc (0),
@@ -144,18 +143,6 @@ void xs::socket_base_t::stop ()
     //  the thread owning the socket. This way, blocking call in the
     //  owner thread can be interrupted.
     send_stop ();
-}
-
-void xs::socket_base_t::lock ()
-{
-    if (reentrant)
-        sync.lock ();
-}
-
-void xs::socket_base_t::unlock ()
-{
-    if (reentrant)
-        sync.unlock ();
 }
 
 int xs::socket_base_t::parse_uri (const char *uri_,

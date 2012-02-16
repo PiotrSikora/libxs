@@ -180,9 +180,7 @@ int xs_setsockopt (void *s_, int option_, const void *optval_,
         errno = ENOTSOCK;
         return -1;
     }
-    s->lock ();
     int rc = s->setsockopt (option_, optval_, optvallen_);
-    s->unlock ();
     return rc;
 }
 
@@ -193,9 +191,7 @@ int xs_getsockopt (void *s_, int option_, void *optval_, size_t *optvallen_)
         errno = ENOTSOCK;
         return -1;
     }
-    s->lock ();
     int rc = s->getsockopt (option_, optval_, optvallen_);
-    s->unlock ();
     return rc;
 }
 
@@ -206,9 +202,7 @@ int xs_bind (void *s_, const char *addr_)
         errno = ENOTSOCK;
         return -1;
     }
-    s->lock ();
     int rc = s->bind (addr_);
-    s->unlock ();
     return rc;
 }
 
@@ -219,9 +213,7 @@ int xs_connect (void *s_, const char *addr_)
         errno = ENOTSOCK;
         return -1;
     }
-    s->lock ();
     int rc = s->connect (addr_);
-    s->unlock ();
     return rc;
 }
 
@@ -281,9 +273,7 @@ int xs_sendmsg (void *s_, xs_msg_t *msg_, int flags_)
         return -1;
     }
     int sz = (int) xs_msg_size (msg_);
-    s->lock ();
     int rc = s->send ((xs::msg_t*) msg_, flags_);
-    s->unlock ();
     if (unlikely (rc < 0))
         return -1;
     return sz;
@@ -296,9 +286,7 @@ int xs_recvmsg (void *s_, xs_msg_t *msg_, int flags_)
         errno = ENOTSOCK;
         return -1;
     }
-    s->lock ();
     int rc = s->recv ((xs::msg_t*) msg_, flags_);
-    s->unlock ();
     if (unlikely (rc < 0))
         return -1;
     return (int) xs_msg_size (msg_);
