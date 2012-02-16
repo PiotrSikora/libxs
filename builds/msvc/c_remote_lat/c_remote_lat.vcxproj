@@ -76,7 +76,7 @@
     <ClCompile Include="..\..\..\perf\remote_lat.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\libzmq\libzmq.vcxproj">
+    <ProjectReference Include="..\libxs\libxs.vcxproj">
       <Project>{641c5f36-32ee-4323-b740-992b651cf9d6}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

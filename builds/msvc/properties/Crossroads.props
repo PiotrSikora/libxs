@@ -6,7 +6,7 @@
   </ImportGroup>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <_PropertySheetDisplayName>ZeroMQ Settings</_PropertySheetDisplayName>
+    <_PropertySheetDisplayName>Crossroads Settings</_PropertySheetDisplayName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <PreBuildEvent>

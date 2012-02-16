@@ -28,7 +28,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{641C5F36-32EE-4323-B740-992B651CF9D6}</ProjectGuid>
-    <RootNamespace>libzmq</RootNamespace>
+    <RootNamespace>libxs</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='WithOpenPGM|Win32'" Label="Configuration">
@@ -63,37 +63,37 @@
   <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='WithOpenPGM|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(ProjectDir)..\properties\ZeroMQ.props" />
+    <Import Project="$(ProjectDir)..\properties\Crossroads.props" />
     <Import Project="$(ProjectDir)..\properties\WithOpenPGM.props" />
     <Import Project="$(ProjectDir)..\properties\Win32_Release.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='WithOpenPGM|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(ProjectDir)..\properties\ZeroMQ.props" />
+    <Import Project="$(ProjectDir)..\properties\Crossroads.props" />
     <Import Project="$(ProjectDir)..\properties\WithOpenPGM.props" />
     <Import Project="$(ProjectDir)..\properties\x64.props" />
     <Import Project="$(ProjectDir)..\properties\Release.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(ProjectDir)..\properties\ZeroMQ.props" />
+    <Import Project="$(ProjectDir)..\properties\Crossroads.props" />
     <Import Project="$(ProjectDir)..\properties\Win32_Release.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(ProjectDir)..\properties\ZeroMQ.props" />
+    <Import Project="$(ProjectDir)..\properties\Crossroads.props" />
     <Import Project="$(ProjectDir)..\properties\x64.props" />
     <Import Project="$(ProjectDir)..\properties\Release.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(ProjectDir)..\properties\ZeroMQ.props" />
+    <Import Project="$(ProjectDir)..\properties\Crossroads.props" />
     <Import Project="$(ProjectDir)..\properties\Win32.props" />
     <Import Project="$(ProjectDir)..\properties\Debug.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(ProjectDir)..\properties\ZeroMQ.props" />
+    <Import Project="$(ProjectDir)..\properties\Crossroads.props" />
     <Import Project="$(ProjectDir)..\properties\x64.props" />
     <Import Project="$(ProjectDir)..\properties\Debug.props" />
   </ImportGroup>
@@ -158,12 +158,12 @@
     <ClCompile Include="..\..\..\src\xrep.cpp" />
     <ClCompile Include="..\..\..\src\xreq.cpp" />
     <ClCompile Include="..\..\..\src\xsub.cpp" />
-    <ClCompile Include="..\..\..\src\zmq.cpp" />
-    <ClCompile Include="..\..\..\src\zmq_utils.cpp" />
+    <ClCompile Include="..\..\..\src\xs.cpp" />
+    <ClCompile Include="..\..\..\src\xs_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\include\zmq.h" />
-    <ClInclude Include="..\..\..\include\zmq_utils.h" />
+    <ClInclude Include="..\..\..\include\xs.h" />
+    <ClInclude Include="..\..\..\include\xs_utils.h" />
     <ClInclude Include="..\..\..\src\array.hpp" />
     <ClInclude Include="..\..\..\src\atomic_counter.hpp" />
     <ClInclude Include="..\..\..\src\atomic_ptr.hpp" />
