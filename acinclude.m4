@@ -629,17 +629,20 @@ dnl # LIBXS_CHECK_POLLER_EPOLL([action-if-found], [action-if-not-found])        
 dnl # Checks epoll polling system                                                  #
 dnl ################################################################################
 AC_DEFUN([LIBXS_CHECK_POLLER_EPOLL], [{
-    AC_LINK_IFELSE(
+    AC_RUN_IFELSE(
         [AC_LANG_PROGRAM(
         [
 #include <sys/epoll.h>
         ],
 [[
 struct epoll_event t_ev;
-epoll_create(10);
+int r;
+r = epoll_create(10);
+return(r < 0);
 ]]
         )],
         [libxs_cv_have_poller_epoll="yes" ; $1],
+        [libxs_cv_have_poller_epoll="no" ; $2],
         [libxs_cv_have_poller_epoll="no" ; $2])
 }])
 
