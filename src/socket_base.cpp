@@ -711,8 +711,6 @@ int xs::socket_base_t::recv (msg_t *msg_, int flags_)
 
 int xs::socket_base_t::close ()
 {
-    sync.lock ();
-
     //  Mark the socket as dead.
     tag = 0xdeadbeef;
 
@@ -721,7 +719,6 @@ int xs::socket_base_t::close ()
     //  process.
     send_reap (this);
 
-    sync.unlock ();
     return 0;
 }
 
