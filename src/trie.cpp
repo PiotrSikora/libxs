@@ -4,10 +4,10 @@
     Copyright (c) 2011-2012 Spotify AB
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of Crossroads project.
+    This file is part of Crossroads I/O project.
 
-    Crossroads is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by
+    Crossroads I/O is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
