@@ -26,7 +26,7 @@ int main (int argc, char *argv [])
 {
     fprintf (stderr, "test_reqrep_inproc running...\n");
 
-    void *ctx = zmq_init (0);
+    void *ctx = zmq_init (1);
     assert (ctx);
 
     void *sb = zmq_socket (ctx, ZMQ_REP);

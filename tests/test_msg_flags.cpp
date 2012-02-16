@@ -1,5 +1,6 @@
 /*
-    Copyright (c) 2011 250bpm s.r.o.
+    Copyright (c) 2011-2012 250bpm s.r.o.
+    Copyright (c) 2011 Other contributors as noted in the AUTHORS file
 
     This file is part of 0MQ.
 
@@ -25,7 +26,7 @@
 int main (int argc, char *argv [])
 {
     //  Create the infrastructure
-    void *ctx = zmq_init (0);
+    void *ctx = zmq_init (1);
     assert (ctx);
     void *sb = zmq_socket (ctx, ZMQ_XREP);
     assert (sb);

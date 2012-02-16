@@ -39,6 +39,7 @@ namespace zmq
 {
 
     class object_t;
+    class monitor_t;
     class io_thread_t;
     class socket_base_t;
     class reaper_t;
@@ -151,6 +152,9 @@ namespace zmq
         //  thus it is synchronised by a mutex.
         zmq::socket_base_t *log_socket;
         mutex_t log_sync;
+
+        //  Monitor object attached to the context.
+        zmq::monitor_t *monitor;
 
         //  Maximum socket ID.
         static atomic_counter_t max_socket_id;

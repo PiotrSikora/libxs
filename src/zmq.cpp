@@ -92,7 +92,8 @@ const char *zmq_strerror (int errnum_)
 
 void *zmq_init (int io_threads_)
 {
-    if (io_threads_ < 0) {
+    //  We need at least one I/O thread to run the monitor object in.
+    if (io_threads_ < 1) {
         errno = EINVAL;
         return NULL;
     }

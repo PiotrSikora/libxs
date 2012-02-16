@@ -34,6 +34,7 @@ libzmq_la_SOURCES = \
     lb.hpp \
     likely.hpp \
     mailbox.hpp \
+    monitor.hpp \
     msg.hpp \
     mtrie.hpp \
     mutex.hpp \
@@ -94,6 +95,7 @@ libzmq_la_SOURCES = \
     kqueue.cpp \
     lb.cpp \
     mailbox.cpp \
+    monitor.cpp \
     msg.cpp \
     mtrie.cpp \
     object.cpp \

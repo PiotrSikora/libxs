@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2010-2011 250bpm s.r.o.
+    Copyright (c) 2010-2012 250bpm s.r.o.
     Copyright (c) 2010-2011 Other contributors as noted in the AUTHORS file
 
     This file is part of 0MQ.
@@ -26,7 +26,7 @@ int main (int argc, char *argv [])
 {
     fprintf (stderr, "test_pair_inproc running...\n");
 
-    void *ctx = zmq_init (0);
+    void *ctx = zmq_init (1);
     assert (ctx);
 
     void *sb = zmq_socket (ctx, ZMQ_PAIR);
