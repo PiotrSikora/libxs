@@ -4,7 +4,7 @@ xs(7)
 
 NAME
 ----
-xs - Crossroads, a lightweight messaging layer
+xs - Crossroads I/O, a lightweight messaging layer
 
 
 SYNOPSIS
@@ -16,7 +16,7 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-Crossroads is a library which extends the standard
+Crossroads I/O is a library which extends the standard
 socket interfaces with features traditionally provided by specialised
 _messaging middleware_ products. Crossroads sockets provide an abstraction of
 asynchronous  _message queues_, multiple _messaging patterns_, message
