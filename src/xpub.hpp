@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2010-2011 250bpm s.r.o.
+    Copyright (c) 2010-2012 250bpm s.r.o.
     Copyright (c) 2010-2011 Other contributors as noted in the AUTHORS file
 
     This file is part of 0MQ.
@@ -43,7 +43,7 @@ namespace zmq
     {
     public:
 
-        xpub_t (zmq::ctx_t *parent_, uint32_t tid_);
+        xpub_t (zmq::ctx_t *parent_, uint32_t tid_, int sid_);
         ~xpub_t ();
 
         //  Implementations of virtual functions from socket_base_t.

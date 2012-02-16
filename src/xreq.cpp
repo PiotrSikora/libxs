@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2011 VMware, Inc.
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
@@ -23,8 +23,8 @@
 #include "err.hpp"
 #include "msg.hpp"
 
-zmq::xreq_t::xreq_t (class ctx_t *parent_, uint32_t tid_) :
-    socket_base_t (parent_, tid_),
+zmq::xreq_t::xreq_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
+    socket_base_t (parent_, tid_, sid_),
     prefetched (false)
 {
     options.type = ZMQ_XREQ;

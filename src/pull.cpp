@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2010 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
@@ -24,8 +24,8 @@
 #include "msg.hpp"
 #include "pipe.hpp"
 
-zmq::pull_t::pull_t (class ctx_t *parent_, uint32_t tid_) :
-    socket_base_t (parent_, tid_)
+zmq::pull_t::pull_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
+    socket_base_t (parent_, tid_, sid_)
 {
     options.type = ZMQ_PULL;
 }

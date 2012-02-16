@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2011 VMware, Inc.
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
@@ -105,6 +105,9 @@ namespace zmq
 
         //  Receivers identity from all new connections.
         bool recv_identity;
+
+        //  ID of the socket.
+        int socket_id;
     };
 
 }

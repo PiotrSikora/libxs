@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
@@ -22,8 +22,8 @@
 #include "sub.hpp"
 #include "msg.hpp"
 
-zmq::sub_t::sub_t (class ctx_t *parent_, uint32_t tid_) :
-    xsub_t (parent_, tid_)
+zmq::sub_t::sub_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
+    xsub_t (parent_, tid_, sid_)
 {
     options.type = ZMQ_SUB;
 

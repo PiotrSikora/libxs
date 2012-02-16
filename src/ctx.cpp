@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2011 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
@@ -180,8 +180,11 @@ zmq::socket_base_t *zmq::ctx_t::create_socket (int type_)
     uint32_t slot = empty_slots.back ();
     empty_slots.pop_back ();
 
+    //  Generate new unique socket ID.
+    int sid = ((int) max_socket_id.add (1)) + 1;
+
     //  Create the socket and register its mailbox.
-    socket_base_t *s = socket_base_t::create (type_, this, slot);
+    socket_base_t *s = socket_base_t::create (type_, this, slot, sid);
     if (!s) {
         empty_slots.push_back (slot);
         slot_sync.unlock ();
@@ -322,4 +325,6 @@ void zmq::ctx_t::log (const char *format_, va_list args_)
     errno_assert (rc == 0);
 }
 
+//  The last used socket ID, or 0 if no socket was used so far.
+zmq::atomic_counter_t zmq::ctx_t::max_socket_id;
 

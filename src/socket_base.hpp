@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2011 VMware, Inc.
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
@@ -57,7 +57,7 @@ namespace zmq
 
         //  Create a socket of a specified type.
         static socket_base_t *create (int type_, zmq::ctx_t *parent_,
-            uint32_t tid_);
+            uint32_t tid_, int sid_);
 
         //  Returns the mailbox associated with this socket.
         mailbox_t *get_mailbox ();
@@ -98,7 +98,7 @@ namespace zmq
 
     protected:
 
-        socket_base_t (zmq::ctx_t *parent_, uint32_t tid_);
+        socket_base_t (zmq::ctx_t *parent_, uint32_t tid_, int sid_);
         virtual ~socket_base_t ();
 
         //  Concrete algorithms for the x- methods are to be defined by

@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
@@ -33,6 +33,7 @@
 #include "mutex.hpp"
 #include "stdint.hpp"
 #include "options.hpp"
+#include "atomic_counter.hpp"
 
 namespace zmq
 {
@@ -150,6 +151,9 @@ namespace zmq
         //  thus it is synchronised by a mutex.
         zmq::socket_base_t *log_socket;
         mutex_t log_sync;
+
+        //  Maximum socket ID.
+        static atomic_counter_t max_socket_id;
 
         ctx_t (const ctx_t&);
         const ctx_t &operator = (const ctx_t&);

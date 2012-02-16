@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2011 VMware, Inc.
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
@@ -27,8 +27,8 @@
 #include "random.hpp"
 #include "likely.hpp"
 
-zmq::req_t::req_t (class ctx_t *parent_, uint32_t tid_) :
-    xreq_t (parent_, tid_),
+zmq::req_t::req_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
+    xreq_t (parent_, tid_, sid_),
     receiving_reply (false),
     message_begins (true)
 {

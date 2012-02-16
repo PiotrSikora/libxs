@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
@@ -36,7 +36,7 @@ namespace zmq
     {
     public:
 
-        pub_t (zmq::ctx_t *parent_, uint32_t tid_);
+        pub_t (zmq::ctx_t *parent_, uint32_t tid_, int sid_);
         ~pub_t ();
 
         //  Implementations of virtual functions from socket_base_t.
