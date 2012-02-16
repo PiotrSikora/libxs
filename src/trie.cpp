@@ -1,6 +1,7 @@
 /*
     Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
+    Copyright (c) 2011-2012 Spotify AB
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
     This file is part of Crossroads project.
@@ -35,7 +36,8 @@
 xs::trie_t::trie_t () :
     refcnt (0),
     min (0),
-    count (0)
+    count (0),
+    live_nodes (0)
 {
 }
 
@@ -112,6 +114,7 @@ bool xs::trie_t::add (unsigned char *prefix_, size_t size_)
     if (count == 1) {
         if (!next.node) {
             next.node = new (std::nothrow) trie_t;
+            ++live_nodes;
             xs_assert (next.node);
         }
         return next.node->add (prefix_ + 1, size_ - 1);
@@ -119,6 +122,7 @@ bool xs::trie_t::add (unsigned char *prefix_, size_t size_)
     else {
         if (!next.table [c - min]) {
             next.table [c - min] = new (std::nothrow) trie_t;
+            ++live_nodes;
             xs_assert (next.table [c - min]);
         }
         return next.table [c - min]->add (prefix_ + 1, size_ - 1);
@@ -146,7 +150,18 @@ bool xs::trie_t::rm (unsigned char *prefix_, size_t size_)
      if (!next_node)
          return false;
 
-     return next_node->rm (prefix_ + 1, size_ - 1);
+     bool ret = next_node->rm (prefix_ + 1, size_ - 1);
+
+     if (next_node->is_redundant ()) {
+         delete next_node;
+         if (count == 1)
+             next.node = 0;
+         else
+             next.table [c - min] = 0;
+         --live_nodes;
+     }
+
+     return ret;
 }
 
 bool xs::trie_t::check (unsigned char *data_, size_t size_)
@@ -224,6 +239,11 @@ void xs::trie_t::apply_helper (
         if (next.table [c])
             next.table [c]->apply_helper (buff_, buffsize_ + 1, maxbuffsize_,
                 func_, arg_);
-    }   
+    }
+}
+
+bool xs::trie_t::is_redundant() const
+{
+    return refcnt == 0 && live_nodes == 0;
 }
 
