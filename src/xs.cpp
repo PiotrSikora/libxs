@@ -202,40 +202,54 @@ int xs_close (void *s_)
 int xs_setsockopt (void *s_, int option_, const void *optval_,
     size_t optvallen_)
 {
-    if (!s_ || !((xs::socket_base_t*) s_)->check_tag ()) {
+    xs::socket_base_t *s = (xs::socket_base_t*) s_;
+    if (!s || !s->check_tag ()) {
         errno = ENOTSOCK;
         return -1;
     }
-    return (((xs::socket_base_t*) s_)->setsockopt (option_, optval_,
-        optvallen_));
+    s->lock ();
+    int rc = s->setsockopt (option_, optval_, optvallen_);
+    s->unlock ();
+    return rc;
 }
 
 int xs_getsockopt (void *s_, int option_, void *optval_, size_t *optvallen_)
 {
-    if (!s_ || !((xs::socket_base_t*) s_)->check_tag ()) {
+    xs::socket_base_t *s = (xs::socket_base_t*) s_;
+    if (!s || !s->check_tag ()) {
         errno = ENOTSOCK;
         return -1;
     }
-    return (((xs::socket_base_t*) s_)->getsockopt (option_, optval_,
-        optvallen_));
+    s->lock ();
+    int rc = s->getsockopt (option_, optval_, optvallen_);
+    s->unlock ();
+    return rc;
 }
 
 int xs_bind (void *s_, const char *addr_)
 {
-    if (!s_ || !((xs::socket_base_t*) s_)->check_tag ()) {
+    xs::socket_base_t *s = (xs::socket_base_t*) s_;
+    if (!s || !s->check_tag ()) {
         errno = ENOTSOCK;
         return -1;
     }
-    return (((xs::socket_base_t*) s_)->bind (addr_));
+    s->lock ();
+    int rc = s->bind (addr_);
+    s->unlock ();
+    return rc;
 }
 
 int xs_connect (void *s_, const char *addr_)
 {
-    if (!s_ || !((xs::socket_base_t*) s_)->check_tag ()) {
+    xs::socket_base_t *s = (xs::socket_base_t*) s_;
+    if (!s || !s->check_tag ()) {
         errno = ENOTSOCK;
         return -1;
     }
-    return (((xs::socket_base_t*) s_)->connect (addr_));
+    s->lock ();
+    int rc = s->connect (addr_);
+    s->unlock ();
+    return rc;
 }
 
 int xs_send (void *s_, const void *buf_, size_t len_, int flags_)
@@ -288,12 +302,15 @@ int xs_recv (void *s_, void *buf_, size_t len_, int flags_)
 
 int xs_sendmsg (void *s_, xs_msg_t *msg_, int flags_)
 {
-    if (!s_ || !((xs::socket_base_t*) s_)->check_tag ()) {
+    xs::socket_base_t *s = (xs::socket_base_t*) s_;
+    if (!s || !s->check_tag ()) {
         errno = ENOTSOCK;
         return -1;
     }
     int sz = (int) xs_msg_size (msg_);
-    int rc = (((xs::socket_base_t*) s_)->send ((xs::msg_t*) msg_, flags_));
+    s->lock ();
+    int rc = s->send ((xs::msg_t*) msg_, flags_);
+    s->unlock ();
     if (unlikely (rc < 0))
         return -1;
     return sz;
@@ -301,11 +318,14 @@ int xs_sendmsg (void *s_, xs_msg_t *msg_, int flags_)
 
 int xs_recvmsg (void *s_, xs_msg_t *msg_, int flags_)
 {
-    if (!s_ || !((xs::socket_base_t*) s_)->check_tag ()) {
+    xs::socket_base_t *s = (xs::socket_base_t*) s_;
+    if (!s || !s->check_tag ()) {
         errno = ENOTSOCK;
         return -1;
     }
-    int rc = (((xs::socket_base_t*) s_)->recv ((xs::msg_t*) msg_, flags_));
+    s->lock ();
+    int rc = s->recv ((xs::msg_t*) msg_, flags_);
+    s->unlock ();
     if (unlikely (rc < 0))
         return -1;
     return (int) xs_msg_size (msg_);
