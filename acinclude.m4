@@ -1,5 +1,5 @@
 dnl ##############################################################################
-dnl # LIBXS_CONFIG_LIBTOOL                                                      #
+dnl # LIBXS_CONFIG_LIBTOOL                                                       #
 dnl # Configure libtool. Requires AC_CANONICAL_HOST                              #
 dnl ##############################################################################
 AC_DEFUN([LIBXS_CONFIG_LIBTOOL],  [{
@@ -19,7 +19,7 @@ AC_DEFUN([LIBXS_CONFIG_LIBTOOL],  [{
 }])
 
 dnl ##############################################################################
-dnl # LIBXS_CHECK_LANG_ICC([action-if-found], [action-if-not-found])            #
+dnl # LIBXS_CHECK_LANG_ICC([action-if-found], [action-if-not-found])             #
 dnl # Check if the current language is compiled using ICC                        #
 dnl # Adapted from http://software.intel.com/en-us/forums/showthread.php?t=67984 #
 dnl ##############################################################################
@@ -36,7 +36,7 @@ AC_DEFUN([LIBXS_CHECK_LANG_ICC],
 ])])
 
 dnl ##############################################################################
-dnl # LIBXS_CHECK_LANG_SUN_STUDIO([action-if-found], [action-if-not-found])     #
+dnl # LIBXS_CHECK_LANG_SUN_STUDIO([action-if-found], [action-if-not-found])      #
 dnl # Check if the current language is compiled using Sun Studio                 #
 dnl ##############################################################################
 AC_DEFUN([LIBXS_CHECK_LANG_SUN_STUDIO],
@@ -52,7 +52,7 @@ AC_DEFUN([LIBXS_CHECK_LANG_SUN_STUDIO],
 ])])
 
 dnl ##############################################################################
-dnl # LIBXS_CHECK_LANG_CLANG([action-if-found], [action-if-not-found])          #
+dnl # LIBXS_CHECK_LANG_CLANG([action-if-found], [action-if-not-found])           #
 dnl # Check if the current language is compiled using clang                      #
 dnl ##############################################################################
 AC_DEFUN([LIBXS_CHECK_LANG_CLANG],
@@ -68,7 +68,7 @@ AC_DEFUN([LIBXS_CHECK_LANG_CLANG],
 ])])
 
 dnl ##############################################################################
-dnl # LIBXS_CHECK_LANG_GCC4([action-if-found], [action-if-not-found])           #
+dnl # LIBXS_CHECK_LANG_GCC4([action-if-found], [action-if-not-found])            #
 dnl # Check if the current language is compiled using clang                      #
 dnl ##############################################################################
 AC_DEFUN([LIBXS_CHECK_LANG_GCC4],
@@ -84,7 +84,7 @@ AC_DEFUN([LIBXS_CHECK_LANG_GCC4],
 ])])
 
 dnl ##############################################################################
-dnl # LIBXS_CHECK_DOC_BUILD                                                     #
+dnl # LIBXS_CHECK_DOC_BUILD                                                      #
 dnl # Check whether to build documentation and install man-pages                 #
 dnl ##############################################################################
 AC_DEFUN([LIBXS_CHECK_DOC_BUILD], [{
@@ -129,7 +129,7 @@ AC_DEFUN([LIBXS_CHECK_DOC_BUILD], [{
 }])
 
 dnl ##############################################################################
-dnl # LIBXS_CHECK_LANG_COMPILER([action-if-found], [action-if-not-found])       #
+dnl # LIBXS_CHECK_LANG_COMPILER([action-if-found], [action-if-not-found])        #
 dnl # Check that compiler for the current language actually works                #
 dnl ##############################################################################
 AC_DEFUN([LIBXS_CHECK_LANG_COMPILER], [{
@@ -147,7 +147,7 @@ AC_DEFUN([LIBXS_CHECK_LANG_COMPILER], [{
 }])
 
 dnl ##############################################################################
-dnl # LIBXS_CHECK_COMPILERS                                                     #
+dnl # LIBXS_CHECK_COMPILERS                                                      #
 dnl # Check compiler characteristics. This is so that we can AC_REQUIRE checks   #
 dnl ##############################################################################
 AC_DEFUN([LIBXS_CHECK_COMPILERS], [{
@@ -185,9 +185,9 @@ AC_DEFUN([LIBXS_CHECK_COMPILERS], [{
 }])
 
 dnl ############################################################################
-dnl # LIBXS_CHECK_LANG_FLAG([flag], [action-if-found], [action-if-not-found]) #
+dnl # LIBXS_CHECK_LANG_FLAG([flag], [action-if-found], [action-if-not-found])  #
 dnl # Check if the compiler supports given flag. Works for C and C++           #
-dnl # Sets libxs_cv_[]_AC_LANG_ABBREV[]_supports_flag_[FLAG]=yes/no           #
+dnl # Sets libxs_cv_[]_AC_LANG_ABBREV[]_supports_flag_[FLAG]=yes/no            #
 dnl ############################################################################
 AC_DEFUN([LIBXS_CHECK_LANG_FLAG], [{
 
@@ -245,10 +245,10 @@ AC_DEFUN([LIBXS_CHECK_LANG_FLAG], [{
 }])
 
 dnl ####################################################################################
-dnl # LIBXS_CHECK_LANG_FLAG_PREPEND([flag], [action-if-found], [action-if-not-found]) #
+dnl # LIBXS_CHECK_LANG_FLAG_PREPEND([flag], [action-if-found], [action-if-not-found])  #
 dnl # Check if the compiler supports given flag. Works for C and C++                   #
 dnl # This macro prepends the flag to CFLAGS or CPPFLAGS accordingly                   #
-dnl # Sets libxs_cv_[]_AC_LANG_ABBREV[]_supports_flag_[FLAG]=yes/no                   #
+dnl # Sets libxs_cv_[]_AC_LANG_ABBREV[]_supports_flag_[FLAG]=yes/no                    #
 dnl ####################################################################################
 AC_DEFUN([LIBXS_CHECK_LANG_FLAG_PREPEND], [{
     LIBXS_CHECK_LANG_FLAG([$1])
@@ -265,7 +265,7 @@ AC_DEFUN([LIBXS_CHECK_LANG_FLAG_PREPEND], [{
 }])
 
 dnl ##############################################################################
-dnl # LIBXS_CHECK_ENABLE_DEBUG([action-if-found], [action-if-not-found])        #
+dnl # LIBXS_CHECK_ENABLE_DEBUG([action-if-found], [action-if-not-found])         #
 dnl # Check whether to enable debug build and set compiler flags accordingly     #
 dnl ##############################################################################
 AC_DEFUN([LIBXS_CHECK_ENABLE_DEBUG], [{
@@ -318,7 +318,7 @@ AC_DEFUN([LIBXS_CHECK_ENABLE_DEBUG], [{
 }])
 
 dnl ##############################################################################
-dnl # LIBXS_WITH_GCOV([action-if-found], [action-if-not-found])                 #
+dnl # LIBXS_WITH_GCOV([action-if-found], [action-if-not-found])                  #
 dnl # Check whether to build with code coverage                                  #
 dnl ##############################################################################
 AC_DEFUN([LIBXS_WITH_GCOV], [{
@@ -360,7 +360,7 @@ AC_DEFUN([LIBXS_WITH_GCOV], [{
 }])
 
 dnl ##############################################################################
-dnl # LIBXS_CHECK_WITH_FLAG([flags], [macro])                                   #
+dnl # LIBXS_CHECK_WITH_FLAG([flags], [macro])                                    #
 dnl # Runs a normal autoconf check with compiler flags                           #
 dnl ##############################################################################
 AC_DEFUN([LIBXS_CHECK_WITH_FLAG], [{
@@ -378,9 +378,9 @@ AC_DEFUN([LIBXS_CHECK_WITH_FLAG], [{
 }])
 
 dnl ##############################################################################
-dnl # LIBXS_LANG_WALL([action-if-found], [action-if-not-found])                 #
+dnl # LIBXS_LANG_WALL([action-if-found], [action-if-not-found])                  #
 dnl # How to define -Wall for the current compiler                               #
-dnl # Sets libxs_cv_[]_AC_LANG_ABBREV[]__wall_flag variable to found style      #
+dnl # Sets libxs_cv_[]_AC_LANG_ABBREV[]__wall_flag variable to found style       #
 dnl ##############################################################################
 AC_DEFUN([LIBXS_LANG_WALL], [{
 
@@ -427,7 +427,7 @@ AC_DEFUN([LIBXS_LANG_WALL], [{
 }])
 
 dnl ####################################################################
-dnl # LIBXS_LANG_STRICT([action-if-found], [action-if-not-found])     #
+dnl # LIBXS_LANG_STRICT([action-if-found], [action-if-not-found])      #
 dnl # Check how to turn on strict standards compliance                 #
 dnl ####################################################################
 AC_DEFUN([LIBXS_LANG_STRICT], [{
@@ -474,7 +474,7 @@ AC_DEFUN([LIBXS_LANG_STRICT], [{
 }])
 
 dnl ########################################################################
-dnl # LIBXS_LANG_WERROR([action-if-found], [action-if-not-found])         #
+dnl # LIBXS_LANG_WERROR([action-if-found], [action-if-not-found])          #
 dnl # Check how to turn warnings to errors                                 #
 dnl ########################################################################
 AC_DEFUN([LIBXS_LANG_WERROR], [{
@@ -517,7 +517,7 @@ AC_DEFUN([LIBXS_LANG_WERROR], [{
 }])
 
 dnl ################################################################################
-dnl # LIBXS_CHECK_LANG_PRAGMA([pragma], [action-if-found], [action-if-not-found]) #
+dnl # LIBXS_CHECK_LANG_PRAGMA([pragma], [action-if-found], [action-if-not-found])  #
 dnl # Check if the compiler supports given pragma                                  #
 dnl ################################################################################
 AC_DEFUN([LIBXS_CHECK_LANG_PRAGMA], [{
@@ -558,7 +558,7 @@ AC_DEFUN([LIBXS_CHECK_LANG_PRAGMA], [{
 }])
 
 dnl ################################################################################
-dnl # LIBXS_CHECK_LANG_VISIBILITY([action-if-found], [action-if-not-found])       #
+dnl # LIBXS_CHECK_LANG_VISIBILITY([action-if-found], [action-if-not-found])        #
 dnl # Check if the compiler supports dso visibility                                #
 dnl ################################################################################
 AC_DEFUN([LIBXS_CHECK_LANG_VISIBILITY], [{
@@ -582,7 +582,7 @@ AC_DEFUN([LIBXS_CHECK_LANG_VISIBILITY], [{
 }])
 
 dnl ################################################################################
-dnl # LIBXS_CHECK_SOCK_CLOEXEC([action-if-found], [action-if-not-found])          #
+dnl # LIBXS_CHECK_SOCK_CLOEXEC([action-if-found], [action-if-not-found])           #
 dnl # Check if SOCK_CLOEXEC is supported                                           #
 dnl ################################################################################
 AC_DEFUN([LIBXS_CHECK_SOCK_CLOEXEC], [{
@@ -604,7 +604,7 @@ int main (int argc, char *argv [])
 }])
 
 dnl ################################################################################
-dnl # LIBXS_CHECK_POLLER_KQUEUE([action-if-found], [action-if-not-found])         #
+dnl # LIBXS_CHECK_POLLER_KQUEUE([action-if-found], [action-if-not-found])          #
 dnl # Checks kqueue polling system                                                 #
 dnl ################################################################################
 AC_DEFUN([LIBXS_CHECK_POLLER_KQUEUE], [{
@@ -625,7 +625,7 @@ kqueue();
 }])
 
 dnl ################################################################################
-dnl # LIBXS_CHECK_POLLER_EPOLL([action-if-found], [action-if-not-found])          #
+dnl # LIBXS_CHECK_POLLER_EPOLL([action-if-found], [action-if-not-found])           #
 dnl # Checks epoll polling system                                                  #
 dnl ################################################################################
 AC_DEFUN([LIBXS_CHECK_POLLER_EPOLL], [{
@@ -644,7 +644,7 @@ epoll_create(10);
 }])
 
 dnl ################################################################################
-dnl # LIBXS_CHECK_POLLER_DEVPOLL([action-if-found], [action-if-not-found])        #
+dnl # LIBXS_CHECK_POLLER_DEVPOLL([action-if-found], [action-if-not-found])         #
 dnl # Checks devpoll polling system                                                #
 dnl ################################################################################
 AC_DEFUN([LIBXS_CHECK_POLLER_DEVPOLL], [{
@@ -663,7 +663,7 @@ int fd = open("/dev/poll", O_RDWR);
 }])
 
 dnl ################################################################################
-dnl # LIBXS_CHECK_POLLER_POLL([action-if-found], [action-if-not-found])           #
+dnl # LIBXS_CHECK_POLLER_POLL([action-if-found], [action-if-not-found])            #
 dnl # Checks poll polling system                                                   #
 dnl ################################################################################
 AC_DEFUN([LIBXS_CHECK_POLLER_POLL], [{
@@ -682,7 +682,7 @@ poll(&t_poll, 1, 1);
 }])
 
 dnl ################################################################################
-dnl # LIBXS_CHECK_POLLER_SELECT([action-if-found], [action-if-not-found])         #
+dnl # LIBXS_CHECK_POLLER_SELECT([action-if-found], [action-if-not-found])          #
 dnl # Checks select polling system                                                 #
 dnl ################################################################################
 AC_DEFUN([LIBXS_CHECK_POLLER_SELECT], [{
@@ -716,7 +716,7 @@ select(1, &t_rfds, NULL, NULL, &tv);
 }])
 
 dnl ################################################################################
-dnl # LIBXS_CHECK_POLLER([action-if-found], [action-if-not-found])                #
+dnl # LIBXS_CHECK_POLLER([action-if-found], [action-if-not-found])                 #
 dnl # Choose polling system                                                        #
 dnl ################################################################################
 AC_DEFUN([LIBXS_CHECK_POLLER], [{
