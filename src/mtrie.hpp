@@ -1,5 +1,6 @@
 /*
     Copyright (c) 2011-2012 250bpm s.r.o.
+    Copyright (c) 2011-2012 Spotify AB
     Copyright (c) 2011 Other contributors as noted in the AUTHORS file
 
     This file is part of Crossroads project.
@@ -69,12 +70,14 @@ namespace xs
             void *arg_);
         bool rm_helper (unsigned char *prefix_, size_t size_,
             xs::pipe_t *pipe_);
+        bool is_redundant () const;
 
         typedef std::set <xs::pipe_t*> pipes_t;
         pipes_t pipes;
 
         unsigned char min;
         unsigned short count;
+        unsigned short live_nodes;
         union {
             class mtrie_t *node;
             class mtrie_t **table;
