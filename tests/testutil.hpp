@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
+#include <stddef.h>
 
 #include "../include/xs.h"
 #include "../include/xs_utils.h"

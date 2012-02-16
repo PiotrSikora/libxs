@@ -43,17 +43,23 @@ extern "C" {
 #endif
 
 /*  Helper functions are used by perf tests so that they don't have to care   */
-/*  about minutiae of time-related functions on different OS platforms.       */
+/*  about minutiae of different OS platforms.                                 */
 
 /*  Starts the stopwatch. Returns the handle to the watch.                    */
 XS_EXPORT void *xs_stopwatch_start (void);
 
 /*  Stops the stopwatch. Returns the number of microseconds elapsed since     */
 /*  the stopwatch was started.                                                */
-XS_EXPORT unsigned long xs_stopwatch_stop (void *watch_);
+XS_EXPORT unsigned long xs_stopwatch_stop (void *watch);
 
 /*  Sleeps for specified number of seconds.                                   */
-XS_EXPORT void xs_sleep (int seconds_);
+XS_EXPORT void xs_sleep (int seconds);
+
+/*  Creates a new thread.                                                     */
+XS_EXPORT void *xs_thread_create (void (*fn) (void *arg), void* arg);
+
+/*  Wait for thread to finish.                                                */
+XS_EXPORT void xs_thread_join (void *thread);
 
 #undef XS_EXPORT
 

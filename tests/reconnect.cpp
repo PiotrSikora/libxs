@@ -20,13 +20,6 @@
 
 #include "testutil.hpp"
 
-#if defined XS_HAVE_WINDOWS
-int XS_TEST_MAIN ()
-{
-    return 0;
-}
-#else
-
 int XS_TEST_MAIN ()
 {
     fprintf (stderr, "reconnect test running...\n");
@@ -68,7 +61,7 @@ int XS_TEST_MAIN ()
     assert (push);
 
     //  Connect before bind was done at the peer and send one message.
-    rc = xs_connect (push, "ipc:///tmp/tester");
+    rc = xs_connect (push, "tcp://127.0.0.1:5560");
     assert (rc == 0);
     rc = xs_send (push, "ABC", 3, 0);
     assert (rc == 3);
@@ -77,7 +70,7 @@ int XS_TEST_MAIN ()
     xs_sleep (1);
 
     //  Bind the peer and get the message.
-    rc = xs_bind (pull, "ipc:///tmp/tester");
+    rc = xs_bind (pull, "tcp://127.0.0.1:5560");
     assert (rc == 0);
     rc = xs_recv (pull, buf, sizeof (buf), 0);
     assert (rc == 3);
@@ -92,5 +85,3 @@ int XS_TEST_MAIN ()
 
     return 0 ;
 }
-
-#endif

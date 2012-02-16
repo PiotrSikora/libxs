@@ -20,13 +20,6 @@
 
 #include "testutil.hpp"
 
-#if defined XS_HAVE_WINDOWS
-int XS_TEST_MAIN ()
-{
-    return 0;
-}
-#else
-
 int XS_TEST_MAIN ()
 {
     fprintf (stderr, "linger test running...\n");
@@ -43,7 +36,7 @@ int XS_TEST_MAIN ()
 
     //  Connect to non-existent endpoing.
     assert (rc == 0);
-    rc = xs_connect (s, "ipc:///tmp/this-file-does-not-exist");
+    rc = xs_connect (s, "tcp://127.0.0.1:5560");
     assert (rc == 0);
 
     //  Send a message.
@@ -63,5 +56,3 @@ int XS_TEST_MAIN ()
 
     return 0;
 }
-
-#endif

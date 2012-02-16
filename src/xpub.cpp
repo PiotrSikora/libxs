@@ -177,7 +177,7 @@ void xs::xpub_t::send_unsubscription (unsigned char *data_, size_t size_,
 		xpub_t *self = (xpub_t*) arg_;
 		blob_t unsub (size_ + 1, 0);
 		unsub [0] = 0;
-		memcpy (&unsub [1], data_, size_);
+		memcpy ((void*) (unsub.data () + 1), data_, size_);
 		self->pending.push_back (unsub);
     }
 }
