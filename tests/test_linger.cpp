@@ -22,7 +22,7 @@
 
 int XS_TEST_MAIN ()
 {
-    fprintf (stderr, "test_invalid_rep running...\n");
+    fprintf (stderr, "test_linger running...\n");
 
     //  Create REQ/XREP wiring.
     void *ctx = xs_init (1);
