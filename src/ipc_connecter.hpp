@@ -93,12 +93,9 @@ namespace xs
         //  Underlying socket.
         fd_t s;
 
-        //  Handle corresponding to the listening socket.
+        //  Handle corresponding to the listening socket or NULL if the socket
+        //  is not registered with the poller.
         handle_t handle;
-
-        //  If true file descriptor is registered with the poller and 'handle'
-        //  contains valid value.
-        bool handle_valid;
 
         //  If true, connecter is waiting a while before trying to connect.
         bool wait;

@@ -43,7 +43,7 @@ xs::ipc_connecter_t::ipc_connecter_t (class io_thread_t *io_thread_,
     own_t (io_thread_, options_),
     io_object_t (io_thread_),
     s (retired_fd),
-    handle_valid (false),
+    handle (NULL),
     wait (wait_),
     session (session_),
     current_reconnect_ivl(options.reconnect_ivl),
@@ -61,8 +61,10 @@ xs::ipc_connecter_t::~ipc_connecter_t ()
         xs_assert (reconnect_timer);
         rm_timer (reconnect_timer);
     }
-    if (handle_valid)
+    if (handle) {
         rm_fd (handle);
+        handle = NULL;
+    }
 
     if (s != retired_fd)
         close ();
@@ -87,8 +89,9 @@ void xs::ipc_connecter_t::in_event (fd_t fd_)
 void xs::ipc_connecter_t::out_event (fd_t fd_)
 {
     fd_t fd = connect ();
+    xs_assert (handle);
     rm_fd (handle);
-    handle_valid = false;
+    handle = NULL;
 
     //  Handle the error condition by attempt to reconnect.
     if (fd == retired_fd) {
@@ -124,16 +127,16 @@ void xs::ipc_connecter_t::start_connecting ()
 
     //  Connect may succeed in synchronous manner.
     if (rc == 0) {
+        xs_assert (!handle);
         handle = add_fd (s);
-        handle_valid = true;
         out_event (s);
         return;
     }
 
     //  Connection establishment may be delayed. Poll for its completion.
     else if (rc == -1 && errno == EAGAIN) {
+        xs_assert (!handle);
         handle = add_fd (s);
-        handle_valid = true;
         set_pollout (handle);
         return;
     }
