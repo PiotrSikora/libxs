@@ -20,6 +20,13 @@
 
 #include "testutil.hpp"
 
+#if defined XS_HAVE_WINDOWS
+int XS_TEST_MAIN ()
+{
+    return 0;
+}
+#else
+
 int XS_TEST_MAIN ()
 {
     fprintf (stderr, "reqrep_ipc test running...\n");
@@ -50,3 +57,5 @@ int XS_TEST_MAIN ()
 
     return 0 ;
 }
+
+#endif
