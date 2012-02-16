@@ -55,6 +55,16 @@ xs::poller_base_t::~poller_base_t ()
     xs_assert (get_load () == 0);
 }
 
+void xs::poller_base_t::start ()
+{
+    xstart ();
+}
+
+void xs::poller_base_t::stop ()
+{
+    xstop ();
+}
+
 int xs::poller_base_t::get_load ()
 {
     return load.get ();

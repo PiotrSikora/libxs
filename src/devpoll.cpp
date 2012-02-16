@@ -125,12 +125,12 @@ void xs::devpoll_t::reset_pollout (handle_t handle_)
     devpoll_ctl (handle_, fd_table [handle_].events);
 }
 
-void xs::devpoll_t::start ()
+void xs::devpoll_t::xstart ()
 {
     worker.start (worker_routine, this);
 }
 
-void xs::devpoll_t::stop ()
+void xs::devpoll_t::xstop ()
 {
     stopping = true;
 }

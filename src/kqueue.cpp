@@ -141,12 +141,12 @@ void xs::kqueue_t::reset_pollout (handle_t handle_)
    }
 }
 
-void xs::kqueue_t::start ()
+void xs::kqueue_t::xstart ()
 {
     worker.start (worker_routine, this);
 }
 
-void xs::kqueue_t::stop ()
+void xs::kqueue_t::xstop ()
 {
     stopping = true;
 }

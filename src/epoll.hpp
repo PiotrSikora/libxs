@@ -55,8 +55,8 @@ namespace xs
         void reset_pollin (handle_t handle_);
         void set_pollout (handle_t handle_);
         void reset_pollout (handle_t handle_);
-        void start ();
-        void stop ();
+        void xstart ();
+        void xstop ();
 
     private:
 

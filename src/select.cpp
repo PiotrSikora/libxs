@@ -138,12 +138,12 @@ void xs::select_t::reset_pollout (handle_t handle_)
     FD_CLR (ptrtofd (handle_), &source_set_out);
 }
 
-void xs::select_t::start ()
+void xs::select_t::xstart ()
 {
     worker.start (worker_routine, this);
 }
 
-void xs::select_t::stop ()
+void xs::select_t::xstop ()
 {
     stopping = true;
 }

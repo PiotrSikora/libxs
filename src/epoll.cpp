@@ -31,8 +31,8 @@
 #include <new>
 
 #include "epoll.hpp"
-#include "err.hpp"
 #include "config.hpp"
+#include "err.hpp"
 
 xs::epoll_t::epoll_t () :
     stopping (false)
@@ -118,12 +118,12 @@ void xs::epoll_t::reset_pollout (handle_t handle_)
     errno_assert (rc != -1);
 }
 
-void xs::epoll_t::start ()
+void xs::epoll_t::xstart ()
 {
     worker.start (worker_routine, this);
 }
 
-void xs::epoll_t::stop ()
+void xs::epoll_t::xstop ()
 {
     stopping = true;
 }

@@ -106,12 +106,12 @@ void xs::poll_t::reset_pollout (handle_t handle_)
     pollset [index].events &= ~((short) POLLOUT);
 }
 
-void xs::poll_t::start ()
+void xs::poll_t::xstart ()
 {
     worker.start (worker_routine, this);
 }
 
-void xs::poll_t::stop ()
+void xs::poll_t::xstop ()
 {
     stopping = true;
 }

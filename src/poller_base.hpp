@@ -63,14 +63,17 @@ namespace xs
         //  invoked from a different thread!
         int get_load ();
 
+        void start ();
+        void stop ();
+
         virtual handle_t add_fd (fd_t fd_, xs::i_poll_events *events_) = 0;
         virtual void rm_fd (handle_t handle_) = 0;
         virtual void set_pollin (handle_t handle_) = 0;
         virtual void reset_pollin (handle_t handle_) = 0;
         virtual void set_pollout (handle_t handle_) = 0;
         virtual void reset_pollout (handle_t handle_) = 0;
-        virtual void start () = 0;
-        virtual void stop () = 0;
+        virtual void xstart () = 0;
+        virtual void xstop () = 0;
 
         //  Add a timeout to expire in timeout_ milliseconds. After the
         //  expiration timer_event on sink_ object will be called.
