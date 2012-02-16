@@ -23,6 +23,7 @@ libxs_la_SOURCES = \
     fd.hpp \
     fq.hpp \
     io_object.hpp \
+    io_thread.hpp \
     ip.hpp \
     ipc_address.hpp \
     ipc_connecter.hpp \
@@ -45,7 +46,6 @@ libxs_la_SOURCES = \
     pipe.hpp \
     platform.hpp \
     poll.hpp \
-    poller_base.hpp \
     pair.hpp \
     pub.hpp \
     pull.hpp \
@@ -85,6 +85,7 @@ libxs_la_SOURCES = \
     err.cpp \
     fq.cpp \
     io_object.cpp \
+    io_thread.cpp \
     ip.cpp \
     ipc_address.cpp \
     ipc_connecter.cpp \
@@ -104,7 +105,6 @@ libxs_la_SOURCES = \
     pgm_socket.cpp \
     pipe.cpp \
     poll.cpp \
-    poller_base.cpp \
     pull.cpp \
     push.cpp \
     reaper.cpp \

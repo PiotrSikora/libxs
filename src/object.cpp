@@ -26,7 +26,7 @@
 #include "ctx.hpp"
 #include "err.hpp"
 #include "pipe.hpp"
-#include "poller_base.hpp"
+#include "io_thread.hpp"
 #include "session_base.hpp"
 #include "socket_base.hpp"
 
@@ -149,7 +149,7 @@ void xs::object_t::destroy_socket (socket_base_t *socket_)
     ctx->destroy_socket (socket_);
 }
 
-xs::poller_base_t *xs::object_t::choose_io_thread (uint64_t affinity_)
+xs::io_thread_t *xs::object_t::choose_io_thread (uint64_t affinity_)
 {
     return ctx->choose_io_thread (affinity_);
 }

@@ -26,7 +26,7 @@
 #include "platform.hpp"
 #include "tcp_listener.hpp"
 #include "stream_engine.hpp"
-#include "poller_base.hpp"
+#include "io_thread.hpp"
 #include "session_base.hpp"
 #include "config.hpp"
 #include "err.hpp"
@@ -48,7 +48,7 @@
 #include <ioctl.h>
 #endif
 
-xs::tcp_listener_t::tcp_listener_t (poller_base_t *io_thread_,
+xs::tcp_listener_t::tcp_listener_t (io_thread_t *io_thread_,
       socket_base_t *socket_, const options_t &options_) :
     own_t (io_thread_, options_),
     io_object_t (io_thread_),
@@ -94,7 +94,7 @@ void xs::tcp_listener_t::in_event (fd_t fd_)
 
     //  Choose I/O thread to run connecter in. Given that we are already
     //  running in an I/O thread, there must be at least one available.
-    poller_base_t *io_thread = choose_io_thread (options.affinity);
+    io_thread_t *io_thread = choose_io_thread (options.affinity);
     xs_assert (io_thread);
 
     //  Create and launch a session object. 

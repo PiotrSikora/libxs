@@ -34,7 +34,7 @@
 namespace xs
 {
 
-    class poller_base_t;
+    class io_thread_t;
     class session_base_t;
 
     class ipc_connecter_t : public own_t, public io_object_t
@@ -43,7 +43,7 @@ namespace xs
 
         //  If 'delay' is true connecter first waits for a while, then starts
         //  connection process.
-        ipc_connecter_t (xs::poller_base_t *io_thread_,
+        ipc_connecter_t (xs::io_thread_t *io_thread_,
             xs::session_base_t *session_, const options_t &options_,
             const char *address_, bool delay_);
         ~ipc_connecter_t ();
@@ -94,7 +94,7 @@ namespace xs
         fd_t s;
 
         //  Handle corresponding to the listening socket or NULL if the socket
-        //  is not registered with the poller.
+        //  is not registered with the io_thread.
         handle_t handle;
 
         //  If true, connecter is waiting a while before trying to connect.

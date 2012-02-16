@@ -38,7 +38,7 @@
 #include "config.hpp"
 
 xs::devpoll_t::devpoll_t (xs::ctx_t *ctx_, uint32_t tid_) :
-    poller_base_t (ctx_, tid_),
+    io_thread_t (ctx_, tid_),
     stopping (false)
 {
     devpoll_fd = open ("/dev/poll", O_RDWR);

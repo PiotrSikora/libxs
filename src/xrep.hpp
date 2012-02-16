@@ -37,7 +37,7 @@ namespace xs
 
     class ctx_t;
     class pipe_t;
-    class poller_base_t;
+    class io_thread_t;
 
     //  TODO: This class uses O(n) scheduling. Rewrite it to use O(1) algorithm.
     class xrep_t :
@@ -109,7 +109,7 @@ namespace xs
     {
     public:
 
-        xrep_session_t (xs::poller_base_t *io_thread_, bool connect_,
+        xrep_session_t (xs::io_thread_t *io_thread_, bool connect_,
             socket_base_t *socket_, const options_t &options_,
             const char *protocol_, const char *address_);
         ~xrep_session_t ();

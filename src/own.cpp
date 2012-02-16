@@ -20,7 +20,7 @@
 
 #include "own.hpp"
 #include "err.hpp"
-#include "poller_base.hpp"
+#include "io_thread.hpp"
 
 xs::own_t::own_t (class ctx_t *parent_, uint32_t tid_) :
     object_t (parent_, tid_),
@@ -32,7 +32,7 @@ xs::own_t::own_t (class ctx_t *parent_, uint32_t tid_) :
 {
 }
 
-xs::own_t::own_t (poller_base_t *io_thread_, const options_t &options_) :
+xs::own_t::own_t (io_thread_t *io_thread_, const options_t &options_) :
     object_t (io_thread_),
     options (options_),
     terminating (false),

@@ -25,30 +25,30 @@
 #include <stddef.h>
 
 #include "stdint.hpp"
-#include "poller_base.hpp"
+#include "io_thread.hpp"
 
 namespace xs
 {
 
     //  Simple base class for objects that live in I/O threads.
-    //  It makes communication with the poller object easier and
+    //  It makes communication with the io_thread object easier and
     //  makes defining unneeded event handlers unnecessary.
 
     class io_object_t : public i_poll_events
     {
     public:
 
-        io_object_t (xs::poller_base_t *io_thread_ = NULL);
+        io_object_t (xs::io_thread_t *io_thread_ = NULL);
         ~io_object_t ();
 
         //  When migrating an object from one I/O thread to another, first
         //  unplug it, then migrate it, then plug it to the new thread.
-        void plug (xs::poller_base_t *io_thread_);
+        void plug (xs::io_thread_t *io_thread_);
         void unplug ();
 
     protected:
 
-        //  Methods to access underlying poller object.
+        //  Methods to access underlying io_thread object.
         handle_t add_fd (fd_t fd_);
         void rm_fd (handle_t handle_);
         void set_pollin (handle_t handle_);
@@ -65,7 +65,7 @@ namespace xs
 
     private:
 
-        poller_base_t *poller;
+        io_thread_t *io_thread;
 
         io_object_t (const io_object_t&);
         const io_object_t &operator = (const io_object_t&);

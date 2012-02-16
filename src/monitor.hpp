@@ -30,14 +30,14 @@
 namespace xs
 {
 
-    class poller_base_t;
+    class io_thread_t;
     class socket_base_t;
 
     class monitor_t : public own_t, public io_object_t
     {
     public:
 
-        monitor_t (xs::poller_base_t *io_thread_);
+        monitor_t (xs::io_thread_t *io_thread_);
         ~monitor_t ();
 
         void start ();
@@ -51,7 +51,7 @@ namespace xs
         void process_plug ();
         void process_stop ();
 
-        //  Events from the poller.
+        //  Events from the I/O thread.
         void timer_event (handle_t handle_);
 
         //  Actual monitoring data to send and the related critical section.

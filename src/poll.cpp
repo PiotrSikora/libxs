@@ -33,7 +33,7 @@
 #include "config.hpp"
 
 xs::poll_t::poll_t (xs::ctx_t *ctx_, uint32_t tid_) :
-    poller_base_t (ctx_, tid_),
+    io_thread_t (ctx_, tid_),
     retired (false),
     stopping (false)
 {

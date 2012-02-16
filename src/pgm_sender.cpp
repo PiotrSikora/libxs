@@ -37,7 +37,7 @@
 #include "wire.hpp"
 #include "stdint.hpp"
 
-xs::pgm_sender_t::pgm_sender_t (poller_base_t *parent_, 
+xs::pgm_sender_t::pgm_sender_t (io_thread_t *parent_, 
       const options_t &options_) :
     io_object_t (parent_),
     encoder (0),
@@ -64,7 +64,7 @@ int xs::pgm_sender_t::init (bool udp_encapsulation_, const char *network_)
     return rc;
 }
 
-void xs::pgm_sender_t::plug (poller_base_t *io_thread_,
+void xs::pgm_sender_t::plug (io_thread_t *io_thread_,
     session_base_t *session_)
 {
     //  Alocate 2 fds for PGM socket.
@@ -75,7 +75,7 @@ void xs::pgm_sender_t::plug (poller_base_t *io_thread_,
 
     encoder.set_session (session_);
 
-    //  Fill fds from PGM transport and add them to the poller.
+    //  Fill fds from PGM transport and add them to the I/O thread.
     pgm_socket.get_sender_fds (&downlink_socket_fd, &uplink_socket_fd,
         &rdata_notify_fd, &pending_notify_fd);
 
@@ -204,7 +204,7 @@ void xs::pgm_sender_t::out_event (fd_t fd_)
 
 void xs::pgm_sender_t::timer_event (handle_t handle_)
 {
-    //  Timer cancels on return by poller_base.
+    //  Timer cancels on return by io_thread.
     if (handle_ == rx_timer) {
         rx_timer = NULL;
         in_event (retired_fd);

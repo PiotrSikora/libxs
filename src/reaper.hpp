@@ -23,7 +23,7 @@
 
 #include "object.hpp"
 #include "mailbox.hpp"
-#include "poller_base.hpp"
+#include "io_thread.hpp"
 
 namespace xs
 {
@@ -61,8 +61,8 @@ namespace xs
         //  Handle associated with mailbox' file descriptor.
         handle_t mailbox_handle;
 
-        //  I/O multiplexing is performed using a poller object.
-        poller_base_t *poller;
+        //  I/O multiplexing is performed using an io_thread object.
+        io_thread_t *io_thread;
 
         //  Number of sockets being reaped at the moment.
         int sockets;

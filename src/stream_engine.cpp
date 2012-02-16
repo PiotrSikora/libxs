@@ -36,7 +36,7 @@
 #include <new>
 
 #include "stream_engine.hpp"
-#include "poller_base.hpp"
+#include "io_thread.hpp"
 #include "session_base.hpp"
 #include "config.hpp"
 #include "err.hpp"
@@ -103,7 +103,7 @@ xs::stream_engine_t::~stream_engine_t ()
     }
 }
 
-void xs::stream_engine_t::plug (poller_base_t *io_thread_,
+void xs::stream_engine_t::plug (io_thread_t *io_thread_,
     session_base_t *session_)
 {
     xs_assert (!plugged);
@@ -117,7 +117,7 @@ void xs::stream_engine_t::plug (poller_base_t *io_thread_,
     decoder.set_session (session_);
     session = session_;
 
-    //  Connect to I/O threads poller object.
+    //  Connect to the io_thread object.
     io_object_t::plug (io_thread_);
     handle = add_fd (s);
     set_pollin (handle);
@@ -135,7 +135,7 @@ void xs::stream_engine_t::unplug ()
     //  Cancel all fd subscriptions.
     rm_fd (handle);
 
-    //  Disconnect from I/O threads poller object.
+    //  Disconnect from the io_thread object.
     io_object_t::unplug ();
 
     //  Disconnect from session object.

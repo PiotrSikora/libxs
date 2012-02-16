@@ -35,7 +35,7 @@
 #include "err.hpp"
 
 xs::epoll_t::epoll_t (xs::ctx_t *ctx_, uint32_t tid_) :
-    poller_base_t (ctx_, tid_),
+    io_thread_t (ctx_, tid_),
     stopping (false)
 {
     epoll_fd = epoll_create (1);

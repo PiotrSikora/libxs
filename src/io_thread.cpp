@@ -18,7 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "poller_base.hpp"
+#include "io_thread.hpp"
 #include "err.hpp"
 
 #include "select.hpp"
@@ -27,9 +27,9 @@
 #include "devpoll.hpp"
 #include "kqueue.hpp"
 
-xs::poller_base_t *xs::poller_base_t::create (xs::ctx_t *ctx_, uint32_t tid_)
+xs::io_thread_t *xs::io_thread_t::create (xs::ctx_t *ctx_, uint32_t tid_)
 {
-    poller_base_t *result;
+    io_thread_t *result;
 #if defined XS_HAVE_SELECT
     result = new (std::nothrow) select_t (ctx_, tid_);
 #elif defined XS_HAVE_POLL
@@ -45,45 +45,45 @@ xs::poller_base_t *xs::poller_base_t::create (xs::ctx_t *ctx_, uint32_t tid_)
     return result;
 }
 
-xs::poller_base_t::poller_base_t (xs::ctx_t *ctx_, uint32_t tid_) :
+xs::io_thread_t::io_thread_t (xs::ctx_t *ctx_, uint32_t tid_) :
     object_t (ctx_, tid_)
 {
 }
 
-xs::poller_base_t::~poller_base_t ()
+xs::io_thread_t::~io_thread_t ()
 {
 }
 
-void xs::poller_base_t::start ()
+void xs::io_thread_t::start ()
 {
     mailbox_handle = add_fd (mailbox.get_fd (), this);
     set_pollin (mailbox_handle);
     xstart ();
 }
 
-void xs::poller_base_t::stop ()
+void xs::io_thread_t::stop ()
 {
     //  Ask the I/O thread to stop.
     send_stop ();
 }
 
-void xs::poller_base_t::process_stop ()
+void xs::io_thread_t::process_stop ()
 {
     rm_fd (mailbox_handle);
     xstop ();
 }
 
-xs::mailbox_t *xs::poller_base_t::get_mailbox ()
+xs::mailbox_t *xs::io_thread_t::get_mailbox ()
 {
     return &mailbox;
 }
 
-int xs::poller_base_t::get_load ()
+int xs::io_thread_t::get_load ()
 {
     return load.get ();
 }
 
-void xs::poller_base_t::adjust_load (int amount_)
+void xs::io_thread_t::adjust_load (int amount_)
 {
     if (amount_ > 0)
         load.add (amount_);
@@ -91,7 +91,7 @@ void xs::poller_base_t::adjust_load (int amount_)
         load.sub (-amount_);
 }
 
-xs::handle_t xs::poller_base_t::add_timer (int timeout_, i_poll_events *sink_)
+xs::handle_t xs::io_thread_t::add_timer (int timeout_, i_poll_events *sink_)
 {
     uint64_t expiration = clock.now_ms () + timeout_;
     timer_info_t info = {sink_, timers_t::iterator ()};
@@ -101,13 +101,13 @@ xs::handle_t xs::poller_base_t::add_timer (int timeout_, i_poll_events *sink_)
     return (handle_t) &(it->second);
 }
 
-void xs::poller_base_t::rm_timer (handle_t handle_)
+void xs::io_thread_t::rm_timer (handle_t handle_)
 {
     timer_info_t *info = (timer_info_t*) handle_;
     timers.erase (info->self);
 }
 
-uint64_t xs::poller_base_t::execute_timers ()
+uint64_t xs::io_thread_t::execute_timers ()
 {
     //  Fast track.
     if (timers.empty ())
@@ -140,7 +140,7 @@ uint64_t xs::poller_base_t::execute_timers ()
     return 0;
 }
 
-void xs::poller_base_t::in_event (fd_t fd_)
+void xs::io_thread_t::in_event (fd_t fd_)
 {
     //  TODO: Do we want to limit number of commands I/O thread can
     //  process in a single go?
@@ -161,13 +161,13 @@ void xs::poller_base_t::in_event (fd_t fd_)
     }
 }
 
-void xs::poller_base_t::out_event (fd_t fd_)
+void xs::io_thread_t::out_event (fd_t fd_)
 {
     //  We are never polling for POLLOUT here. This function is never called.
     xs_assert (false);
 }
 
-void xs::poller_base_t::timer_event (handle_t handle_)
+void xs::io_thread_t::timer_event (handle_t handle_)
 {
     //  No timers here. This function is never called.
     xs_assert (false);

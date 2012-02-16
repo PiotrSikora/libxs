@@ -40,7 +40,7 @@ namespace xs
 
     class object_t;
     class monitor_t;
-    class poller_base_t;
+    class io_thread_t;
     class socket_base_t;
     class reaper_t;
 
@@ -86,7 +86,7 @@ namespace xs
         //  Returns the I/O thread that is the least busy at the moment.
         //  Affinity specifies which I/O threads are eligible (0 = all).
         //  Returns NULL is no I/O thread is available.
-        xs::poller_base_t *choose_io_thread (uint64_t affinity_);
+        xs::io_thread_t *choose_io_thread (uint64_t affinity_);
 
         //  Returns reaper thread object.
         xs::object_t *get_reaper ();
@@ -142,7 +142,7 @@ namespace xs
         xs::reaper_t *reaper;
 
         //  I/O threads.
-        typedef std::vector <xs::poller_base_t*> io_threads_t;
+        typedef std::vector <xs::io_thread_t*> io_threads_t;
         io_threads_t io_threads;
 
         //  Array of pointers to mailboxes for both application and I/O threads.

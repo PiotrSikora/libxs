@@ -29,7 +29,7 @@
 
 #include "fd.hpp"
 #include "thread.hpp"
-#include "poller_base.hpp"
+#include "io_thread.hpp"
 
 namespace xs
 {
@@ -39,14 +39,14 @@ namespace xs
     //  Implements socket polling mechanism using the BSD-specific
     //  kqueue interface.
 
-    class kqueue_t : public poller_base_t
+    class kqueue_t : public io_thread_t
     {
     public:
 
         kqueue_t (xs::ctx_t *ctx_, uint32_t tid_);
         ~kqueue_t ();
 
-        //  "poller" concept.
+        //  Implementation of virtual functions from io_thread_t.
         handle_t add_fd (fd_t fd_, xs::i_poll_events *events_);
         void rm_fd (handle_t handle_);
         void set_pollin (handle_t handle_);

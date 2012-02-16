@@ -45,7 +45,7 @@
 #endif
 
 xs::kqueue_t::kqueue_t (xs::ctx_t *ctx_, uint32_t tid_) :
-    poller_base_t (ctx_, tid_),
+    io_thread_t (ctx_, tid_),
     stopping (false)
 {
     //  Create event queue

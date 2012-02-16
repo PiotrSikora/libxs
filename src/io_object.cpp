@@ -20,11 +20,11 @@
 */
 
 #include "io_object.hpp"
-#include "poller_base.hpp"
+#include "io_thread.hpp"
 #include "err.hpp"
 
-xs::io_object_t::io_object_t (poller_base_t *io_thread_) :
-    poller (NULL)
+xs::io_object_t::io_object_t (io_thread_t *io_thread_) :
+    io_thread (NULL)
 {
     if (io_thread_)
         plug (io_thread_);
@@ -34,62 +34,59 @@ xs::io_object_t::~io_object_t ()
 {
 }
 
-void xs::io_object_t::plug (poller_base_t *io_thread_)
+void xs::io_object_t::plug (io_thread_t *io_thread_)
 {
     xs_assert (io_thread_);
-    xs_assert (!poller);
+    xs_assert (!io_thread);
 
-    //  Retrieve the poller from the thread we are running in.
-    poller = io_thread_;
+    //  Retrieve the io_thread from the thread we are running in.
+    io_thread = io_thread_;
 }
 
 void xs::io_object_t::unplug ()
 {
-    xs_assert (poller);
-
-    //  Forget about old poller in preparation to be migrated
-    //  to a different I/O thread.
-    poller = NULL;
+    xs_assert (io_thread);
+    io_thread = NULL;
 }
 
 xs::handle_t xs::io_object_t::add_fd (fd_t fd_)
 {
-    return poller->add_fd (fd_, this);
+    return io_thread->add_fd (fd_, this);
 }
 
 void xs::io_object_t::rm_fd (handle_t handle_)
 {
-    poller->rm_fd (handle_);
+    io_thread->rm_fd (handle_);
 }
 
 void xs::io_object_t::set_pollin (handle_t handle_)
 {
-    poller->set_pollin (handle_);
+    io_thread->set_pollin (handle_);
 }
 
 void xs::io_object_t::reset_pollin (handle_t handle_)
 {
-    poller->reset_pollin (handle_);
+    io_thread->reset_pollin (handle_);
 }
 
 void xs::io_object_t::set_pollout (handle_t handle_)
 {
-    poller->set_pollout (handle_);
+    io_thread->set_pollout (handle_);
 }
 
 void xs::io_object_t::reset_pollout (handle_t handle_)
 {
-    poller->reset_pollout (handle_);
+    io_thread->reset_pollout (handle_);
 }
 
 xs::handle_t xs::io_object_t::add_timer (int timeout_)
 {
-    return poller->add_timer (timeout_, this);
+    return io_thread->add_timer (timeout_, this);
 }
 
 void xs::io_object_t::rm_timer (handle_t handle_)
 {
-    poller->rm_timer (handle_);
+    io_thread->rm_timer (handle_);
 }
 
 void xs::io_object_t::in_event (fd_t fd_)

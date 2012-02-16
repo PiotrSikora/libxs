@@ -18,8 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __XS_POLLER_BASE_HPP_INCLUDED__
-#define __XS_POLLER_BASE_HPP_INCLUDED__
+#ifndef __XS_IO_THREAD_HPP_INCLUDED__
+#define __XS_IO_THREAD_HPP_INCLUDED__
 
 #include <map>
 
@@ -54,23 +54,23 @@ namespace xs
         virtual void timer_event (handle_t handle_) = 0;
     };
 
-    class poller_base_t : public object_t, public i_poll_events
+    class io_thread_t : public object_t, public i_poll_events
     {
     public:
 
-        //  Create optimal poller mechanism for this environment.
-        static poller_base_t *create (xs::ctx_t *ctx_, uint32_t tid_);
+        //  Create optimal polling mechanism for this environment.
+        static io_thread_t *create (xs::ctx_t *ctx_, uint32_t tid_);
 
-        virtual ~poller_base_t ();
+        virtual ~io_thread_t ();
 
-        //  Returns load of the poller. Note that this function can be
+        //  Returns load of the I/O thread. Note that this function can be
         //  invoked from a different thread!
         int get_load ();
 
         void start ();
         void stop ();
 
-        //  Returns mailbox associated with this I/O poller.
+        //  Returns mailbox associated with this I/O thread.
         mailbox_t *get_mailbox ();
 
         virtual handle_t add_fd (fd_t fd_, xs::i_poll_events *events_) = 0;
@@ -96,9 +96,9 @@ namespace xs
 
     protected:
 
-        poller_base_t (xs::ctx_t *ctx_, uint32_t tid_);
+        io_thread_t (xs::ctx_t *ctx_, uint32_t tid_);
 
-        //  Called by individual poller implementations to manage the load.
+        //  Called by individual io_thread implementations to manage the load.
         void adjust_load (int amount_);
 
         //  Executes any timers that are due. Returns number of milliseconds
@@ -121,7 +121,7 @@ namespace xs
         typedef std::multimap <uint64_t, timer_info_t> timers_t;
         timers_t timers;
 
-        //  Load of the poller. Currently the number of file descriptors
+        //  Load of the I/O thread. Currently the number of file descriptors
         //  registered.
         atomic_counter_t load;
 
@@ -131,8 +131,8 @@ namespace xs
         //  Handle associated with mailbox' file descriptor.
         handle_t mailbox_handle;
 
-        poller_base_t (const poller_base_t&);
-        const poller_base_t &operator = (const poller_base_t&);
+        io_thread_t (const io_thread_t&);
+        const io_thread_t &operator = (const io_thread_t&);
     };
 
 }

@@ -32,7 +32,7 @@ namespace xs
     class ctx_t;
     class pipe_t;
     class msg_t;
-    class poller_base_t;
+    class io_thread_t;
 
     class push_t :
         public socket_base_t
@@ -64,7 +64,7 @@ namespace xs
     {
     public:
 
-        push_session_t (xs::poller_base_t *io_thread_, bool connect_,
+        push_session_t (xs::io_thread_t *io_thread_, bool connect_,
             socket_base_t *socket_, const options_t &options_,
             const char *protocol_, const char *address_);
         ~push_session_t ();

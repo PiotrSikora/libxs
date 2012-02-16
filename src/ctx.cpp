@@ -197,7 +197,7 @@ xs::socket_base_t *xs::ctx_t::create_socket (int type_)
 
         //  Create I/O thread objects and launch them.
         for (uint32_t i = 2; i != io_thread_count + 2; i++) {
-            poller_base_t *io_thread = poller_base_t::create (this, i);
+            io_thread_t *io_thread = io_thread_t::create (this, i);
             errno_assert (io_thread);
             io_threads.push_back (io_thread);
             slots [i] = io_thread->get_mailbox ();
@@ -226,7 +226,7 @@ xs::socket_base_t *xs::ctx_t::create_socket (int type_)
     #endif
 
         //  Create the monitor object.
-        poller_base_t *io_thread = choose_io_thread (0);
+        io_thread_t *io_thread = choose_io_thread (0);
         xs_assert (io_thread);
         monitor = new (std::nothrow) monitor_t (io_thread);
         alloc_assert (monitor);
@@ -301,7 +301,7 @@ void xs::ctx_t::send_command (uint32_t tid_, const command_t &command_)
     slots [tid_]->send (command_);
 }
 
-xs::poller_base_t *xs::ctx_t::choose_io_thread (uint64_t affinity_)
+xs::io_thread_t *xs::ctx_t::choose_io_thread (uint64_t affinity_)
 {
     if (io_threads.empty ())
         return NULL;

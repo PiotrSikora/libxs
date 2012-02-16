@@ -28,7 +28,7 @@ namespace xs
 {
 
     class ctx_t;
-    class poller_base_t;
+    class io_thread_t;
     class socket_base_t;
     class msg_t;
 
@@ -53,7 +53,7 @@ namespace xs
     {
     public:
 
-        pub_session_t (xs::poller_base_t *io_thread_, bool connect_,
+        pub_session_t (xs::io_thread_t *io_thread_, bool connect_,
             xs::socket_base_t *socket_, const options_t &options_,
             const char *protocol_, const char *address_);
         ~pub_session_t ();

@@ -27,16 +27,16 @@ xs::reaper_t::reaper_t (class ctx_t *ctx_, uint32_t tid_) :
     sockets (0),
     terminating (false)
 {
-    poller = poller_base_t::create (ctx_, tid_);
-    xs_assert (poller);
+    io_thread = io_thread_t::create (ctx_, tid_);
+    xs_assert (io_thread);
 
-    mailbox_handle = poller->add_fd (mailbox.get_fd (), this);
-    poller->set_pollin (mailbox_handle);
+    mailbox_handle = io_thread->add_fd (mailbox.get_fd (), this);
+    io_thread->set_pollin (mailbox_handle);
 }
 
 xs::reaper_t::~reaper_t ()
 {
-    delete poller;
+    delete io_thread;
 }
 
 xs::mailbox_t *xs::reaper_t::get_mailbox ()
@@ -47,7 +47,7 @@ xs::mailbox_t *xs::reaper_t::get_mailbox ()
 void xs::reaper_t::start ()
 {
     //  Start the thread.
-    poller->start ();
+    io_thread->start ();
 }
 
 void xs::reaper_t::stop ()
@@ -90,15 +90,15 @@ void xs::reaper_t::process_stop ()
     //  If there are no sockets being reaped finish immediately.
     if (!sockets) {
         send_done ();
-        poller->rm_fd (mailbox_handle);
-        poller->stop ();
+        io_thread->rm_fd (mailbox_handle);
+        io_thread->stop ();
     }
 }
 
 void xs::reaper_t::process_reap (socket_base_t *socket_)
 {
-    //  Add the socket to the poller.
-    socket_->start_reaping (poller);
+    //  Add the socket to the I/O thread.
+    socket_->start_reaping (io_thread);
 
     ++sockets;
 }
@@ -111,7 +111,7 @@ void xs::reaper_t::process_reaped ()
     //  finish immediately.
     if (!sockets && terminating) {
         send_done ();
-        poller->rm_fd (mailbox_handle);
-        poller->stop ();
+        io_thread->rm_fd (mailbox_handle);
+        io_thread->stop ();
     }
 }

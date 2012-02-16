@@ -39,7 +39,7 @@
 #include "tcp_listener.hpp"
 #include "ipc_listener.hpp"
 #include "tcp_connecter.hpp"
-#include "poller_base.hpp"
+#include "io_thread.hpp"
 #include "session_base.hpp"
 #include "config.hpp"
 #include "clock.hpp"
@@ -338,7 +338,7 @@ int xs::socket_base_t::bind (const char *addr_)
 
     //  Remaining trasnports require to be run in an I/O thread, so at this
     //  point we'll choose one.
-    poller_base_t *io_thread = choose_io_thread (options.affinity);
+    io_thread_t *io_thread = choose_io_thread (options.affinity);
     if (!io_thread) {
         errno = EMTHREAD;
         return -1;
@@ -449,7 +449,7 @@ int xs::socket_base_t::connect (const char *addr_)
     }
 
     //  Choose the I/O thread to run the session in.
-    poller_base_t *io_thread = choose_io_thread (options.affinity);
+    io_thread_t *io_thread = choose_io_thread (options.affinity);
     if (!io_thread) {
         errno = EMTHREAD;
         return -1;
@@ -667,12 +667,12 @@ bool xs::socket_base_t::has_out ()
     return ret;
 }
 
-void xs::socket_base_t::start_reaping (poller_base_t *poller_)
+void xs::socket_base_t::start_reaping (io_thread_t *io_thread_)
 {
     //  Plug the socket to the reaper thread.
-    poller = poller_;
-    handle = poller->add_fd (mailbox.get_fd (), this);
-    poller->set_pollin (handle);
+    io_thread = io_thread_;
+    handle = io_thread->add_fd (mailbox.get_fd (), this);
+    io_thread->set_pollin (handle);
 
     //  Initialise the termination and check whether it can be deallocated
     //  immediately.
@@ -843,8 +843,8 @@ void xs::socket_base_t::check_destroy ()
     //  If the object was already marked as destroyed, finish the deallocation.
     if (destroyed) {
 
-        //  Remove the socket from the reaper's poller.
-        poller->rm_fd (handle);
+        //  Remove the socket from the reaper's I/O thread.
+        io_thread->rm_fd (handle);
 
         //  Remove the socket from the context.
         destroy_socket (this);
