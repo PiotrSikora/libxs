@@ -44,6 +44,11 @@ int xs::sub_t::xsetsockopt (int option_, const void *optval_,
         return -1;
     }
 
+    if (optvallen_ > 0 && !optval_) {
+        errno = EFAULT;
+        return -1;
+    }
+
     //  Create the subscription message.
     msg_t msg;
     int rc = msg.init_size (optvallen_ + 1);
