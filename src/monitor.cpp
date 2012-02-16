@@ -59,7 +59,7 @@ void xs::monitor_t::process_plug ()
 
 void xs::monitor_t::process_stop ()
 {
-    cancel_timer (timer_id);
+    rm_timer (timer_id);
     send_done ();
     delete this;
 }

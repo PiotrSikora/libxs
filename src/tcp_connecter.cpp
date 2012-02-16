@@ -66,7 +66,7 @@ xs::tcp_connecter_t::tcp_connecter_t (class io_thread_t *io_thread_,
 xs::tcp_connecter_t::~tcp_connecter_t ()
 {
     if (wait)
-        cancel_timer (reconnect_timer_id);
+        rm_timer (reconnect_timer_id);
     if (handle_valid)
         rm_fd (handle);
 

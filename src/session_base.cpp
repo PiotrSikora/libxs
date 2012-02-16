@@ -128,7 +128,7 @@ xs::session_base_t::~session_base_t ()
 
     //  If there's still a pending linger timer, remove it.
     if (has_linger_timer) {
-        cancel_timer (linger_timer_id);
+        rm_timer (linger_timer_id);
         has_linger_timer = false;
     }
 

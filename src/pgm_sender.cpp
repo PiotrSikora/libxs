@@ -107,12 +107,12 @@ void xs::pgm_sender_t::plug (io_thread_t *io_thread_, session_base_t *session_)
 void xs::pgm_sender_t::unplug ()
 {
     if (has_rx_timer) {
-        cancel_timer (rx_timer_id);
+        rm_timer (rx_timer_id);
         has_rx_timer = false;
     }
 
     if (has_tx_timer) {
-        cancel_timer (tx_timer_id);
+        rm_timer (tx_timer_id);
         has_tx_timer = false;
     }
 
@@ -151,7 +151,7 @@ xs::pgm_sender_t::~pgm_sender_t ()
 void xs::pgm_sender_t::in_event (fd_t fd_)
 {
     if (has_rx_timer) {
-        cancel_timer (rx_timer_id);
+        rm_timer (rx_timer_id);
         has_rx_timer = false;
     }
 
@@ -190,7 +190,7 @@ void xs::pgm_sender_t::out_event (fd_t fd_)
     }
 
     if (has_tx_timer) {
-        cancel_timer (tx_timer_id);
+        rm_timer (tx_timer_id);
         has_tx_timer = false;
     }
 

@@ -87,9 +87,9 @@ void xs::io_object_t::add_timer (int timeout_, int id_)
     poller->add_timer (timeout_, this, id_);
 }
 
-void xs::io_object_t::cancel_timer (int id_)
+void xs::io_object_t::rm_timer (int id_)
 {
-    poller->cancel_timer (this, id_);
+    poller->rm_timer (this, id_);
 }
 
 void xs::io_object_t::in_event (fd_t fd_)

@@ -78,7 +78,7 @@ namespace xs
         void add_timer (int timeout_, xs::i_poll_events *sink_, int id_);
 
         //  Cancel the timer created by sink_ object with ID equal to id_.
-        void cancel_timer (xs::i_poll_events *sink_, int id_);
+        void rm_timer (xs::i_poll_events *sink_, int id_);
 
     protected:
 

@@ -75,7 +75,7 @@ void xs::poller_base_t::add_timer (int timeout_, i_poll_events *sink_, int id_)
     timers.insert (timers_t::value_type (expiration, info));
 }
 
-void xs::poller_base_t::cancel_timer (i_poll_events *sink_, int id_)
+void xs::poller_base_t::rm_timer (i_poll_events *sink_, int id_)
 {
     //  Complexity of this operation is O(n). We assume it is rarely used.
     for (timers_t::iterator it = timers.begin (); it != timers.end (); ++it)

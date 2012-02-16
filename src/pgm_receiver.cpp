@@ -91,7 +91,7 @@ void xs::pgm_receiver_t::unplug ()
     pending_bytes = 0;
 
     if (has_rx_timer) {
-        cancel_timer (rx_timer_id);
+        rm_timer (rx_timer_id);
         has_rx_timer = false;
     }
 
@@ -158,7 +158,7 @@ void xs::pgm_receiver_t::in_event (fd_t fd_)
         return;
 
     if (has_rx_timer) {
-        cancel_timer (rx_timer_id);
+        rm_timer (rx_timer_id);
         has_rx_timer = false;
     }
 
@@ -251,7 +251,7 @@ void xs::pgm_receiver_t::in_event (fd_t fd_)
 
             //  Reset outstanding timer.
             if (has_rx_timer) {
-                cancel_timer (rx_timer_id);
+                rm_timer (rx_timer_id);
                 has_rx_timer = false;
             }
 
