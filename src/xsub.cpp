@@ -35,6 +35,9 @@ xs::xsub_t::xsub_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     //  subscription commands are sent to the wire.
     options.linger = 0;
 
+    //  Also, we want the subscription buffer to be elastic by default.
+    options.sndhwm = 0;
+
     int rc = message.init ();
     errno_assert (rc == 0);
 }
