@@ -208,11 +208,13 @@ void xs::stream_engine_t::in_event ()
 
 void xs::stream_engine_t::out_event ()
 {
+    bool more_data = true;
+
     //  If write buffer is empty, try to read new data from the encoder.
     if (!outsize) {
 
         outpos = NULL;
-        encoder.get_data (&outpos, &outsize);
+        more_data = encoder.get_data (&outpos, &outsize);
 
         //  If IO handler has unplugged engine, flush transient IO handler.
         if (unlikely (!plugged)) {
@@ -243,6 +245,11 @@ void xs::stream_engine_t::out_event ()
 
     outpos += nbytes;
     outsize -= nbytes;
+
+    //  If the encoder reports that there are no more data to get from it
+    //  we can stop polling for POLLOUT immediately.
+    if (!more_data)
+        reset_pollout (handle);
 }
 
 void xs::stream_engine_t::activate_out ()

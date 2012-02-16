@@ -63,7 +63,11 @@ namespace xs
         //  If offset is not NULL, it is filled by offset of the first message
         //  in the batch.If there's no beginning of a message in the batch,
         //  offset is set to -1.
-        inline void get_data (unsigned char **data_, size_t *size_,
+        //  If data is returned and return value is false, there are no more
+        //  data available to get from the encoder the next time. Therefore,
+        //  an optimisation can be made and the engine can stop polling for
+        //  POLLOUT immediately.
+        inline bool get_data (unsigned char **data_, size_t *size_,
             int *offset_ = NULL)
         {
             unsigned char *buffer = !*data_ ? buf : *data_;
@@ -82,7 +86,7 @@ namespace xs
                     if (!(static_cast <T*> (this)->*next) ()) {
                         *data_ = buffer;
                         *size_ = pos;
-                        return;
+                        return false;
                     }
 
                     //  If beginning of the message was processed, adjust the
@@ -109,7 +113,7 @@ namespace xs
                     *size_ = to_write;
                     write_pos = NULL;
                     to_write = 0;
-                    return;
+                    return true;
                 }
 
                 //  Copy data to the buffer. If the buffer is full, return.
@@ -121,7 +125,7 @@ namespace xs
                 if (pos == buffersize) {
                     *data_ = buffer;
                     *size_ = pos;
-                    return;
+                    return true;
                 }
             }
         }
