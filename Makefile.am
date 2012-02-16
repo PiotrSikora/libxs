@@ -31,7 +31,6 @@ dist-hook:
 	else \
 		echo A git clone is required to generate a ChangeLog >&2; \
 	fi
-	-cp $(top_srcdir)/builds/redhat/zeromq.spec $(distdir)/zeromq.spec
 	-rm -rf $(distdir)/foreign/openpgm/build-staging
 distclean-local:
 	-rm -rf $(top_srcdir)/foreign/openpgm/build-staging
