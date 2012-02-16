@@ -17,9 +17,10 @@ be your first choice.
 ADDRESSING
 ----------
 A Crossroads address string consists of two parts as follows:
-'transport'`://`'endpoint'. The 'transport' part specifies the underlying
-transport protocol to use, and for the TCP transport shall be set to `tcp`.
-The meaning of the 'endpoint' part for the TCP transport is defined below.
+'transport'`://[`'source address'`;]`'endpoint'. The 'transport' part specifies
+the underlying transport protocol to use, and for the TCP transport shall be
+set to `tcp`.  'source address' is optional. The meaning of the 'endpoint' part
+for the TCP transport is defined below.
 
 
 Assigning a local address to a socket

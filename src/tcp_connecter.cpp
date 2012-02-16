@@ -178,7 +178,23 @@ int xs::tcp_connecter_t::get_new_reconnect_ivl ()
 
 int xs::tcp_connecter_t::set_address (const char *addr_)
 {
-    return address.resolve (addr_, false, options.ipv4only ? true : false);
+    //  Find the ';'. It separates source address address from a destination.
+    const char *delimiter = strchr (addr_, ';');
+
+    std::string addr_str;
+    if (delimiter) {
+        std::string saddr_str (addr_, delimiter - addr_);
+        addr_str = delimiter + 1;
+        int rc = source_address.resolve (saddr_str.c_str(), true,
+            options.ipv4only ? true : false, true);
+        if (rc != 0)
+            return -1;
+    }
+    else
+        addr_str = addr_;
+
+    return address.resolve (addr_str.c_str(), false,
+        options.ipv4only ? true : false);
 }
 
 int xs::tcp_connecter_t::open ()
@@ -202,8 +218,12 @@ int xs::tcp_connecter_t::open ()
     if (address.family () == AF_INET6)
         enable_ipv4_mapping (s);
 
-    // Set the socket to non-blocking mode so that we get async connect().
+    //  Set the socket to non-blocking mode so that we get async connect().
     unblock_socket (s);
+
+    //  Set a source address for conversations.
+    if (source_address.family ())
+        ::bind (s, source_address.addr (), source_address.addrlen ());
 
     //  Connect to the remote peer.
     int rc = ::connect (s, address.addr (), address.addrlen ());

@@ -45,7 +45,8 @@ namespace xs
         //  strcuture. If 'local' is true, names are resolved as local interface
         //  names. If it is false, names are resolved as remote hostnames.
         //  If 'ipv4only' is true, the name will never resolve to IPv6 address.
-        int resolve (const char* name_, bool local_, bool ipv4only_);
+        int resolve (const char* name_, bool local_, bool ipv4only_,
+            bool ignore_port_=false);
 
 #if defined XS_HAVE_WINDOWS
         unsigned short family ();

@@ -250,11 +250,8 @@ int xs::tcp_address_t::resolve_interface (char const *interface_,
     int rc = resolve_nic_name (interface_, ipv4only_);
     if (rc != 0 && errno != ENODEV)
         return rc;
-    if (rc == 0) {
-        xs_assert (out_addrlen <= (socklen_t) sizeof (address));
-        memcpy (&address, out_addr, out_addrlen);
+    if (rc == 0)
         return 0;
-    }
 
     //  There's no such interface name. Assume literal address.
 #if defined XS_HAVE_OPENVMS && defined __ia64
@@ -369,30 +366,37 @@ xs::tcp_address_t::~tcp_address_t ()
 {
 }
 
-int xs::tcp_address_t::resolve (const char *name_, bool local_, bool ipv4only_)
+int xs::tcp_address_t::resolve (const char *name_, bool local_, bool ipv4only_,
+    bool ignore_port_)
 {
     //  Find the ':' at end that separates address from the port number.
     const char *delimiter = strrchr (name_, ':');
-    if (!delimiter) {
-        errno = EINVAL;
-        return -1;
-    }
+    std::string addr_str;
+    uint16_t port = 0;
 
-    //  Separate the address/port.
-    std::string addr_str (name_, delimiter - name_);
-    std::string port_str (delimiter + 1);
+    if (!ignore_port_) {
+        if (!delimiter) {
+            errno = EINVAL;
+            return -1;
+        }
+
+        //  Separate the address/port.
+        addr_str = std::string (name_, delimiter - name_);
+
+        //  Parse the port number (0 is not a valid port).
+        port = (uint16_t) atoi (delimiter+1);
+        if (port == 0) {
+            errno = EINVAL;
+            return -1;
+        }
+    }
+    else
+        addr_str = name_;
 
     //  Remove square brackets around the address, if any.
     if (!addr_str.empty () && addr_str [0] == '[' &&
           addr_str [addr_str.size () - 1] == ']')
         addr_str = addr_str.substr (1, addr_str.size () - 2);
-
-    //  Parse the port number (0 is not a valid port).
-    uint16_t port = (uint16_t) atoi (port_str.c_str());
-    if (port == 0) {
-        errno = EINVAL;
-        return -1;
-    }
 
     //  Resolve the IP address.
     int rc;

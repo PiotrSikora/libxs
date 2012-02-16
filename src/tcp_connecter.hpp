@@ -87,6 +87,9 @@ namespace xs
         //  Address to connect to.
         tcp_address_t address;
 
+        //  Source address.
+        tcp_address_t source_address;
+
         //  Underlying socket.
         fd_t s;
 
