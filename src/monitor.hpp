@@ -40,6 +40,8 @@ namespace zmq
         void start ();
         void stop ();
 
+        void log (int sid_, const char *text_);
+
     private:
 
         enum {timer_id = 0x44};

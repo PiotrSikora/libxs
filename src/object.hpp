@@ -61,9 +61,6 @@ namespace zmq
         zmq::endpoint_t find_endpoint (const char *addr_);
         void destroy_socket (zmq::socket_base_t *socket_);
 
-        //  Logs an message.
-        void log (const char *format_, ...);
-
         //  Chooses least loaded I/O thread.
         zmq::io_thread_t *choose_io_thread (uint64_t affinity_);
 

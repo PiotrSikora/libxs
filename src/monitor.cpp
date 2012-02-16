@@ -44,6 +44,10 @@ void zmq::monitor_t::stop ()
     send_stop ();
 }
 
+void zmq::monitor_t::log (int sid_, const char *text_)
+{
+}
+
 void zmq::monitor_t::process_plug ()
 {
     //  Schedule sending of the first snapshot.
