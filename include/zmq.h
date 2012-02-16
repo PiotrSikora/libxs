@@ -109,7 +109,7 @@
 #define ZMQ_POLLOUT XS_POLLOUT
 #define ZMQ_POLLERR XS_POLLERR
 
-#define zmq_pollitem_t xs_pollitem_t;
+#define zmq_pollitem_t xs_pollitem_t
 #define zmq_poll xs_poll
 
 #endif
