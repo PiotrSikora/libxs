@@ -21,7 +21,11 @@
 //  This file is used only in MSVC build.
 //  It gathers all the tests into a single executable.
 
+#include "testutil.hpp"
+
 #include <assert.h>
+
+#undef XS_TEST_MAIN
 
 #define XS_TEST_MAIN hwm
 #include "hwm.cpp"
@@ -115,6 +119,9 @@ int main ()
     assert (rc == 0);
     rc = timeo ();
     assert (rc == 0);
+
+    fprintf (stderr, "SUCCESS\n");
+    xs_sleep (1);
 
     return 0;
 }
