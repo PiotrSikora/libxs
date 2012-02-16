@@ -57,6 +57,33 @@ int main (int argc, char *argv [])
     assert (rc == 0);
     rc = xs_close (pull);
     assert (rc == 0);
+
+    //  Now, let's test the same scenario with IPC.
+    push = xs_socket (ctx, XS_PUSH);
+    assert (push);
+    pull = xs_socket (ctx, XS_PULL);
+    assert (push);
+
+    //  Connect before bind was done at the peer and send one message.
+    rc = xs_connect (push, "ipc:///tmp/tester");
+    assert (rc == 0);
+    rc = xs_send (push, "ABC", 3, 0);
+    assert (rc == 3);
+
+    //  Wait a while for few attempts to reconnect to happen.
+    xs_sleep (1);
+
+    //  Bind the peer and get the message.
+    rc = xs_bind (pull, "ipc:///tmp/tester");
+    assert (rc == 0);
+    rc = xs_recv (pull, buf, sizeof (buf), 0);
+    assert (rc == 3);
+
+    //  Clean up.
+    rc = xs_close (push);
+    assert (rc == 0);
+    rc = xs_close (pull);
+    assert (rc == 0);
     rc = xs_term (ctx);
     assert (rc == 0);
 
