@@ -30,7 +30,6 @@
 #include "stdint.hpp"
 #include "poller_base.hpp"
 #include "atomic_counter.hpp"
-#include "i_poll_events.hpp"
 #include "mailbox.hpp"
 #include "stdint.hpp"
 #include "pipe.hpp"

@@ -29,7 +29,6 @@ libxs_la_SOURCES = \
     ipc_connecter.hpp \
     ipc_listener.hpp \
     i_engine.hpp \
-    i_poll_events.hpp \
     kqueue.hpp \
     lb.hpp \
     likely.hpp \

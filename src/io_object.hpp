@@ -26,7 +26,6 @@
 
 #include "stdint.hpp"
 #include "poller_base.hpp"
-#include "i_poll_events.hpp"
 
 namespace xs
 {

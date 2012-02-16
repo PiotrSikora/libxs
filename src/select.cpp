@@ -42,7 +42,6 @@
 
 #include "err.hpp"
 #include "config.hpp"
-#include "i_poll_events.hpp"
 
 xs::select_t::select_t () :
     maxfd (retired_fd),

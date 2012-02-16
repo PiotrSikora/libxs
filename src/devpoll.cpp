@@ -36,7 +36,6 @@
 #include "devpoll.hpp"
 #include "err.hpp"
 #include "config.hpp"
-#include "i_poll_events.hpp"
 
 xs::devpoll_t::devpoll_t () :
     stopping (false)

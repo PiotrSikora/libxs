@@ -34,7 +34,6 @@
 #include "kqueue.hpp"
 #include "err.hpp"
 #include "config.hpp"
-#include "i_poll_events.hpp"
 #include "likely.hpp"
 
 //  NetBSD defines (struct kevent).udata as intptr_t, everyone else

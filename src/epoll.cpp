@@ -33,7 +33,6 @@
 #include "epoll.hpp"
 #include "err.hpp"
 #include "config.hpp"
-#include "i_poll_events.hpp"
 
 xs::epoll_t::epoll_t () :
     stopping (false)

@@ -19,7 +19,6 @@
 */
 
 #include "poller_base.hpp"
-#include "i_poll_events.hpp"
 #include "err.hpp"
 
 #include "select.hpp"

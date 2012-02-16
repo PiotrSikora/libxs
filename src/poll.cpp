@@ -31,7 +31,6 @@
 #include "poll.hpp"
 #include "err.hpp"
 #include "config.hpp"
-#include "i_poll_events.hpp"
 
 xs::poll_t::poll_t () :
     retired (false),

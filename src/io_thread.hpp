@@ -27,7 +27,6 @@
 #include "stdint.hpp"
 #include "object.hpp"
 #include "poller_base.hpp"
-#include "i_poll_events.hpp"
 #include "mailbox.hpp"
 
 namespace xs

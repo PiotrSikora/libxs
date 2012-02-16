@@ -235,9 +235,6 @@
     <ClInclude Include="..\..\..\src\i_engine.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\i_poll_events.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\io_object.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
