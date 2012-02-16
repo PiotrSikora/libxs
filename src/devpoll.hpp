@@ -43,7 +43,7 @@ namespace xs
     {
     public:
 
-        devpoll_t ();
+        devpoll_t (xs::ctx_t *ctx_, uint32_t tid_);
         ~devpoll_t ();
 
         //  "poller" concept.

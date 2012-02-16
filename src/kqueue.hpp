@@ -43,7 +43,7 @@ namespace xs
     {
     public:
 
-        kqueue_t ();
+        kqueue_t (xs::ctx_t *ctx_, uint32_t tid_);
         ~kqueue_t ();
 
         //  "poller" concept.

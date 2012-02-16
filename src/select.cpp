@@ -43,7 +43,8 @@
 #include "err.hpp"
 #include "config.hpp"
 
-xs::select_t::select_t () :
+xs::select_t::select_t (xs::ctx_t *ctx_, uint32_t tid_) :
+    poller_base_t (ctx_, tid_),
     maxfd (retired_fd),
     retired (false),
     stopping (false)

@@ -46,7 +46,7 @@ namespace xs
     {
     public:
 
-        poll_t ();
+        poll_t (xs::ctx_t *ctx_, uint32_t tid_);
         ~poll_t ();
 
         //  "poller" concept.

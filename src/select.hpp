@@ -56,7 +56,7 @@ namespace xs
     {
     public:
 
-        select_t ();
+        select_t (xs::ctx_t *ctx_, uint32_t tid_);
         ~select_t ();
 
         //  "poller" concept.
