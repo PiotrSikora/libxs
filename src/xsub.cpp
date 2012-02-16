@@ -48,7 +48,7 @@ xs::xsub_t::~xsub_t ()
     errno_assert (rc == 0);
 }
 
-void xs::xsub_t::xattach_pipe (pipe_t *pipe_)
+void xs::xsub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
 {
     xs_assert (pipe_);
     fq.attach (pipe_);

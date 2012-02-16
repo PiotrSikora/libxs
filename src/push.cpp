@@ -34,7 +34,7 @@ xs::push_t::~push_t ()
 {
 }
 
-void xs::push_t::xattach_pipe (pipe_t *pipe_)
+void xs::push_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
 {
     xs_assert (pipe_);
     lb.attach (pipe_);

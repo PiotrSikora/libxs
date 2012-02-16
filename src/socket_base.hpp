@@ -102,7 +102,8 @@ namespace xs
 
         //  Concrete algorithms for the x- methods are to be defined by
         //  individual socket types.
-        virtual void xattach_pipe (xs::pipe_t *pipe_) = 0;
+        virtual void xattach_pipe (xs::pipe_t *pipe_,
+            bool icanhasall_ = false) = 0;
 
         //  The default implementation assumes there are no specific socket
         //  options for the particular socket type. If not so, overload this
@@ -157,7 +158,7 @@ namespace xs
         int check_protocol (const std::string &protocol_);
 
         //  Register the pipe with this socket.
-        void attach_pipe (xs::pipe_t *pipe_);
+        void attach_pipe (xs::pipe_t *pipe_, bool icanhasall_ = false);
 
         //  Processes commands sent to this socket (if any). If timeout is -1,
         //  returns only after at least one command was processed.

@@ -46,7 +46,7 @@ xs::xreq_t::~xreq_t ()
     prefetched_msg.close ();
 }
 
-void xs::xreq_t::xattach_pipe (pipe_t *pipe_)
+void xs::xreq_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
 {
     xs_assert (pipe_);
     fq.attach (pipe_);

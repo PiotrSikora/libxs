@@ -45,7 +45,7 @@ namespace xs
     protected:
 
         //  Overloads of functions from socket_base_t.
-        void xattach_pipe (xs::pipe_t *pipe_);
+        void xattach_pipe (xs::pipe_t *pipe_, bool icanhasall_);
         int xrecv (xs::msg_t *msg_, int flags_);
         bool xhas_in ();
         void xread_activated (xs::pipe_t *pipe_);

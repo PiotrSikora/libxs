@@ -55,7 +55,7 @@ xs::xrep_t::~xrep_t ()
     prefetched_msg.close ();
 }
 
-void xs::xrep_t::xattach_pipe (pipe_t *pipe_)
+void xs::xrep_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
 {
     xs_assert (pipe_);
 

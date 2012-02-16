@@ -36,7 +36,7 @@ xs::pair_t::~pair_t ()
     xs_assert (!pipe);
 }
 
-void xs::pair_t::xattach_pipe (pipe_t *pipe_)
+void xs::pair_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
 {
     xs_assert (!pipe);
     pipe = pipe_;
