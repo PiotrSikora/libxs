@@ -35,19 +35,37 @@ namespace xs
 #if defined _MSC_VER &&_MSC_VER <= 1400
     typedef UINT_PTR fd_t;
     enum {retired_fd = (fd_t)(~0)};
-    inline void *fdtoptr (fd_t fd_) {return (void*) fd_;}
-    inline fd_t ptrtofd (void *ptr_) {return (fd_t) ptr_;}
+    inline void *fdtoptr (fd_t fd_)
+    {
+        return (void*) (fd_ + 1);
+    }
+    inline fd_t ptrtofd (void *ptr_)
+    {
+        return ((fd_t) ptr_) - 1;
+    }
 #else
     typedef SOCKET fd_t;
     enum {retired_fd = INVALID_SOCKET};
-    inline void *fdtoptr (fd_t fd_) {return (void*) fd_;}
-    inline fd_t ptrtofd (void *ptr_) {return (fd_t) ptr_;}
+    inline void *fdtoptr (fd_t fd_)
+    {
+        return (void*) (fd_ + 1);
+    }
+    inline fd_t ptrtofd (void *ptr_)
+    {
+        return ((fd_t) ptr_) - 1;
+    }
 #endif
 #else
     typedef int fd_t;
     enum {retired_fd = -1};
-    inline void *fdtoptr (fd_t fd_) {return (void*) fd_;}
-    inline fd_t ptrtofd (void *ptr_) {return (int) ((char*) ptr_ - (char*) 0);}
+    inline void *fdtoptr (fd_t fd_)
+    {
+        return (void*) (fd_ + 1);
+    }
+    inline fd_t ptrtofd (void *ptr_)
+    {
+        return ((int) ((char*) ptr_ - (char*) 0)) - 1;
+    }
 #endif
 
 }
