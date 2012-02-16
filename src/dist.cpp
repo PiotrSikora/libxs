@@ -139,7 +139,8 @@ void xs::dist_t::distribute (msg_t *msg_, int flags_)
 
     if (msg_->is_vsm ()) {
         for (pipes_t::size_type i = 0; i < matching; ++i)
-            write (pipes [i], msg_);
+            if (!write (pipes [i], msg_))
+                --i;
         int rc = msg_->close();
         errno_assert (rc == 0);
         rc = msg_->init ();
@@ -154,8 +155,10 @@ void xs::dist_t::distribute (msg_t *msg_, int flags_)
     //  Push copy of the message to each matching pipe.
     int failed = 0;
     for (pipes_t::size_type i = 0; i < matching; ++i)
-        if (!write (pipes [i], msg_))
+        if (!write (pipes [i], msg_)) {
+            --i;
             ++failed;
+        }
     if (unlikely (failed))
         msg_->rm_refs (failed);
 
