@@ -41,14 +41,14 @@
 xs::pgm_sender_t::pgm_sender_t (io_thread_t *parent_, 
       const options_t &options_) :
     io_object_t (parent_),
-    has_tx_timer (false),
-    has_rx_timer (false),
     encoder (0),
     pgm_socket (false, options_),
     options (options_),
     out_buffer (NULL),
     out_buffer_size (0),
-    write_size (0)
+    write_size (0),
+    rx_timer (NULL),
+    tx_timer (NULL)
 {
 }
 
@@ -106,14 +106,14 @@ void xs::pgm_sender_t::plug (io_thread_t *io_thread_, session_base_t *session_)
 
 void xs::pgm_sender_t::unplug ()
 {
-    if (has_rx_timer) {
-        rm_timer (rx_timer_id);
-        has_rx_timer = false;
+    if (rx_timer) {
+        rm_timer (rx_timer);
+        rx_timer = NULL;
     }
 
-    if (has_tx_timer) {
-        rm_timer (tx_timer_id);
-        has_tx_timer = false;
+    if (tx_timer) {
+        rm_timer (tx_timer);
+        tx_timer = NULL;
     }
 
     rm_fd (handle);
@@ -150,17 +150,17 @@ xs::pgm_sender_t::~pgm_sender_t ()
 
 void xs::pgm_sender_t::in_event (fd_t fd_)
 {
-    if (has_rx_timer) {
-        rm_timer (rx_timer_id);
-        has_rx_timer = false;
+    if (rx_timer) {
+        rm_timer (rx_timer);
+        rx_timer = NULL;
     }
 
     //  In-event on sender side means NAK or SPMR receiving from some peer.
     pgm_socket.process_upstream ();
     if (errno == ENOMEM || errno == EBUSY) {
         const long timeout = pgm_socket.get_rx_timeout ();
-        add_timer (timeout, rx_timer_id);
-        has_rx_timer = true;
+        xs_assert (!rx_timer);
+        rx_timer = add_timer (timeout);
     }
 }
 
@@ -189,9 +189,9 @@ void xs::pgm_sender_t::out_event (fd_t fd_)
         put_uint16 (out_buffer, offset == -1 ? 0xffff : (uint16_t) offset);
     }
 
-    if (has_tx_timer) {
-        rm_timer (tx_timer_id);
-        has_tx_timer = false;
+    if (tx_timer) {
+        rm_timer (tx_timer);
+        tx_timer = NULL;
     }
 
     //  Send the data.
@@ -205,21 +205,21 @@ void xs::pgm_sender_t::out_event (fd_t fd_)
 
         if (errno == ENOMEM) {
             const long timeout = pgm_socket.get_tx_timeout ();
-            add_timer (timeout, tx_timer_id);
-            has_tx_timer = true;
+            xs_assert (!tx_timer);
+            tx_timer = add_timer (timeout);
         } else
             xs_assert (errno == EBUSY);
     }
 }
 
-void xs::pgm_sender_t::timer_event (int token)
+void xs::pgm_sender_t::timer_event (handle_t handle_)
 {
     //  Timer cancels on return by poller_base.
-    if (token == rx_timer_id) {
-        has_rx_timer = false;
+    if (handle_ == rx_timer) {
+        rx_timer = NULL;
         in_event (retired_fd);
-    } else if (token == tx_timer_id) {
-        has_tx_timer = false;
+    } else if (handle_ == tx_timer) {
+        tx_timer = NULL;
         out_event (retired_fd);
     } else
         xs_assert (false);

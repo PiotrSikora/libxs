@@ -59,7 +59,7 @@ namespace xs
         //  i_poll_events implementation.
         void in_event (fd_t fd_);
         void out_event (fd_t fd_);
-        void timer_event (int id_);
+        void timer_event (handle_t handle_);
 
         //  Used by io_objects to retrieve the assciated poller object.
         poller_base_t *get_poller ();

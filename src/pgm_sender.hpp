@@ -65,16 +65,9 @@ namespace xs
         //  i_poll_events interface implementation.
         void in_event (fd_t fd_);
         void out_event (fd_t fd_);
-        void timer_event (int token);
+        void timer_event (handle_t handle_);
 
     private:
-
-        //  TX and RX timeout timer ID's.
-        enum {tx_timer_id = 0xa0, rx_timer_id = 0xa1};
-
-        //  Timers are running.
-        bool has_tx_timer;
-        bool has_rx_timer;
 
         //  Message encoder.
         encoder_t encoder;
@@ -100,6 +93,10 @@ namespace xs
         //  Number of bytes in the buffer to be written to the socket.
         //  If zero, there are no data to be sent.
         size_t write_size;
+
+        //  Receive and send timers or NULL if not active.
+        handle_t rx_timer;
+        handle_t tx_timer;
 
         pgm_sender_t (const pgm_sender_t&);
         const pgm_sender_t &operator = (const pgm_sender_t&);

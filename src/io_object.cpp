@@ -82,14 +82,14 @@ void xs::io_object_t::reset_pollout (handle_t handle_)
     poller->reset_pollout (handle_);
 }
 
-void xs::io_object_t::add_timer (int timeout_, int id_)
+xs::handle_t xs::io_object_t::add_timer (int timeout_)
 {
-    poller->add_timer (timeout_, this, id_);
+    return poller->add_timer (timeout_, this);
 }
 
-void xs::io_object_t::rm_timer (int id_)
+void xs::io_object_t::rm_timer (handle_t handle_)
 {
-    poller->rm_timer (this, id_);
+    poller->rm_timer (handle_);
 }
 
 void xs::io_object_t::in_event (fd_t fd_)
@@ -98,11 +98,12 @@ void xs::io_object_t::in_event (fd_t fd_)
 }
 
 void xs::io_object_t::out_event (fd_t fd_)
+
 {
     xs_assert (false);
 }
 
-void xs::io_object_t::timer_event (int id_)
+void xs::io_object_t::timer_event (handle_t handle_)
 {
     xs_assert (false);
 }

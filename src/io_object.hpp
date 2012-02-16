@@ -57,13 +57,13 @@ namespace xs
         void reset_pollin (handle_t handle_);
         void set_pollout (handle_t handle_);
         void reset_pollout (handle_t handle_);
-        void add_timer (int timout_, int id_);
-        void rm_timer (int id_);
+        handle_t add_timer (int timout_);
+        void rm_timer (handle_t handle_);
 
         //  i_poll_events interface implementation.
         void in_event (fd_t fd_);
         void out_event (fd_t fd_);
-        void timer_event (int id_);
+        void timer_event (handle_t handle_);
 
     private:
 

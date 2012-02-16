@@ -89,7 +89,7 @@ void xs::io_thread_t::out_event (fd_t fd_)
     xs_assert (false);
 }
 
-void xs::io_thread_t::timer_event (int id_)
+void xs::io_thread_t::timer_event (handle_t handle_)
 {
     //  No timers here. This function is never called.
     xs_assert (false);

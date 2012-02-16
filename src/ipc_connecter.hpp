@@ -59,7 +59,7 @@ namespace xs
         //  Handlers for I/O events.
         void in_event (fd_t fd_);
         void out_event (fd_t fd_);
-        void timer_event (int id_);
+        void timer_event (handle_t handle_);
 
         //  Internal function to start the actual connection establishment.
         void start_connecting ();
@@ -108,6 +108,9 @@ namespace xs
 
         //  Current reconnect ivl, updated for backoff strategy
         int current_reconnect_ivl;
+
+        //  Handle of the reconnect timer, if active. NULL otherwise.
+        handle_t reconnect_timer;
 
         ipc_connecter_t (const ipc_connecter_t&);
         const ipc_connecter_t &operator = (const ipc_connecter_t&);

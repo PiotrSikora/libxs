@@ -47,18 +47,19 @@ namespace xs
 
     private:
 
-        enum {timer_id = 0x44};
-
         //  Handlers for incoming commands.
         void process_plug ();
         void process_stop ();
 
         //  Events from the poller.
-        void timer_event (int id_);
+        void timer_event (handle_t handle_);
 
         //  Actual monitoring data to send and the related critical section.
         std::string text;
         mutex_t sync;
+
+        //  Handle of the timer.
+        handle_t timer;
 
         monitor_t (const monitor_t&);
         const monitor_t &operator = (const monitor_t&);

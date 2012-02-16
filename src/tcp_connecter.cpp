@@ -55,7 +55,8 @@ xs::tcp_connecter_t::tcp_connecter_t (class io_thread_t *io_thread_,
     handle_valid (false),
     wait (wait_),
     session (session_),
-    current_reconnect_ivl(options.reconnect_ivl)
+    current_reconnect_ivl(options.reconnect_ivl),
+    reconnect_timer (NULL)
 {
     //  TODO: set_addess should be called separately, so that the error
     //  can be propagated.
@@ -65,8 +66,11 @@ xs::tcp_connecter_t::tcp_connecter_t (class io_thread_t *io_thread_,
 
 xs::tcp_connecter_t::~tcp_connecter_t ()
 {
-    if (wait)
-        rm_timer (reconnect_timer_id);
+    if (wait) {
+        xs_assert (reconnect_timer);
+        rm_timer (reconnect_timer);
+        reconnect_timer = NULL;
+    }
     if (handle_valid)
         rm_fd (handle);
 
@@ -117,9 +121,10 @@ void xs::tcp_connecter_t::out_event (fd_t fd_)
     terminate ();
 }
 
-void xs::tcp_connecter_t::timer_event (int id_)
+void xs::tcp_connecter_t::timer_event (handle_t handle_)
 {
-    xs_assert (id_ == reconnect_timer_id);
+    xs_assert (handle_ == reconnect_timer);
+    reconnect_timer = NULL;
     wait = false;
     start_connecting ();
 }
@@ -153,7 +158,8 @@ void xs::tcp_connecter_t::start_connecting ()
 
 void xs::tcp_connecter_t::add_reconnect_timer()
 {
-    add_timer (get_new_reconnect_ivl(), reconnect_timer_id);
+    xs_assert (!reconnect_timer);
+    reconnect_timer = add_timer (get_new_reconnect_ivl());
 }
 
 int xs::tcp_connecter_t::get_new_reconnect_ivl ()

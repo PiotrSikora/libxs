@@ -87,7 +87,7 @@ namespace xs
         //  is handled by the poller in the reaper thread.
         void in_event (fd_t fd_);
         void out_event (fd_t fd_);
-        void timer_event (int id_);
+        void timer_event (handle_t handle_);
 
         //  i_pipe_events interface implementation.
         void read_activated (pipe_t *pipe_);

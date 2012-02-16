@@ -47,16 +47,13 @@ namespace xs
 
     private:
 
-        //  ID of the timer used to delay the reconnection.
-        enum {reconnect_timer_id = 1};
-
         //  Handlers for incoming commands.
         void process_plug ();
 
         //  Handlers for I/O events.
         void in_event (fd_t fd_);
         void out_event (fd_t fd_);
-        void timer_event (int id_);
+        void timer_event (handle_t handle_);
 
         //  Internal function to start the actual connection establishment.
         void start_connecting ();
@@ -108,6 +105,9 @@ namespace xs
 
         //  Current reconnect ivl, updated for backoff strategy
         int current_reconnect_ivl;
+
+        //  Handle to reconnect timer, if active, NULL otherwise.
+        handle_t reconnect_timer;
 
         tcp_connecter_t (const tcp_connecter_t&);
         const tcp_connecter_t &operator = (const tcp_connecter_t&);

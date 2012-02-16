@@ -66,19 +66,13 @@ namespace xs
 
         //  i_poll_events interface implementation.
         void in_event (fd_t fd_);
-        void timer_event (int token);
+        void timer_event (handle_t handle_);
 
     private:
 
         //  PGM is not able to move subscriptions upstream. Thus, drop all
         //  the pending subscriptions.
         void drop_subscriptions ();
-
-        //  RX timeout timer ID.
-        enum {rx_timer_id = 0xa1};
-
-        //  RX timer is running.
-        bool has_rx_timer;
 
         //  If joined is true we are already getting messages from the peer.
         //  It it's false, we are getting data but still we haven't seen
@@ -127,6 +121,9 @@ namespace xs
 
         //  Poll handle associated with engine PGM waiting pipe.
         handle_t pipe_handle;
+
+        //  Receive timer, if active, otherwise NULL.
+        handle_t rx_timer;
 
         pgm_receiver_t (const pgm_receiver_t&);
         const pgm_receiver_t &operator = (const pgm_receiver_t&);

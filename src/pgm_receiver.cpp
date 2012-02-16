@@ -40,12 +40,12 @@
 xs::pgm_receiver_t::pgm_receiver_t (class io_thread_t *parent_, 
       const options_t &options_) :
     io_object_t (parent_),
-    has_rx_timer (false),
     pgm_socket (true, options_),
     options (options_),
     session (NULL),
     mru_decoder (NULL),
-    pending_bytes (0)
+    pending_bytes (0),
+    rx_timer (NULL)
 {
 }
 
@@ -90,9 +90,9 @@ void xs::pgm_receiver_t::unplug ()
     mru_decoder = NULL;
     pending_bytes = 0;
 
-    if (has_rx_timer) {
-        rm_timer (rx_timer_id);
-        has_rx_timer = false;
+    if (rx_timer) {
+        rm_timer (rx_timer);
+        rx_timer = NULL;
     }
 
     rm_fd (socket_handle);
@@ -157,9 +157,9 @@ void xs::pgm_receiver_t::in_event (fd_t fd_)
     if (pending_bytes > 0)
         return;
 
-    if (has_rx_timer) {
-        rm_timer (rx_timer_id);
-        has_rx_timer = false;
+    if (rx_timer) {
+        rm_timer (rx_timer);
+        rx_timer = NULL;
     }
 
     //  TODO: This loop can effectively block other engines in the same I/O
@@ -177,8 +177,8 @@ void xs::pgm_receiver_t::in_event (fd_t fd_)
         if (received == 0) {
             if (errno == ENOMEM || errno == EBUSY) {
                 const long timeout = pgm_socket.get_rx_timeout ();
-                add_timer (timeout, rx_timer_id);
-                has_rx_timer = true;
+                xs_assert (!rx_timer);
+                rx_timer = add_timer (timeout);
             }
             break;
         }
@@ -250,9 +250,9 @@ void xs::pgm_receiver_t::in_event (fd_t fd_)
             reset_pollin (socket_handle);
 
             //  Reset outstanding timer.
-            if (has_rx_timer) {
-                rm_timer (rx_timer_id);
-                has_rx_timer = false;
+            if (rx_timer) {
+                rm_timer (rx_timer);
+                rx_timer = NULL;
             }
 
             break;
@@ -263,12 +263,10 @@ void xs::pgm_receiver_t::in_event (fd_t fd_)
     session->flush ();
 }
 
-void xs::pgm_receiver_t::timer_event (int token)
+void xs::pgm_receiver_t::timer_event (handle_t handle_)
 {
-    xs_assert (token == rx_timer_id);
-
-    //  Timer cancels on return by poller_base.
-    has_rx_timer = false;
+    xs_assert (handle_ == rx_timer);
+    rx_timer = NULL;
     in_event (retired_fd);
 }
 

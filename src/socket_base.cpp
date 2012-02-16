@@ -807,7 +807,7 @@ void xs::socket_base_t::out_event (fd_t fd_)
     xs_assert (false);
 }
 
-void xs::socket_base_t::timer_event (int id_)
+void xs::socket_base_t::timer_event (handle_t handle_)
 {
     xs_assert (false);
 }

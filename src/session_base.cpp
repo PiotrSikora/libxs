@@ -112,9 +112,9 @@ xs::session_base_t::session_base_t (class io_thread_t *io_thread_,
     engine (NULL),
     socket (socket_),
     io_thread (io_thread_),
-    has_linger_timer (false),
     send_identity (options_.send_identity),
-    recv_identity (options_.recv_identity)
+    recv_identity (options_.recv_identity),
+    linger_timer (NULL)
 {
     if (protocol_)
         protocol = protocol_;
@@ -127,9 +127,9 @@ xs::session_base_t::~session_base_t ()
     xs_assert (!pipe);
 
     //  If there's still a pending linger timer, remove it.
-    if (has_linger_timer) {
-        rm_timer (linger_timer_id);
-        has_linger_timer = false;
+    if (linger_timer) {
+        rm_timer (linger_timer);
+        linger_timer = NULL;
     }
 
     //  Close the engine.
@@ -329,9 +329,8 @@ void xs::session_base_t::process_term (int linger_)
     //  If linger is infinite (negative) we don't even have to set
     //  the timer.
     if (linger_ > 0) {
-        xs_assert (!has_linger_timer);
-        add_timer (linger_, linger_timer_id);
-        has_linger_timer = true;
+        xs_assert (!linger_timer);
+        linger_timer = add_timer (linger_);
     }
 
     //  Start pipe termination process. Delay the termination till all messages
@@ -353,12 +352,11 @@ void xs::session_base_t::proceed_with_term ()
     own_t::process_term (0);
 }
 
-void xs::session_base_t::timer_event (int id_)
+void xs::session_base_t::timer_event (handle_t handle_)
 {
     //  Linger period expired. We can proceed with termination even though
     //  there are still pending messages to be sent.
-    xs_assert (id_ == linger_timer_id);
-    has_linger_timer = false;
+    xs_assert (handle_ == linger_timer);
 
     //  Ask pipe to terminate even though there may be pending messages in it.
     xs_assert (pipe);

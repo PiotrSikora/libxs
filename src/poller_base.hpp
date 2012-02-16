@@ -47,7 +47,7 @@ namespace xs
         virtual void out_event (fd_t fd_) = 0;
  
         // Called when timer expires.
-        virtual void timer_event (int id_) = 0;
+        virtual void timer_event (handle_t handle_) = 0;
     };
 
     class poller_base_t
@@ -73,12 +73,11 @@ namespace xs
         virtual void stop () = 0;
 
         //  Add a timeout to expire in timeout_ milliseconds. After the
-        //  expiration timer_event on sink_ object will be called with
-        //  argument set to id_.
-        void add_timer (int timeout_, xs::i_poll_events *sink_, int id_);
+        //  expiration timer_event on sink_ object will be called.
+        handle_t add_timer (int timeout_, xs::i_poll_events *sink_);
 
-        //  Cancel the timer created by sink_ object with ID equal to id_.
-        void rm_timer (xs::i_poll_events *sink_, int id_);
+        //  Cancel the timer identified by the handle.
+        void rm_timer (handle_t handle_);
 
     protected:
 
@@ -100,7 +99,7 @@ namespace xs
         struct timer_info_t
         {
             xs::i_poll_events *sink;
-            int id;
+            std::multimap <uint64_t, timer_info_t>::iterator self;
         };
         typedef std::multimap <uint64_t, timer_info_t> timers_t;
         timers_t timers;

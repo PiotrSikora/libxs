@@ -84,7 +84,7 @@ namespace xs
         void process_term (int linger_);
 
         //  i_poll_events handlers.
-        void timer_event (int id_);
+        void timer_event (handle_t handle_);
 
         //  Remove any half processed messages. Flush unflushed messages.
         //  Call this function when engine disconnect to get rid of leftovers.
@@ -118,12 +118,6 @@ namespace xs
         //  the engines into the same thread.
         xs::io_thread_t *io_thread;
 
-        //  ID of the linger timer
-        enum {linger_timer_id = 0x20};
-
-        //  True is linger timer is running.
-        bool has_linger_timer;
-
         //  If true, identity is to be sent/recvd from the network.
         bool send_identity;
         bool recv_identity;
@@ -131,6 +125,9 @@ namespace xs
         //  Protocol and address to use when connecting.
         std::string protocol;
         std::string address;
+
+        //  Handle of the linger timer, if active, NULL otherwise.
+        handle_t linger_timer;
 
         session_base_t (const session_base_t&);
         const session_base_t &operator = (const session_base_t&);

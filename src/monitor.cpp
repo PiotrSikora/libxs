@@ -26,7 +26,8 @@
 
 xs::monitor_t::monitor_t (xs::io_thread_t *io_thread_) :
     own_t (io_thread_, options_t ()),
-    io_object_t (io_thread_)
+    io_object_t (io_thread_),
+    timer (NULL)
 {
 }
 
@@ -54,19 +55,20 @@ void xs::monitor_t::log (int sid_, const char *text_)
 void xs::monitor_t::process_plug ()
 {
     //  Schedule sending of the first snapshot.
-    add_timer (500 + (generate_random () % 1000), timer_id);
+    timer = add_timer (500 + (generate_random () % 1000));
 }
 
 void xs::monitor_t::process_stop ()
 {
-    rm_timer (timer_id);
+    rm_timer (timer);
+    timer = NULL;
     send_done ();
     delete this;
 }
 
-void xs::monitor_t::timer_event (int id_)
+void xs::monitor_t::timer_event (handle_t handle_)
 {
-    xs_assert (id_ == timer_id);
+    xs_assert (handle_ == timer);
 
     //  Send the snapshot here!
     sync.lock ();
@@ -74,5 +76,5 @@ void xs::monitor_t::timer_event (int id_)
     sync.unlock ();
 
     //  Wait before sending next snapshot.
-    add_timer (500 + (generate_random () % 1000), timer_id);
+    timer = add_timer (500 + (generate_random () % 1000));
 }

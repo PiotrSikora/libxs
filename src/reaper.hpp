@@ -46,7 +46,7 @@ namespace xs
         //  i_poll_events implementation.
         void in_event (fd_t fd_);
         void out_event (fd_t fd_);
-        void timer_event (int id_);
+        void timer_event (handle_t handle_);
 
     private:
 

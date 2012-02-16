@@ -68,24 +68,20 @@ void xs::poller_base_t::adjust_load (int amount_)
         load.sub (-amount_);
 }
 
-void xs::poller_base_t::add_timer (int timeout_, i_poll_events *sink_, int id_)
+xs::handle_t xs::poller_base_t::add_timer (int timeout_, i_poll_events *sink_)
 {
     uint64_t expiration = clock.now_ms () + timeout_;
-    timer_info_t info = {sink_, id_};
-    timers.insert (timers_t::value_type (expiration, info));
+    timer_info_t info = {sink_, timers_t::iterator ()};
+    timers_t::iterator it = timers.insert (
+        timers_t::value_type (expiration, info));
+    it->second.self = it;
+    return (handle_t) &(it->second);
 }
 
-void xs::poller_base_t::rm_timer (i_poll_events *sink_, int id_)
+void xs::poller_base_t::rm_timer (handle_t handle_)
 {
-    //  Complexity of this operation is O(n). We assume it is rarely used.
-    for (timers_t::iterator it = timers.begin (); it != timers.end (); ++it)
-        if (it->second.sink == sink_ && it->second.id == id_) {
-            timers.erase (it);
-            return;
-        }
-
-    //  Timer not found.
-    xs_assert (false);
+    timer_info_t *info = (timer_info_t*) handle_;
+    timers.erase (info->self);
 }
 
 uint64_t xs::poller_base_t::execute_timers ()
@@ -109,7 +105,7 @@ uint64_t xs::poller_base_t::execute_timers ()
             return it->first - current;
 
         //  Trigger the timer.
-        it->second.sink->timer_event (it->second.id);
+        it->second.sink->timer_event ((handle_t) &it->second);
 
         //  Remove it from the list of active timers.
         timers_t::iterator o = it;
