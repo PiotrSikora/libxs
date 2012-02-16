@@ -37,6 +37,7 @@ tests/msg_flags
 tests/reconnect
 tests/linger
 tests/max_sockets
+tests/emptyctx
 tests/polltimeo
 src/platform.hpp*
 src/stamp-h1
