@@ -37,28 +37,34 @@ namespace xs
     class mutex_t
     {
     public:
-        inline mutex_t ()
+        inline mutex_t (bool fake_ = false) :
+            fake (fake_)
         {
-            InitializeCriticalSection (&cs);
+            if (!fake)
+                InitializeCriticalSection (&cs);
         }
 
         inline ~mutex_t ()
         {
-            DeleteCriticalSection (&cs);
+            if (!fake)
+                DeleteCriticalSection (&cs);
         }
 
         inline void lock ()
         {
-            EnterCriticalSection (&cs);
+            if (!fake)
+                EnterCriticalSection (&cs);
         }
 
         inline void unlock ()
         {
-            LeaveCriticalSection (&cs);
+            if (!fake)
+                LeaveCriticalSection (&cs);
         }
 
     private:
 
+        bool fake;
         CRITICAL_SECTION cs;
 
         //  Disable copy construction and assignment.
@@ -78,36 +84,46 @@ namespace xs
     class mutex_t
     {
     public:
-        inline mutex_t ()
+        inline mutex_t (bool fake_ = false) :
+            fake (fake_)
         {
-            int rc = pthread_mutex_init (&mutex, NULL);
-            if (rc)
-                posix_assert (rc);
+            if (!fake) {
+                int rc = pthread_mutex_init (&mutex, NULL);
+                if (rc)
+                    posix_assert (rc);
+            }
         }
  
         inline ~mutex_t ()
         {
-            int rc = pthread_mutex_destroy (&mutex);
-            if (rc)
-                posix_assert (rc);
+            if (!fake) {
+                int rc = pthread_mutex_destroy (&mutex);
+                if (rc)
+                    posix_assert (rc);
+            }
         }
  
         inline void lock ()
         {
-            int rc = pthread_mutex_lock (&mutex);
-            if (rc)
-                posix_assert (rc);
+            if (!fake) {
+                int rc = pthread_mutex_lock (&mutex);
+                if (rc)
+                    posix_assert (rc);
+            }
         }
  
         inline void unlock ()
         {
-            int rc = pthread_mutex_unlock (&mutex);
-            if (rc)
-                posix_assert (rc);
+            if (!fake) {
+                int rc = pthread_mutex_unlock (&mutex);
+                if (rc)
+                    posix_assert (rc);
+            }
         }
  
     private:
  
+        bool fake;
         pthread_mutex_t mutex;
  
         // Disable copy construction and assignment.

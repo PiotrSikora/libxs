@@ -100,6 +100,9 @@ namespace xs
         void log (int sid_, const char *text_);
         void publish_logs (const char *text_);
 
+        //  True, if API is expected to be reentrant.
+        bool is_reentrant ();
+
         enum {
             term_tid = 0,
             reaper_tid = 1
@@ -172,6 +175,9 @@ namespace xs
 
         //  Number of I/O threads to launch.
         uint32_t io_thread_count;
+
+        //  True, if API is expected to be reentrant.
+        bool reentrant;
 
         //  Synchronisation of access to context options.
         mutex_t opt_sync;

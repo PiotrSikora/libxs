@@ -43,7 +43,8 @@ xs::ctx_t::ctx_t (uint32_t io_threads_) :
     starting (true),
     terminating (false),
     max_sockets (512),
-    io_thread_count (io_threads_)
+    io_thread_count (io_threads_),
+    reentrant (false)
 {
 }
 
@@ -145,6 +146,16 @@ int xs::ctx_t::setctxopt (int option_, const void *optval_, size_t optvallen_)
         }
         opt_sync.lock ();
         max_sockets = *((int*) optval_);
+        opt_sync.unlock ();
+        break;
+    case XS_CTX_REENTRANT:
+        if (optvallen_ != sizeof (int) || (*((int*) optval_) != 0 &&
+              *((int*) optval_) != 1)) {
+            errno = EINVAL;
+            return -1;
+        }
+        opt_sync.lock ();
+        reentrant = (*((int*) optval_) ? true : false);
         opt_sync.unlock ();
         break;
     default:
@@ -377,6 +388,14 @@ void xs::ctx_t::publish_logs (const char *text_)
     errno_assert (rc == 0);
     msg.close ();
     log_sync.unlock ();
+}
+
+bool xs::ctx_t::is_reentrant ()
+{
+    opt_sync.lock ();
+    bool ret = reentrant;
+    opt_sync.unlock ();
+    return ret;
 }
 
 //  The last used socket ID, or 0 if no socket was used so far. Note that this

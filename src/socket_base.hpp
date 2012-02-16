@@ -141,6 +141,10 @@ namespace xs
         //  Used to check whether the object is a socket.
         uint32_t tag;
 
+        //  Synchronisation of access to the socket. If Crossroads are running
+        //  in non-reentrant mode, it is a dummy mutex-like object.
+        mutex_t sync;
+
         //  If true, associated context was already terminated.
         bool ctx_terminated;
 
