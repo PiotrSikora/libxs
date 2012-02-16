@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libxs.la
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libxs.pc
 
-include_HEADERS = ../include/xs.h ../include/xs_utils.h
+include_HEADERS = ../include/xs.h ../include/xs_utils.h ../include/zmq.h
 
 libxs_la_SOURCES = \
     array.hpp \
