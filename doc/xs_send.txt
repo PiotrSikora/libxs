@@ -1,0 +1,105 @@
+xs_send(3)
+==========
+
+
+NAME
+----
+xs_send - send a message part  on a socket
+
+
+SYNOPSIS
+--------
+*int xs_send (void '*socket', void '*buf', size_t 'len', int 'flags');*
+
+
+DESCRIPTION
+-----------
+The _xs_send()_ function shall queue a message created from the buffer
+referenced by the 'buf' and 'len' arguments. The 'flags' argument is
+a combination of the flags defined below:
+
+*XS_DONTWAIT*::
+Specifies that the operation should be performed in non-blocking mode. If the
+message cannot be queued on the 'socket', the _xs_send()_ function shall
+fail with 'errno' set to EAGAIN.
+
+*XS_SNDMORE*::
+Specifies that the message being sent is a multi-part message, and that further
+message parts are to follow. Refer to the section regarding multi-part messages
+below for a detailed description.
+
+NOTE: A successful invocation of _xs_send()_ does not indicate that the
+message has been transmitted to the network, only that it has been queued on
+the 'socket' and Crossroads have assumed responsibility for the message.
+
+
+Multi-part messages
+~~~~~~~~~~~~~~~~~~~
+A Crossroads message is composed of 1 or more message parts. Each message
+part is an independent 'xs_msg_t' in its own right. Crossroads ensure atomic
+delivery of messages; peers shall receive either all _message parts_ of a
+message or none at all. The total number of message parts is unlimited except
+by available memory.
+
+An application that sends multipart messages must use the _XS_SNDMORE_ flag
+when sending each data part except the final one.
+
+
+RETURN VALUE
+------------
+The _xs_send()_ function shall return number of bytes in the message
+if successful. Otherwise it shall return `-1` and set 'errno' to one of the
+values defined below.
+
+
+ERRORS
+------
+*EAGAIN*::
+Non-blocking mode was requested and the message cannot be sent at the moment.
+*ENOTSUP*::
+The _xs_send()_ operation is not supported by this socket type.
+*EFSM*::
+The _xs_send()_ operation cannot be performed on this socket at the moment
+due to the socket not being in the appropriate state.  This error may occur with
+socket types that switch between several states, such as XS_REP.  See the
+_messaging patterns_ section of linkxs:xs_socket[3] for more information.
+*ETERM*::
+The 'context' associated with the specified 'socket' was terminated.
+*ENOTSOCK*::
+The provided 'socket' was invalid.
+*EINTR*::
+The operation was interrupted by delivery of a signal before the message was
+sent.
+*ECANTROUTE*::
+Message cannot be routed to the destination specified as the peer is either
+dead or disconnected. This error makes sense only with XS_ROUTER socket.
+
+
+EXAMPLE
+-------
+.Sending a multi-part message
+----
+/* Send a multi-part message consisting of three parts to socket */
+rc = xs_send (socket, "ABC", 3, XS_SNDMORE);
+assert (rc == 3);
+rc = xs_send (socket, "DEFGH", 5, XS_SNDMORE);
+assert (rc == 5);
+/* Final part; no more parts to follow */
+rc = xs_send (socket, "JK", 2, 0);
+assert (rc == 2);
+----
+
+SEE ALSO
+--------
+linkxs:xs_sendmsg[3]
+linkxs:xs_recv[3]
+linkxs:xs_recvmsg[3]
+linkxs:xs_socket[7]
+linkxs:xs[7]
+
+
+AUTHORS
+-------
++This man page was written by Martin Sustrik <sustrik@250bpm.com>, Martin
++Lucina <martin@lucina.net> and Pieter Hintjens <ph@imatix.com>.
+

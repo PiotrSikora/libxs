@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -20,7 +20,7 @@
 */
 
 #include "epoll.hpp"
-#if defined ZMQ_USE_EPOLL
+#if defined XS_USE_EPOLL
 
 #include <sys/epoll.h>
 #include <stdlib.h>
@@ -34,14 +34,14 @@
 #include "config.hpp"
 #include "i_poll_events.hpp"
 
-zmq::epoll_t::epoll_t () :
+xs::epoll_t::epoll_t () :
     stopping (false)
 {
     epoll_fd = epoll_create (1);
     errno_assert (epoll_fd != -1);
 }
 
-zmq::epoll_t::~epoll_t ()
+xs::epoll_t::~epoll_t ()
 {
     //  Wait till the worker thread exits.
     worker.stop ();
@@ -51,7 +51,7 @@ zmq::epoll_t::~epoll_t ()
         delete *it;
 }
 
-zmq::epoll_t::handle_t zmq::epoll_t::add_fd (fd_t fd_, i_poll_events *events_)
+xs::epoll_t::handle_t xs::epoll_t::add_fd (fd_t fd_, i_poll_events *events_)
 {
     poll_entry_t *pe = new (std::nothrow) poll_entry_t;
     alloc_assert (pe);
@@ -74,7 +74,7 @@ zmq::epoll_t::handle_t zmq::epoll_t::add_fd (fd_t fd_, i_poll_events *events_)
     return pe;
 }
 
-void zmq::epoll_t::rm_fd (handle_t handle_)
+void xs::epoll_t::rm_fd (handle_t handle_)
 {
     poll_entry_t *pe = (poll_entry_t*) handle_;
     int rc = epoll_ctl (epoll_fd, EPOLL_CTL_DEL, pe->fd, &pe->ev);
@@ -86,7 +86,7 @@ void zmq::epoll_t::rm_fd (handle_t handle_)
     adjust_load (-1);
 }
 
-void zmq::epoll_t::set_pollin (handle_t handle_)
+void xs::epoll_t::set_pollin (handle_t handle_)
 {
     poll_entry_t *pe = (poll_entry_t*) handle_;
     pe->ev.events |= EPOLLIN;
@@ -94,7 +94,7 @@ void zmq::epoll_t::set_pollin (handle_t handle_)
     errno_assert (rc != -1);
 }
 
-void zmq::epoll_t::reset_pollin (handle_t handle_)
+void xs::epoll_t::reset_pollin (handle_t handle_)
 {
     poll_entry_t *pe = (poll_entry_t*) handle_;
     pe->ev.events &= ~((short) EPOLLIN);
@@ -102,7 +102,7 @@ void zmq::epoll_t::reset_pollin (handle_t handle_)
     errno_assert (rc != -1);
 }
 
-void zmq::epoll_t::set_pollout (handle_t handle_)
+void xs::epoll_t::set_pollout (handle_t handle_)
 {
     poll_entry_t *pe = (poll_entry_t*) handle_;
     pe->ev.events |= EPOLLOUT;
@@ -110,7 +110,7 @@ void zmq::epoll_t::set_pollout (handle_t handle_)
     errno_assert (rc != -1);
 }
 
-void zmq::epoll_t::reset_pollout (handle_t handle_)
+void xs::epoll_t::reset_pollout (handle_t handle_)
 {
     poll_entry_t *pe = (poll_entry_t*) handle_;
     pe->ev.events &= ~((short) EPOLLOUT);
@@ -118,17 +118,17 @@ void zmq::epoll_t::reset_pollout (handle_t handle_)
     errno_assert (rc != -1);
 }
 
-void zmq::epoll_t::start ()
+void xs::epoll_t::start ()
 {
     worker.start (worker_routine, this);
 }
 
-void zmq::epoll_t::stop ()
+void xs::epoll_t::stop ()
 {
     stopping = true;
 }
 
-void zmq::epoll_t::loop ()
+void xs::epoll_t::loop ()
 {
     epoll_event ev_buf [max_io_events];
 
@@ -169,7 +169,7 @@ void zmq::epoll_t::loop ()
     }
 }
 
-void zmq::epoll_t::worker_routine (void *arg_)
+void xs::epoll_t::worker_routine (void *arg_)
 {
     ((epoll_t*) arg_)->loop ();
 }

@@ -1,15 +1,15 @@
 /*
-    Copyright (c) 2011 250bpm s.r.o.
+    Copyright (c) 2011-2012 250bpm s.r.o.
     Copyright (c) 2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -20,7 +20,7 @@
 
 #include "ipc_listener.hpp"
 
-#if !defined ZMQ_HAVE_WINDOWS && !defined ZMQ_HAVE_OPENVMS
+#if !defined XS_HAVE_WINDOWS && !defined XS_HAVE_OPENVMS
 
 #include <new>
 
@@ -39,7 +39,7 @@
 #include <fcntl.h>
 #include <sys/un.h>
 
-zmq::ipc_listener_t::ipc_listener_t (io_thread_t *io_thread_,
+xs::ipc_listener_t::ipc_listener_t (io_thread_t *io_thread_,
       socket_base_t *socket_, const options_t &options_) :
     own_t (io_thread_, options_),
     io_object_t (io_thread_),
@@ -49,26 +49,26 @@ zmq::ipc_listener_t::ipc_listener_t (io_thread_t *io_thread_,
 {
 }
 
-zmq::ipc_listener_t::~ipc_listener_t ()
+xs::ipc_listener_t::~ipc_listener_t ()
 {
     if (s != retired_fd)
         close ();
 }
 
-void zmq::ipc_listener_t::process_plug ()
+void xs::ipc_listener_t::process_plug ()
 {
     //  Start polling for incoming connections.
     handle = add_fd (s);
     set_pollin (handle);
 }
 
-void zmq::ipc_listener_t::process_term (int linger_)
+void xs::ipc_listener_t::process_term (int linger_)
 {
     rm_fd (handle);
     own_t::process_term (linger_);
 }
 
-void zmq::ipc_listener_t::in_event ()
+void xs::ipc_listener_t::in_event ()
 {
     fd_t fd = accept ();
 
@@ -84,7 +84,7 @@ void zmq::ipc_listener_t::in_event ()
     //  Choose I/O thread to run connecter in. Given that we are already
     //  running in an I/O thread, there must be at least one available.
     io_thread_t *io_thread = choose_io_thread (options.affinity);
-    zmq_assert (io_thread);
+    xs_assert (io_thread);
 
     //  Create and launch a session object. 
     session_base_t *session = session_base_t::create (io_thread, false, socket,
@@ -95,7 +95,7 @@ void zmq::ipc_listener_t::in_event ()
     send_attach (session, engine, false);
 }
 
-int zmq::ipc_listener_t::set_address (const char *addr_)
+int xs::ipc_listener_t::set_address (const char *addr_)
 {
     //  Get rid of the file associated with the UNIX domain socket that
     //  may have been left behind by the previous run of the application.
@@ -128,9 +128,9 @@ int zmq::ipc_listener_t::set_address (const char *addr_)
     return 0;  
 }
 
-int zmq::ipc_listener_t::close ()
+int xs::ipc_listener_t::close ()
 {
-    zmq_assert (s != retired_fd);
+    xs_assert (s != retired_fd);
     int rc = ::close (s);
     if (rc != 0)
         return -1;
@@ -147,10 +147,10 @@ int zmq::ipc_listener_t::close ()
     return 0;
 }
 
-zmq::fd_t zmq::ipc_listener_t::accept ()
+xs::fd_t xs::ipc_listener_t::accept ()
 {
     //  Accept one connection and deal with different failure modes.
-    zmq_assert (s != retired_fd);
+    xs_assert (s != retired_fd);
     fd_t sock = ::accept (s, NULL, NULL);
     if (sock == -1) {
         errno_assert (errno == EAGAIN || errno == EWOULDBLOCK ||

@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -19,8 +19,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/zmq.h"
-#include "../include/zmq_utils.h"
+#include "../include/xs.h"
+#include "../include/xs_utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,7 +34,7 @@ int main (int argc, char *argv [])
     void *s;
     int rc;
     int i;
-    zmq_msg_t msg;
+    xs_msg_t msg;
 
     if (argc != 4) {
         printf ("usage: remote_thr <connect-to> <message-size> "
@@ -45,59 +45,59 @@ int main (int argc, char *argv [])
     message_size = atoi (argv [2]);
     message_count = atoi (argv [3]);
 
-    ctx = zmq_init (1);
+    ctx = xs_init (1);
     if (!ctx) {
-        printf ("error in zmq_init: %s\n", zmq_strerror (errno));
+        printf ("error in xs_init: %s\n", xs_strerror (errno));
         return -1;
     }
 
-    s = zmq_socket (ctx, ZMQ_PUSH);
+    s = xs_socket (ctx, XS_PUSH);
     if (!s) {
-        printf ("error in zmq_socket: %s\n", zmq_strerror (errno));
+        printf ("error in xs_socket: %s\n", xs_strerror (errno));
         return -1;
     }
 
     //  Add your socket options here.
-    //  For example ZMQ_RATE, ZMQ_RECOVERY_IVL and ZMQ_MCAST_LOOP for PGM.
+    //  For example XS_RATE, XS_RECOVERY_IVL and XS_MCAST_LOOP for PGM.
 
-    rc = zmq_connect (s, connect_to);
+    rc = xs_connect (s, connect_to);
     if (rc != 0) {
-        printf ("error in zmq_connect: %s\n", zmq_strerror (errno));
+        printf ("error in xs_connect: %s\n", xs_strerror (errno));
         return -1;
     }
 
     for (i = 0; i != message_count; i++) {
 
-        rc = zmq_msg_init_size (&msg, message_size);
+        rc = xs_msg_init_size (&msg, message_size);
         if (rc != 0) {
-            printf ("error in zmq_msg_init_size: %s\n", zmq_strerror (errno));
+            printf ("error in xs_msg_init_size: %s\n", xs_strerror (errno));
             return -1;
         }
-#if defined ZMQ_MAKE_VALGRIND_HAPPY
-        memset (zmq_msg_data (&msg), 0, message_size);
+#if defined XS_MAKE_VALGRIND_HAPPY
+        memset (xs_msg_data (&msg), 0, message_size);
 #endif
 
-        rc = zmq_sendmsg (s, &msg, 0);
+        rc = xs_sendmsg (s, &msg, 0);
         if (rc < 0) {
-            printf ("error in zmq_sendmsg: %s\n", zmq_strerror (errno));
+            printf ("error in xs_sendmsg: %s\n", xs_strerror (errno));
             return -1;
         }
-        rc = zmq_msg_close (&msg);
+        rc = xs_msg_close (&msg);
         if (rc != 0) {
-            printf ("error in zmq_msg_close: %s\n", zmq_strerror (errno));
+            printf ("error in xs_msg_close: %s\n", xs_strerror (errno));
             return -1;
         }
     }
 
-    rc = zmq_close (s);
+    rc = xs_close (s);
     if (rc != 0) {
-        printf ("error in zmq_close: %s\n", zmq_strerror (errno));
+        printf ("error in xs_close: %s\n", xs_strerror (errno));
         return -1;
     }
 
-    rc = zmq_term (ctx);
+    rc = xs_term (ctx);
     if (rc != 0) {
-        printf ("error in zmq_term: %s\n", zmq_strerror (errno));
+        printf ("error in xs_term: %s\n", xs_strerror (errno));
         return -1;
     }
 

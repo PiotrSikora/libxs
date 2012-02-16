@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -20,7 +20,7 @@
 */
 
 #include "msg.hpp"
-#include "../include/zmq.h"
+#include "../include/xs.h"
 
 #include <string.h>
 #include <errno.h>
@@ -31,17 +31,17 @@
 #include "likely.hpp"
 #include "err.hpp"
 
-//  Check whether the sizes of public representation of the message (zmq_msg_t)
-//  and private represenation of the message (zmq::msg_t) match.
-typedef char zmq_msg_size_check
-    [2 * ((sizeof (zmq::msg_t) == sizeof (zmq_msg_t)) != 0) - 1];
+//  Check whether the sizes of public representation of the message (xs_msg_t)
+//  and private represenation of the message (xs::msg_t) match.
+typedef char xs_msg_size_check
+    [2 * ((sizeof (xs::msg_t) == sizeof (xs_msg_t)) != 0) - 1];
 
-bool zmq::msg_t::check ()
+bool xs::msg_t::check ()
 {
      return u.base.type >= type_min && u.base.type <= type_max;
 }
 
-int zmq::msg_t::init ()
+int xs::msg_t::init ()
 {
     u.vsm.type = type_vsm;
     u.vsm.flags = 0;
@@ -49,7 +49,7 @@ int zmq::msg_t::init ()
     return 0;
 }
 
-int zmq::msg_t::init_size (size_t size_)
+int xs::msg_t::init_size (size_t size_)
 {
     if (size_ <= max_vsm_size) {
         u.vsm.type = type_vsm;
@@ -70,12 +70,12 @@ int zmq::msg_t::init_size (size_t size_)
         u.lmsg.content->size = size_;
         u.lmsg.content->ffn = NULL;
         u.lmsg.content->hint = NULL;
-        new (&u.lmsg.content->refcnt) zmq::atomic_counter_t ();
+        new (&u.lmsg.content->refcnt) xs::atomic_counter_t ();
     }
     return 0;
 }
 
-int zmq::msg_t::init_data (void *data_, size_t size_, msg_free_fn *ffn_,
+int xs::msg_t::init_data (void *data_, size_t size_, msg_free_fn *ffn_,
     void *hint_)
 {
     u.lmsg.type = type_lmsg;
@@ -90,19 +90,19 @@ int zmq::msg_t::init_data (void *data_, size_t size_, msg_free_fn *ffn_,
     u.lmsg.content->size = size_;
     u.lmsg.content->ffn = ffn_;
     u.lmsg.content->hint = hint_;
-    new (&u.lmsg.content->refcnt) zmq::atomic_counter_t ();
+    new (&u.lmsg.content->refcnt) xs::atomic_counter_t ();
     return 0;
 
 }
 
-int zmq::msg_t::init_delimiter ()
+int xs::msg_t::init_delimiter ()
 {
     u.delimiter.type = type_delimiter;
     u.delimiter.flags = 0;
     return 0;
 }
 
-int zmq::msg_t::close ()
+int xs::msg_t::close ()
 {
     //  Check the validity of the message.
     if (unlikely (!check ())) {
@@ -135,7 +135,7 @@ int zmq::msg_t::close ()
 
 }
 
-int zmq::msg_t::move (msg_t &src_)
+int xs::msg_t::move (msg_t &src_)
 {
     //  Check the validity of the source.
     if (unlikely (!src_.check ())) {
@@ -156,7 +156,7 @@ int zmq::msg_t::move (msg_t &src_)
     return 0;
 }
 
-int zmq::msg_t::copy (msg_t &src_)
+int xs::msg_t::copy (msg_t &src_)
 {
     //  Check the validity of the source.
     if (unlikely (!src_.check ())) {
@@ -186,10 +186,10 @@ int zmq::msg_t::copy (msg_t &src_)
 
 }
 
-void *zmq::msg_t::data ()
+void *xs::msg_t::data ()
 {
     //  Check the validity of the message.
-    zmq_assert (check ());
+    xs_assert (check ());
 
     switch (u.base.type) {
     case type_vsm:
@@ -197,15 +197,15 @@ void *zmq::msg_t::data ()
     case type_lmsg:
         return u.lmsg.content->data;
     default:
-        zmq_assert (false);
+        xs_assert (false);
         return NULL;
     }
 }
 
-size_t zmq::msg_t::size ()
+size_t xs::msg_t::size ()
 {
     //  Check the validity of the message.
-    zmq_assert (check ());
+    xs_assert (check ());
 
     switch (u.base.type) {
     case type_vsm:
@@ -213,39 +213,39 @@ size_t zmq::msg_t::size ()
     case type_lmsg:
         return u.lmsg.content->size;
     default:
-        zmq_assert (false);
+        xs_assert (false);
         return 0;
     }
 }
 
-unsigned char zmq::msg_t::flags ()
+unsigned char xs::msg_t::flags ()
 {
     return u.base.flags;
 }
 
-void zmq::msg_t::set_flags (unsigned char flags_)
+void xs::msg_t::set_flags (unsigned char flags_)
 {
     u.base.flags |= flags_;
 }
 
-void zmq::msg_t::reset_flags (unsigned char flags_)
+void xs::msg_t::reset_flags (unsigned char flags_)
 {
     u.base.flags &= ~flags_;
 }
 
-bool zmq::msg_t::is_delimiter ()
+bool xs::msg_t::is_delimiter ()
 {
     return u.base.type == type_delimiter;
 }
 
-bool zmq::msg_t::is_vsm ()
+bool xs::msg_t::is_vsm ()
 {
     return u.base.type == type_vsm;
 }
 
-void zmq::msg_t::add_refs (int refs_)
+void xs::msg_t::add_refs (int refs_)
 {
-    zmq_assert (refs_ >= 0);
+    xs_assert (refs_ >= 0);
 
     //  No copies required.
     if (!refs_)
@@ -263,9 +263,9 @@ void zmq::msg_t::add_refs (int refs_)
     }
 }
 
-bool zmq::msg_t::rm_refs (int refs_)
+bool xs::msg_t::rm_refs (int refs_)
 {
-    zmq_assert (refs_ >= 0);
+    xs_assert (refs_ >= 0);
 
     //  No copies required.
     if (!refs_)

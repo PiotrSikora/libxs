@@ -3,14 +3,14 @@
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -19,12 +19,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ZMQ_PUB_HPP_INCLUDED__
-#define __ZMQ_PUB_HPP_INCLUDED__
+#ifndef __XS_PUB_HPP_INCLUDED__
+#define __XS_PUB_HPP_INCLUDED__
 
 #include "xpub.hpp"
 
-namespace zmq
+namespace xs
 {
 
     class ctx_t;
@@ -36,11 +36,11 @@ namespace zmq
     {
     public:
 
-        pub_t (zmq::ctx_t *parent_, uint32_t tid_, int sid_);
+        pub_t (xs::ctx_t *parent_, uint32_t tid_, int sid_);
         ~pub_t ();
 
         //  Implementations of virtual functions from socket_base_t.
-        int xrecv (zmq::msg_t *msg_, int flags_);
+        int xrecv (xs::msg_t *msg_, int flags_);
         bool xhas_in ();
 
     private:
@@ -53,8 +53,8 @@ namespace zmq
     {
     public:
 
-        pub_session_t (zmq::io_thread_t *io_thread_, bool connect_,
-            zmq::socket_base_t *socket_, const options_t &options_,
+        pub_session_t (xs::io_thread_t *io_thread_, bool connect_,
+            xs::socket_base_t *socket_, const options_t &options_,
             const char *protocol_, const char *address_);
         ~pub_session_t ();
 

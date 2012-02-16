@@ -1,17 +1,17 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2011 VMware, Inc.
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -20,8 +20,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ZMQ_PIPE_HPP_INCLUDED__
-#define __ZMQ_PIPE_HPP_INCLUDED__
+#ifndef __XS_PIPE_HPP_INCLUDED__
+#define __XS_PIPE_HPP_INCLUDED__
 
 #include "msg.hpp"
 #include "ypipe.hpp"
@@ -31,7 +31,7 @@
 #include "array.hpp"
 #include "blob.hpp"
 
-namespace zmq
+namespace xs
 {
 
     class object_t;
@@ -43,17 +43,17 @@ namespace zmq
     //  Delay specifies how the pipe behaves when the peer terminates. If true
     //  pipe receives all the pending messages before terminating, otherwise it
     //  terminates straight away.
-    int pipepair (zmq::object_t *parents_ [2], zmq::pipe_t* pipes_ [2],
+    int pipepair (xs::object_t *parents_ [2], xs::pipe_t* pipes_ [2],
         int hwms_ [2], bool delays_ [2]);
 
     struct i_pipe_events
     {
         virtual ~i_pipe_events () {}
 
-        virtual void read_activated (zmq::pipe_t *pipe_) = 0;
-        virtual void write_activated (zmq::pipe_t *pipe_) = 0;
-        virtual void hiccuped (zmq::pipe_t *pipe_) = 0;
-        virtual void terminated (zmq::pipe_t *pipe_) = 0;
+        virtual void read_activated (xs::pipe_t *pipe_) = 0;
+        virtual void write_activated (xs::pipe_t *pipe_) = 0;
+        virtual void hiccuped (xs::pipe_t *pipe_) = 0;
+        virtual void terminated (xs::pipe_t *pipe_) = 0;
     };
 
     //  Note that pipe can be stored in three different arrays.
@@ -67,8 +67,8 @@ namespace zmq
         public array_item_t <3>
     {
         //  This allows pipepair to create pipe objects.
-        friend int pipepair (zmq::object_t *parents_ [2],
-            zmq::pipe_t* pipes_ [2], int hwms_ [2], bool delays_ [2]);
+        friend int pipepair (xs::object_t *parents_ [2],
+            xs::pipe_t* pipes_ [2], int hwms_ [2], bool delays_ [2]);
 
     public:
 

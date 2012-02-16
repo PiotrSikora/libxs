@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -30,7 +30,7 @@
 #include "err.hpp"
 #include "ip.hpp"
 
-#if defined ZMQ_HAVE_WINDOWS
+#if defined XS_HAVE_WINDOWS
 #include "windows.hpp"
 #else
 #include <unistd.h>
@@ -41,12 +41,12 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <fcntl.h>
-#ifdef ZMQ_HAVE_OPENVMS
+#ifdef XS_HAVE_OPENVMS
 #include <ioctl.h>
 #endif
 #endif
 
-zmq::tcp_connecter_t::tcp_connecter_t (class io_thread_t *io_thread_,
+xs::tcp_connecter_t::tcp_connecter_t (class io_thread_t *io_thread_,
       class session_base_t *session_, const options_t &options_,
       const char *address_, bool wait_) :
     own_t (io_thread_, options_),
@@ -63,7 +63,7 @@ zmq::tcp_connecter_t::tcp_connecter_t (class io_thread_t *io_thread_,
     errno_assert (rc == 0);
 }
 
-zmq::tcp_connecter_t::~tcp_connecter_t ()
+xs::tcp_connecter_t::~tcp_connecter_t ()
 {
     if (wait)
         cancel_timer (reconnect_timer_id);
@@ -74,7 +74,7 @@ zmq::tcp_connecter_t::~tcp_connecter_t ()
         close ();
 }
 
-void zmq::tcp_connecter_t::process_plug ()
+void xs::tcp_connecter_t::process_plug ()
 {
     if (wait)
         add_reconnect_timer();
@@ -82,7 +82,7 @@ void zmq::tcp_connecter_t::process_plug ()
         start_connecting ();
 }
 
-void zmq::tcp_connecter_t::in_event ()
+void xs::tcp_connecter_t::in_event ()
 {
     //  We are not polling for incomming data, so we are actually called
     //  because of error here. However, we can get error on out event as well
@@ -90,7 +90,7 @@ void zmq::tcp_connecter_t::in_event ()
     out_event ();
 }
 
-void zmq::tcp_connecter_t::out_event ()
+void xs::tcp_connecter_t::out_event ()
 {
     fd_t fd = connect ();
     rm_fd (handle);
@@ -117,14 +117,14 @@ void zmq::tcp_connecter_t::out_event ()
     terminate ();
 }
 
-void zmq::tcp_connecter_t::timer_event (int id_)
+void xs::tcp_connecter_t::timer_event (int id_)
 {
-    zmq_assert (id_ == reconnect_timer_id);
+    xs_assert (id_ == reconnect_timer_id);
     wait = false;
     start_connecting ();
 }
 
-void zmq::tcp_connecter_t::start_connecting ()
+void xs::tcp_connecter_t::start_connecting ()
 {
     //  Open the connecting socket.
     int rc = open ();
@@ -151,12 +151,12 @@ void zmq::tcp_connecter_t::start_connecting ()
     add_reconnect_timer();
 }
 
-void zmq::tcp_connecter_t::add_reconnect_timer()
+void xs::tcp_connecter_t::add_reconnect_timer()
 {
     add_timer (get_new_reconnect_ivl(), reconnect_timer_id);
 }
 
-int zmq::tcp_connecter_t::get_new_reconnect_ivl ()
+int xs::tcp_connecter_t::get_new_reconnect_ivl ()
 {
     //  The new interval is the current interval + random value.
     int this_interval = current_reconnect_ivl +
@@ -176,18 +176,18 @@ int zmq::tcp_connecter_t::get_new_reconnect_ivl ()
     return this_interval;
 }
 
-int zmq::tcp_connecter_t::set_address (const char *addr_)
+int xs::tcp_connecter_t::set_address (const char *addr_)
 {
     return address.resolve (addr_, false, options.ipv4only ? true : false);
 }
 
-int zmq::tcp_connecter_t::open ()
+int xs::tcp_connecter_t::open ()
 {
-    zmq_assert (s == retired_fd);
+    xs_assert (s == retired_fd);
 
     //  Create the socket.
     s = open_socket (address.family (), SOCK_STREAM, IPPROTO_TCP);
-#ifdef ZMQ_HAVE_WINDOWS
+#ifdef XS_HAVE_WINDOWS
     if (s == INVALID_SOCKET) {
         wsa_error_to_errno ();
         return -1;
@@ -213,7 +213,7 @@ int zmq::tcp_connecter_t::open ()
         return 0;
 
     //  Asynchronous connect was launched.
-#ifdef ZMQ_HAVE_WINDOWS
+#ifdef XS_HAVE_WINDOWS
     if (rc == SOCKET_ERROR && (WSAGetLastError () == WSAEINPROGRESS ||
           WSAGetLastError () == WSAEWOULDBLOCK)) {
         errno = EAGAIN;
@@ -229,11 +229,11 @@ int zmq::tcp_connecter_t::open ()
     return -1;
 }
 
-zmq::fd_t zmq::tcp_connecter_t::connect ()
+xs::fd_t xs::tcp_connecter_t::connect ()
 {
     //  Async connect have finished. Check whether an error occured.
     int err = 0;
-#if defined ZMQ_HAVE_HPUX
+#if defined XS_HAVE_HPUX
     int len = sizeof (err);
 #else
     socklen_t len = sizeof (err);
@@ -241,10 +241,10 @@ zmq::fd_t zmq::tcp_connecter_t::connect ()
 
     int rc = getsockopt (s, SOL_SOCKET, SO_ERROR, (char*) &err, &len);
 
-    //  Assert if the error was caused by 0MQ bug.
+    //  Assert if the error was caused by Crossroads bug.
     //  Networking problems are OK. No need to assert.
-#ifdef ZMQ_HAVE_WINDOWS
-    zmq_assert (rc == 0);
+#ifdef XS_HAVE_WINDOWS
+    xs_assert (rc == 0);
     if (err != 0) {
         if (err == WSAECONNREFUSED || err == WSAETIMEDOUT ||
               err == WSAECONNABORTED || err == WSAEHOSTUNREACH ||
@@ -273,10 +273,10 @@ zmq::fd_t zmq::tcp_connecter_t::connect ()
     return result;
 }
 
-void zmq::tcp_connecter_t::close ()
+void xs::tcp_connecter_t::close ()
 {
-    zmq_assert (s != retired_fd);
-#ifdef ZMQ_HAVE_WINDOWS
+    xs_assert (s != retired_fd);
+#ifdef XS_HAVE_WINDOWS
     int rc = closesocket (s);
     wsa_assert (rc != SOCKET_ERROR);
 #else

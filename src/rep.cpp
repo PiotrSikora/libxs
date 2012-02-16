@@ -3,14 +3,14 @@
     Copyright (c) 2007-2011 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -23,19 +23,19 @@
 #include "err.hpp"
 #include "msg.hpp"
 
-zmq::rep_t::rep_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
+xs::rep_t::rep_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     xrep_t (parent_, tid_, sid_),
     sending_reply (false),
     request_begins (true)
 {
-    options.type = ZMQ_REP;
+    options.type = XS_REP;
 }
 
-zmq::rep_t::~rep_t ()
+xs::rep_t::~rep_t ()
 {
 }
 
-int zmq::rep_t::xsend (msg_t *msg_, int flags_)
+int xs::rep_t::xsend (msg_t *msg_, int flags_)
 {
     //  If we are in the middle of receiving a request, we cannot send reply.
     if (!sending_reply) {
@@ -57,7 +57,7 @@ int zmq::rep_t::xsend (msg_t *msg_, int flags_)
     return 0;
 }
 
-int zmq::rep_t::xrecv (msg_t *msg_, int flags_)
+int xs::rep_t::xrecv (msg_t *msg_, int flags_)
 {
     //  If we are in middle of sending a reply, we cannot receive next request.
     if (sending_reply) {
@@ -72,7 +72,7 @@ int zmq::rep_t::xrecv (msg_t *msg_, int flags_)
             int rc = xrep_t::xrecv (msg_, flags_);
             if (rc != 0)
                 return rc;
-            zmq_assert (msg_->flags () & msg_t::more);
+            xs_assert (msg_->flags () & msg_t::more);
             bool bottom = (msg_->size () == 0);
             rc = xrep_t::xsend (msg_, flags_);
             errno_assert (rc == 0);
@@ -96,7 +96,7 @@ int zmq::rep_t::xrecv (msg_t *msg_, int flags_)
     return 0;
 }
 
-bool zmq::rep_t::xhas_in ()
+bool xs::rep_t::xhas_in ()
 {
     if (sending_reply)
         return false;
@@ -104,7 +104,7 @@ bool zmq::rep_t::xhas_in ()
     return xrep_t::xhas_in ();
 }
 
-bool zmq::rep_t::xhas_out ()
+bool xs::rep_t::xhas_out ()
 {
     if (!sending_reply)
         return false;
@@ -112,7 +112,7 @@ bool zmq::rep_t::xhas_out ()
     return xrep_t::xhas_out ();
 }
 
-zmq::rep_session_t::rep_session_t (io_thread_t *io_thread_, bool connect_,
+xs::rep_session_t::rep_session_t (io_thread_t *io_thread_, bool connect_,
       socket_base_t *socket_, const options_t &options_,
       const char *protocol_, const char *address_) :
     xrep_session_t (io_thread_, connect_, socket_, options_, protocol_,
@@ -120,7 +120,7 @@ zmq::rep_session_t::rep_session_t (io_thread_t *io_thread_, bool connect_,
 {
 }
 
-zmq::rep_session_t::~rep_session_t ()
+xs::rep_session_t::~rep_session_t ()
 {
 }
 

@@ -190,7 +190,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="../../../../OpenPGM/include"
-				PreprocessorDefinitions="ZMQ_HAVE_OPENPGM"
+				PreprocessorDefinitions="XS_HAVE_OPENPGM"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"

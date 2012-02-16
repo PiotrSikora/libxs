@@ -1,15 +1,15 @@
 /*
-    Copyright (c) 2011 250bpm s.r.o.
+    Copyright (c) 2011-2012 250bpm s.r.o.
     Copyright (c) 2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -21,7 +21,7 @@
 #include <stdlib.h>
 
 #include "platform.hpp"
-#if defined ZMQ_HAVE_WINDOWS
+#if defined XS_HAVE_WINDOWS
 #include "windows.hpp"
 #else
 #include <unistd.h>
@@ -31,9 +31,9 @@
 #include "stdint.hpp"
 #include "clock.hpp"
 
-void zmq::seed_random ()
+void xs::seed_random ()
 {
-#if defined ZMQ_HAVE_WINDOWS
+#if defined XS_HAVE_WINDOWS
     int pid = (int) GetCurrentProcessId ();
 #else
     int pid = (int) getpid ();
@@ -41,7 +41,7 @@ void zmq::seed_random ()
     srand ((unsigned int) (clock_t::now_us () + pid));
 }
 
-uint32_t zmq::generate_random ()
+uint32_t xs::generate_random ()
 {
     //  Compensate for the fact that rand() returns signed integer.
     uint32_t low = (uint32_t) rand ();

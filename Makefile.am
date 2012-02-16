@@ -11,7 +11,6 @@ DIST_SUBDIRS = foreign/openpgm src doc perf tests builds/msvc
 EXTRA_DIST = \
 	autogen.sh	\
 	version.sh	\
-	MAINTAINERS	\
 	foreign/openpgm/@pgm_basename@.tar.gz
 MAINTAINERCLEANFILES = \
 	$(srcdir)/aclocal.m4		\

@@ -1,15 +1,15 @@
 /*
-    Copyright (c) 2011 250bpm s.r.o.
+    Copyright (c) 2011-2012 250bpm s.r.o.
     Copyright (c) 2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -24,7 +24,7 @@
 #include <algorithm>
 
 #include "platform.hpp"
-#if defined ZMQ_HAVE_WINDOWS
+#if defined XS_HAVE_WINDOWS
 #include "windows.hpp"
 #endif
 
@@ -32,13 +32,13 @@
 #include "pipe.hpp"
 #include "mtrie.hpp"
 
-zmq::mtrie_t::mtrie_t () :
+xs::mtrie_t::mtrie_t () :
     min (0),
     count (0)
 {
 }
 
-zmq::mtrie_t::~mtrie_t ()
+xs::mtrie_t::~mtrie_t ()
 {
     if (count == 1)
         delete next.node;
@@ -50,12 +50,12 @@ zmq::mtrie_t::~mtrie_t ()
     }
 }
 
-bool zmq::mtrie_t::add (unsigned char *prefix_, size_t size_, pipe_t *pipe_)
+bool xs::mtrie_t::add (unsigned char *prefix_, size_t size_, pipe_t *pipe_)
 {
     return add_helper (prefix_, size_, pipe_);
 }
 
-bool zmq::mtrie_t::add_helper (unsigned char *prefix_, size_t size_,
+bool xs::mtrie_t::add_helper (unsigned char *prefix_, size_t size_,
     pipe_t *pipe_)
 {
     //  We are at the node corresponding to the prefix. We are done.
@@ -81,7 +81,7 @@ bool zmq::mtrie_t::add_helper (unsigned char *prefix_, size_t size_,
             count = (min < c ? c - min : min - c) + 1;
             next.table = (mtrie_t**)
                 malloc (sizeof (mtrie_t*) * count);
-            zmq_assert (next.table);
+            xs_assert (next.table);
             for (unsigned short i = 0; i != count; ++i)
                 next.table [i] = 0;
             min = std::min (min, c);
@@ -94,7 +94,7 @@ bool zmq::mtrie_t::add_helper (unsigned char *prefix_, size_t size_,
             count = c - min + 1;
             next.table = (mtrie_t**) realloc ((void*) next.table,
                 sizeof (mtrie_t*) * count);
-            zmq_assert (next.table);
+            xs_assert (next.table);
             for (unsigned short i = old_count; i != count; i++)
                 next.table [i] = NULL;
         }
@@ -105,7 +105,7 @@ bool zmq::mtrie_t::add_helper (unsigned char *prefix_, size_t size_,
             count = (min + old_count) - c;
             next.table = (mtrie_t**) realloc ((void*) next.table,
                 sizeof (mtrie_t*) * count);
-            zmq_assert (next.table);
+            xs_assert (next.table);
             memmove (next.table + min - c, next.table,
                 old_count * sizeof (mtrie_t*));
             for (unsigned short i = 0; i != min - c; i++)
@@ -118,21 +118,21 @@ bool zmq::mtrie_t::add_helper (unsigned char *prefix_, size_t size_,
     if (count == 1) {
         if (!next.node) {
             next.node = new (std::nothrow) mtrie_t;
-            zmq_assert (next.node);
+            xs_assert (next.node);
         }
         return next.node->add_helper (prefix_ + 1, size_ - 1, pipe_);
     }
     else {
         if (!next.table [c - min]) {
             next.table [c - min] = new (std::nothrow) mtrie_t;
-            zmq_assert (next.table [c - min]);
+            xs_assert (next.table [c - min]);
         }
         return next.table [c - min]->add_helper (prefix_ + 1, size_ - 1, pipe_);
     }
 }
 
 
-void zmq::mtrie_t::rm (pipe_t *pipe_,
+void xs::mtrie_t::rm (pipe_t *pipe_,
     void (*func_) (unsigned char *data_, size_t size_, void *arg_),
     void *arg_)
 {
@@ -141,7 +141,7 @@ void zmq::mtrie_t::rm (pipe_t *pipe_,
     free (buff);
 }
 
-void zmq::mtrie_t::rm_helper (pipe_t *pipe_, unsigned char **buff_,
+void xs::mtrie_t::rm_helper (pipe_t *pipe_, unsigned char **buff_,
     size_t buffsize_, size_t maxbuffsize_,
     void (*func_) (unsigned char *data_, size_t size_, void *arg_),
     void *arg_)
@@ -179,17 +179,17 @@ void zmq::mtrie_t::rm_helper (pipe_t *pipe_, unsigned char **buff_,
     }  
 }
 
-bool zmq::mtrie_t::rm (unsigned char *prefix_, size_t size_, pipe_t *pipe_)
+bool xs::mtrie_t::rm (unsigned char *prefix_, size_t size_, pipe_t *pipe_)
 {
     return rm_helper (prefix_, size_, pipe_);
 }
 
-bool zmq::mtrie_t::rm_helper (unsigned char *prefix_, size_t size_,
+bool xs::mtrie_t::rm_helper (unsigned char *prefix_, size_t size_,
     pipe_t *pipe_)
 {
     if (!size_) {
         pipes_t::size_type erased = pipes.erase (pipe_);
-        zmq_assert (erased == 1);
+        xs_assert (erased == 1);
         return pipes.empty ();
     }
 
@@ -206,7 +206,7 @@ bool zmq::mtrie_t::rm_helper (unsigned char *prefix_, size_t size_,
     return next_node->rm_helper (prefix_ + 1, size_ - 1, pipe_);
 }
 
-void zmq::mtrie_t::match (unsigned char *data_, size_t size_,
+void xs::mtrie_t::match (unsigned char *data_, size_t size_,
     void (*func_) (pipe_t *pipe_, void *arg_), void *arg_)
 {
     mtrie_t *current = this;

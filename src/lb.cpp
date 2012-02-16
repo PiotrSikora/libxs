@@ -1,17 +1,17 @@
 /*
-    Copyright (c) 2010-2011 250bpm s.r.o.
+    Copyright (c) 2010-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2011 VMware, Inc.
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -25,7 +25,7 @@
 #include "err.hpp"
 #include "msg.hpp"
 
-zmq::lb_t::lb_t () :
+xs::lb_t::lb_t () :
     active (0),
     current (0),
     more (false),
@@ -33,19 +33,19 @@ zmq::lb_t::lb_t () :
 {
 }
 
-zmq::lb_t::~lb_t ()
+xs::lb_t::~lb_t ()
 {
-    zmq_assert (pipes.empty ());
+    xs_assert (pipes.empty ());
 }
 
-void zmq::lb_t::attach (pipe_t *pipe_)
+void xs::lb_t::attach (pipe_t *pipe_)
 {
     pipes.push_back (pipe_);
     pipes.swap (active, pipes.size () - 1);
     active++;
 }
 
-void zmq::lb_t::terminated (pipe_t *pipe_)
+void xs::lb_t::terminated (pipe_t *pipe_)
 {
     pipes_t::size_type index = pipes.index (pipe_);
 
@@ -64,14 +64,14 @@ void zmq::lb_t::terminated (pipe_t *pipe_)
     pipes.erase (pipe_);
 }
 
-void zmq::lb_t::activated (pipe_t *pipe_)
+void xs::lb_t::activated (pipe_t *pipe_)
 {
     //  Move the pipe to the list of active pipes.
     pipes.swap (pipes.index (pipe_), active);
     active++;
 }
 
-int zmq::lb_t::send (msg_t *msg_, int flags_)
+int xs::lb_t::send (msg_t *msg_, int flags_)
 {
     //  Drop the message if required. If we are at the end of the message
     //  switch back to non-dropping mode.
@@ -84,7 +84,7 @@ int zmq::lb_t::send (msg_t *msg_, int flags_)
         int rc = msg_->close ();
         errno_assert (rc == 0);
         rc = msg_->init ();
-        zmq_assert (rc == 0);
+        xs_assert (rc == 0);
         return 0;
     }
 
@@ -94,7 +94,7 @@ int zmq::lb_t::send (msg_t *msg_, int flags_)
             break;
         }
 
-        zmq_assert (!more);
+        xs_assert (!more);
         active--;
         if (current < active)
             pipes.swap (current, active);
@@ -122,7 +122,7 @@ int zmq::lb_t::send (msg_t *msg_, int flags_)
     return 0;
 }
 
-bool zmq::lb_t::has_out ()
+bool xs::lb_t::has_out ()
 {
     //  If one part of the message was already written we can definitely
     //  write the rest of the message.

@@ -1,15 +1,15 @@
 /*
-    Copyright (c) 2011 250bpm s.r.o.
+    Copyright (c) 2011-2012 250bpm s.r.o.
     Copyright (c) 2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -18,12 +18,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ZMQ_IPC_LISTENER_HPP_INCLUDED__
-#define __ZMQ_IPC_LISTENER_HPP_INCLUDED__
+#ifndef __XS_IPC_LISTENER_HPP_INCLUDED__
+#define __XS_IPC_LISTENER_HPP_INCLUDED__
 
 #include "platform.hpp"
 
-#if !defined ZMQ_HAVE_WINDOWS && !defined ZMQ_HAVE_OPENVMS
+#if !defined XS_HAVE_WINDOWS && !defined XS_HAVE_OPENVMS
 
 #include <string>
 
@@ -32,7 +32,7 @@
 #include "stdint.hpp"
 #include "io_object.hpp"
 
-namespace zmq
+namespace xs
 {
 
     class io_thread_t;
@@ -42,8 +42,8 @@ namespace zmq
     {
     public:
 
-        ipc_listener_t (zmq::io_thread_t *io_thread_,
-            zmq::socket_base_t *socket_, const options_t &options_);
+        ipc_listener_t (xs::io_thread_t *io_thread_,
+            xs::socket_base_t *socket_, const options_t &options_);
         ~ipc_listener_t ();
 
         //  Set address to listen on.
@@ -79,7 +79,7 @@ namespace zmq
         handle_t handle;
 
         //  Socket the listerner belongs to.
-        zmq::socket_base_t *socket;
+        xs::socket_base_t *socket;
 
         ipc_listener_t (const ipc_listener_t&);
         const ipc_listener_t &operator = (const ipc_listener_t&);

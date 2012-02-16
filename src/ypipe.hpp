@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -19,14 +19,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ZMQ_YPIPE_HPP_INCLUDED__
-#define __ZMQ_YPIPE_HPP_INCLUDED__
+#ifndef __XS_YPIPE_HPP_INCLUDED__
+#define __XS_YPIPE_HPP_INCLUDED__
 
 #include "atomic_ptr.hpp"
 #include "yqueue.hpp"
 #include "platform.hpp"
 
-namespace zmq
+namespace xs
 {
 
     //  Lock-free queue implementation.
@@ -59,10 +59,10 @@ namespace zmq
         }
 
         //  Following function (write) deliberately copies uninitialised data
-        //  when used with zmq_msg. Initialising the VSM body for
+        //  when used with xs_msg. Initialising the VSM body for
         //  non-VSM messages won't be good for performance.
 
-#ifdef ZMQ_HAVE_OPENVMS
+#ifdef XS_HAVE_OPENVMS
 #pragma message save
 #pragma message disable(UNINIT)
 #endif
@@ -82,7 +82,7 @@ namespace zmq
                 f = &queue.back ();
         }
 
-#ifdef ZMQ_HAVE_OPENVMS
+#ifdef XS_HAVE_OPENVMS
 #pragma message restore
 #endif
 
@@ -170,7 +170,7 @@ namespace zmq
         inline bool probe (bool (*fn)(T &))
         {
                 bool rc = check_read ();
-                zmq_assert (rc);
+                xs_assert (rc);
 
                 return (*fn) (queue.front ());
         }

@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -22,10 +22,10 @@
 #include "err.hpp"
 #include "platform.hpp"
 
-const char *zmq::errno_to_string (int errno_)
+const char *xs::errno_to_string (int errno_)
 {
     switch (errno_) {
-#if defined ZMQ_HAVE_WINDOWS
+#if defined XS_HAVE_WINDOWS
     case ENOTSUP:
         return "Not supported";
     case EPROTONOSUPPORT:
@@ -63,9 +63,9 @@ const char *zmq::errno_to_string (int errno_)
     }
 }
 
-void zmq::zmq_abort(const char *errmsg_)
+void xs::xs_abort(const char *errmsg_)
 {
-#if defined ZMQ_HAVE_WINDOWS
+#if defined XS_HAVE_WINDOWS
 
     //  Raise STATUS_FATAL_APP_EXIT.
     ULONG_PTR extra_info [1];
@@ -76,9 +76,9 @@ void zmq::zmq_abort(const char *errmsg_)
 #endif
 }
 
-#ifdef ZMQ_HAVE_WINDOWS
+#ifdef XS_HAVE_WINDOWS
 
-const char *zmq::wsa_error()
+const char *xs::wsa_error()
 {
     int no = WSAGetLastError ();
     //  TODO: This is not a generic way to handle this...
@@ -88,7 +88,7 @@ const char *zmq::wsa_error()
     return wsa_error_no (no);
 }
 
-const char *zmq::wsa_error_no (int no_)
+const char *xs::wsa_error_no (int no_)
 {
     //  TODO:  It seems that list of Windows socket errors is longer than this.
     //         Investigate whether there's a way to convert it into the string
@@ -199,16 +199,16 @@ const char *zmq::wsa_error_no (int no_)
         "error not defined"; 
 }
 
-void zmq::win_error (char *buffer_, size_t buffer_size_)
+void xs::win_error (char *buffer_, size_t buffer_size_)
 {
     DWORD errcode = GetLastError ();
     DWORD rc = FormatMessageA (FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS, NULL, errcode, MAKELANGID(LANG_NEUTRAL,
         SUBLANG_DEFAULT), buffer_, (DWORD) buffer_size_, NULL );
-    zmq_assert (rc);
+    xs_assert (rc);
 }
 
-void zmq::wsa_error_to_errno ()
+void xs::wsa_error_to_errno ()
 {
     int errcode = WSAGetLastError ();
     switch (errcode) {

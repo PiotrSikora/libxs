@@ -1,0 +1,410 @@
+xs_setsockopt(3)
+================
+
+
+NAME
+----
+
+xs_setsockopt - set Crossroads socket options
+
+
+SYNOPSIS
+--------
+*int xs_setsockopt (void '*socket', int 'option_name', const void '*option_value', size_t 'option_len');*
+
+Caution: All options, with the exception of XS_SUBSCRIBE, XS_UNSUBSCRIBE and
+XS_LINGER, only take effect for subsequent socket bind/connects.
+
+DESCRIPTION
+-----------
+The _xs_setsockopt()_ function shall set the option specified by the
+'option_name' argument to the value pointed to by the 'option_value' argument
+for the Crossroads socket pointed to by the 'socket' argument. The 'option_len'
+argument is the size of the option value in bytes.
+
+The following socket options can be set with the _xs_setsockopt()_ function:
+
+
+XS_SNDHWM: Set high water mark for outbound messages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The 'XS_SNDHWM' option shall set the high water mark for outbound messages on
+the specified 'socket'. The high water mark is a hard limit on the maximum
+number of outstanding messages the library shall queue in memory for any single
+peer that the specified 'socket' is communicating with.
+
+If this limit has been reached the socket shall enter an exceptional state and
+depending on the socket type, the library shall take appropriate action such as
+blocking or dropping sent messages. Refer to the individual socket descriptions
+in linkxs:xs_socket[3] for details on the exact action taken for each socket
+type.
+
+[horizontal]
+Option value type:: int
+Option value unit:: messages
+Default value:: 1000
+Applicable socket types:: all
+
+
+XS_RCVHWM: Set high water mark for inbound messages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The 'XS_RCVHWM' option shall set the high water mark for inbound messages on
+the specified 'socket'. The high water mark is a hard limit on the maximum
+number of outstanding messages the libray shall queue in memory for any single
+peer that the specified 'socket' is communicating with.
+
+If this limit has been reached the socket shall enter an exceptional state and
+depending on the socket type, the library shall take appropriate action such as
+blocking or dropping sent messages. Refer to the individual socket descriptions
+in linkxs:xs_socket[3] for details on the exact action taken for each socket
+type.
+
+[horizontal]
+Option value type:: int
+Option value unit:: messages
+Default value:: 1000
+Applicable socket types:: all
+
+
+XS_AFFINITY: Set I/O thread affinity
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The 'XS_AFFINITY' option shall set the I/O thread affinity for newly created
+connections on the specified 'socket'.
+
+Affinity determines which threads from the Crossroads I/O thread pool associated
+with the socket's _context_ shall handle newly created connections.  A value of
+zero specifies no affinity, meaning that work shall be distributed fairly among
+all Crossroads I/O threads in the thread pool. For non-zero values, the lowest
+bit corresponds to thread 1, second lowest bit to thread 2 and so on.  For
+example, a value of 3 specifies that subsequent connections on 'socket' shall be
+handled exclusively by I/O threads 1 and 2.
+
+See also linkxs:xs_init[3] for details on allocating the number of I/O
+threads for a specific _context_.
+
+[horizontal]
+Option value type:: uint64_t
+Option value unit:: N/A (bitmap)
+Default value:: 0
+Applicable socket types:: N/A
+
+
+XS_SUBSCRIBE: Establish message filter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The 'XS_SUBSCRIBE' option shall establish a new message filter on a 'XS_SUB'
+socket. Newly created 'XS_SUB' sockets shall filter out all incoming messages,
+therefore you should call this option to establish an initial message filter.
+
+An empty 'option_value' of length zero shall subscribe to all incoming
+messages. A non-empty 'option_value' shall subscribe to all messages beginning
+with the specified prefix. Multiple filters may be attached to a single
+'XS_SUB' socket, in which case a message shall be accepted if it matches at
+least one filter.
+
+[horizontal]
+Option value type:: binary data
+Option value unit:: N/A
+Default value:: N/A
+Applicable socket types:: XS_SUB
+
+
+XS_UNSUBSCRIBE: Remove message filter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The 'XS_UNSUBSCRIBE' option shall remove an existing message filter on a
+'XS_SUB' socket. The filter specified must match an existing filter previously
+established with the 'XS_SUBSCRIBE' option. If the socket has several
+instances of the same filter attached the 'XS_UNSUBSCRIBE' option shall remove
+only one instance, leaving the rest in place and functional.
+
+[horizontal]
+Option value type:: binary data
+Option value unit:: N/A
+Default value:: N/A
+Applicable socket types:: XS_SUB
+
+
+XS_IDENTITY: Set socket identity
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The 'XS_IDENTITY' option shall set the identity of the specified 'socket'.
+Socket identity is used only by request/reply pattern. Namely, it can be used
+in tandem with ROUTER socket to route messages to the peer with specific
+identity.
+
+Identity should be at least one byte and at most 255 bytes long. Identities
+starting with binary zero are reserved for use by Crossroads infrastructure.
+
+[horizontal]
+Option value type:: binary data
+Option value unit:: N/A
+Default value:: NULL
+Applicable socket types:: all
+
+
+XS_RATE: Set multicast data rate
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The 'XS_RATE' option shall set the maximum send or receive data rate for
+multicast transports such as linkxs:xs_pgm[7] using the specified 'socket'.
+
+[horizontal]
+Option value type:: int
+Option value unit:: kilobits per second
+Default value:: 100
+Applicable socket types:: all, when using multicast transports
+
+
+XS_RECOVERY_IVL: Set multicast recovery interval
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The 'XS_RECOVERY_IVL' option shall set the recovery interval for multicast
+transports using the specified 'socket'. The recovery interval determines the
+maximum time in milliseconds that a receiver can be absent from a multicast
+group before unrecoverable data loss will occur.
+
+CAUTION: Exercise care when setting large recovery intervals as the data
+needed for recovery will be held in memory. For example, a 1 minute recovery
+interval at a data rate of 1Gbps requires a 7GB in-memory buffer.
+
+[horizontal]
+Option value type:: int
+Option value unit:: milliseconds
+Default value:: 10000
+Applicable socket types:: all, when using multicast transports
+
+XS_SNDBUF: Set kernel transmit buffer size
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The 'XS_SNDBUF' option shall set the underlying kernel transmit buffer size
+for the 'socket' to the specified size in bytes.  A value of zero means leave
+the OS default unchanged. For details please refer to your operating system
+documentation for the 'SO_SNDBUF' socket option.
+
+[horizontal]
+Option value type:: int
+Option value unit:: bytes
+Default value:: 0
+Applicable socket types:: all
+
+
+XS_RCVBUF: Set kernel receive buffer size
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The 'XS_RCVBUF' option shall set the underlying kernel receive buffer size for
+the 'socket' to the specified size in bytes.  A value of zero means leave the
+OS default unchanged. For details refer to your operating system documentation
+for the 'SO_RCVBUF' socket option.
+
+[horizontal]
+Option value type:: int
+Option value unit:: bytes
+Default value:: 0
+Applicable socket types:: all
+
+
+XS_LINGER: Set linger period for socket shutdown
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The 'XS_LINGER' option shall set the linger period for the specified 'socket'.
+The linger period determines how long pending messages which have yet to be
+sent to a peer shall linger in memory after a socket is closed with
+linkxs:xs_close[3], and further affects the termination of the socket's
+context with linkxs:xs_term[3]. The following outlines the different
+behaviours:
+
+* The default value of '-1' specifies an infinite linger period. Pending
+  messages shall not be discarded after a call to _xs_close()_; attempting to
+  terminate the socket's context with _xs_term()_ shall block until all
+  pending messages have been sent to a peer.
+
+* The value of '0' specifies no linger period. Pending messages shall be
+  discarded immediately when the socket is closed with _xs_close()_.
+
+* Positive values specify an upper bound for the linger period in milliseconds.
+  Pending messages shall not be discarded after a call to _xs_close()_;
+  attempting to terminate the socket's context with _xs_term()_ shall block
+  until either all pending messages have been sent to a peer, or the linger
+  period expires, after which any pending messages shall be discarded.
+
+[horizontal]
+Option value type:: int
+Option value unit:: milliseconds
+Default value:: -1 (infinite)
+Applicable socket types:: all
+
+
+XS_RECONNECT_IVL: Set reconnection interval
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The 'XS_RECONNECT_IVL' option shall set the initial reconnection interval for
+the specified 'socket'.  The reconnection interval is the period the library
+shall wait between attempts to reconnect disconnected peers when using
+connection-oriented transports.
+
+NOTE: The reconnection interval may be randomized by the library to prevent
+reconnection storms in topologies with a large number of peers per socket.
+
+[horizontal]
+Option value type:: int
+Option value unit:: milliseconds
+Default value:: 100
+Applicable socket types:: all, only for connection-oriented transports
+
+
+XS_RECONNECT_IVL_MAX: Set maximum reconnection interval
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The 'XS_RECONNECT_IVL_MAX' option shall set the maximum reconnection interval 
+for the specified 'socket'.  This is the maximum period the library shall wait
+between attempts to reconnect. On each reconnect attempt, the previous interval
+shall be doubled untill XS_RECONNECT_IVL_MAX is reached. This allows for
+exponential backoff strategy. Default value means no exponential backoff is
+performed and reconnect interval calculations are only based on
+XS_RECONNECT_IVL.
+
+NOTE:  Values less than XS_RECONNECT_IVL will be ignored.
+
+[horizontal]
+Option value type:: int
+Option value unit:: milliseconds
+Default value:: 0 (only use XS_RECONNECT_IVL)
+Applicable socket types:: all, only for connection-oriented transports
+
+
+XS_BACKLOG: Set maximum length of the queue of outstanding connections
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The 'XS_BACKLOG' option shall set the maximum length of the queue of
+outstanding peer connections for the specified 'socket'; this only applies to
+connection-oriented transports. For details refer to your operating system
+documentation for the 'listen' function.
+
+[horizontal]
+Option value type:: int
+Option value unit:: connections
+Default value:: 100
+Applicable socket types:: all, only for connection-oriented transports.
+
+
+XS_MAXMSGSIZE: Maximum acceptable inbound message size
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Limits the size of the inbound message. If a peer sends a message larger than
+XS_MAXMSGSIZE it is disconnected. Value of -1 means 'no limit'.
+
+[horizontal]
+Option value type:: int64_t
+Option value unit:: bytes
+Default value:: -1
+Applicable socket types:: all
+
+
+XS_MULTICAST_HOPS: Maximum network hops for multicast packets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sets the time-to-live field in every multicast packet sent from this socket.
+The default is 1 which means that the multicast packets don't leave the local
+network.
+
+[horizontal]
+Option value type:: int
+Option value unit:: network hops
+Default value:: 1
+Applicable socket types:: all, when using multicast transports
+
+
+XS_RCVTIMEO: Maximum time before a recv operation returns with EAGAIN
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sets the timeout for receive operation on the socket. If the value is `0`,
+_xs_recv(3)_ will return immediately, with a EAGAIN error if there is no
+message to receive. If the value is `-1`, it will block until a message is
+available. For all other values, it will wait for a message for that amount
+of time before returning with an EAGAIN error.
+
+[horizontal]
+Option value type:: int
+Option value unit:: milliseconds
+Default value:: -1 (infinite)
+Applicable socket types:: all
+
+
+XS_SNDTIMEO: Maximum time before a send operation returns with EAGAIN
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sets the timeout for send operation on the socket. If the value is `0`,
+_xs_send(3)_ will return immediately, with a EAGAIN error if the message
+cannot be sent. If the value is `-1`, it will block until the message is sent.
+For all other values, it will try to send the message for that amount of time
+before returning with an EAGAIN error.
+
+[horizontal]
+Option value type:: int
+Option value unit:: milliseconds
+Default value:: -1 (infinite)
+Applicable socket types:: all
+
+
+XS_IPV4ONLY: Use IPv4-only sockets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sets the underlying native socket type.  A value of `1` will use IPv4 sockets,
+while the value of `0` will use IPv6 sockets. An IPv6 socket lets 
+applications connect to and accept connections from both IPv4 and IPv6 hosts.
+
+[horizontal]
+Option value type:: int
+Option value unit:: boolean
+Default value:: 1 (true)
+Applicable socket types:: all, when using TCP transports.
+
+
+RETURN VALUE
+------------
+The _xs_setsockopt()_ function shall return zero if successful. Otherwise it
+shall return `-1` and set 'errno' to one of the values defined below.
+
+
+ERRORS
+------
+*EINVAL*::
+The requested option _option_name_ is unknown, or the requested _option_len_ or
+_option_value_ is invalid.
+*ETERM*::
+The 'context' associated with the specified 'socket' was terminated.
+*ENOTSOCK*::
+The provided 'socket' was invalid.
+*EINTR*::
+The operation was interrupted by delivery of a signal.
+
+
+EXAMPLE
+-------
+.Subscribing to messages on a 'XS_SUB' socket
+----
+/* Subscribe to all messages */
+rc = xs_setsockopt (socket, XS_SUBSCRIBE, "", 0);
+assert (rc == 0);
+/* Subscribe to messages prefixed with "ANIMALS.CATS" */
+rc = xs_setsockopt (socket, XS_SUBSCRIBE, "ANIMALS.CATS", 12);
+----
+
+.Setting I/O thread affinity
+----
+int64_t affinity;
+/* Incoming connections on TCP port 5555 shall be handled by I/O thread 1 */
+affinity = 1;
+rc = xs_setsockopt (socket, XS_AFFINITY, &affinity, sizeof affinity);
+assert (rc);
+rc = xs_bind (socket, "tcp://lo:5555");
+assert (rc);
+/* Incoming connections on TCP port 5556 shall be handled by I/O thread 2 */
+affinity = 2;
+rc = xs_setsockopt (socket, XS_AFFINITY, &affinity, sizeof affinity);
+assert (rc);
+rc = xs_bind (socket, "tcp://lo:5556");
+assert (rc);
+----
+
+
+SEE ALSO
+--------
+linkxs:xs_getsockopt[3]
+linkxs:xs_socket[3]
+linkxs:xs[7]
+
+
+AUTHORS
+-------
+The Crossroads documentation was written by Martin Sustrik <sustrik@250bpm.com>
+and Martin Lucina <martin@lucina.net>.

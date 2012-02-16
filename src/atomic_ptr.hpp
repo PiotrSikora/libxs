@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -19,32 +19,32 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ZMQ_ATOMIC_PTR_HPP_INCLUDED__
-#define __ZMQ_ATOMIC_PTR_HPP_INCLUDED__
+#ifndef __XS_ATOMIC_PTR_HPP_INCLUDED__
+#define __XS_ATOMIC_PTR_HPP_INCLUDED__
 
 #include "platform.hpp"
 
-#if defined ZMQ_FORCE_MUTEXES
-#define ZMQ_ATOMIC_PTR_MUTEX
+#if defined XS_FORCE_MUTEXES
+#define XS_ATOMIC_PTR_MUTEX
 #elif (defined __i386__ || defined __x86_64__) && defined __GNUC__
-#define ZMQ_ATOMIC_PTR_X86
-#elif defined ZMQ_HAVE_WINDOWS
-#define ZMQ_ATOMIC_PTR_WINDOWS
-#elif (defined ZMQ_HAVE_SOLARIS || defined ZMQ_HAVE_NETBSD)
-#define ZMQ_ATOMIC_PTR_ATOMIC_H
+#define XS_ATOMIC_PTR_X86
+#elif defined XS_HAVE_WINDOWS
+#define XS_ATOMIC_PTR_WINDOWS
+#elif (defined XS_HAVE_SOLARIS || defined XS_HAVE_NETBSD)
+#define XS_ATOMIC_PTR_ATOMIC_H
 #else
-#define ZMQ_ATOMIC_PTR_MUTEX
+#define XS_ATOMIC_PTR_MUTEX
 #endif
 
-#if defined ZMQ_ATOMIC_PTR_MUTEX
+#if defined XS_ATOMIC_PTR_MUTEX
 #include "mutex.hpp"
-#elif defined ZMQ_ATOMIC_PTR_WINDOWS
+#elif defined XS_ATOMIC_PTR_WINDOWS
 #include "windows.hpp"
-#elif defined ZMQ_ATOMIC_PTR_ATOMIC_H
+#elif defined XS_ATOMIC_PTR_ATOMIC_H
 #include <atomic.h>
 #endif
 
-namespace zmq
+namespace xs
 {
 
     //  This class encapsulates several atomic operations on pointers.
@@ -76,18 +76,18 @@ namespace zmq
         //  to the 'val' value. Old value is returned.
         inline T *xchg (T *val_)
         {
-#if defined ZMQ_ATOMIC_PTR_WINDOWS
+#if defined XS_ATOMIC_PTR_WINDOWS
             return (T*) InterlockedExchangePointer ((PVOID*) &ptr, val_);
-#elif defined ZMQ_ATOMIC_PTR_ATOMIC_H
+#elif defined XS_ATOMIC_PTR_ATOMIC_H
             return (T*) atomic_swap_ptr (&ptr, val_);
-#elif defined ZMQ_ATOMIC_PTR_X86
+#elif defined XS_ATOMIC_PTR_X86
             T *old;
             __asm__ volatile (
                 "lock; xchg %0, %2"
                 : "=r" (old), "=m" (ptr)
                 : "m" (ptr), "0" (val_));
             return old;
-#elif defined ZMQ_ATOMIC_PTR_MUTEX
+#elif defined XS_ATOMIC_PTR_MUTEX
             sync.lock ();
             T *old = (T*) ptr;
             ptr = val_;
@@ -104,12 +104,12 @@ namespace zmq
         //  is returned.
         inline T *cas (T *cmp_, T *val_)
         {
-#if defined ZMQ_ATOMIC_PTR_WINDOWS
+#if defined XS_ATOMIC_PTR_WINDOWS
             return (T*) InterlockedCompareExchangePointer (
                 (volatile PVOID*) &ptr, val_, cmp_);
-#elif defined ZMQ_ATOMIC_PTR_ATOMIC_H
+#elif defined XS_ATOMIC_PTR_ATOMIC_H
             return (T*) atomic_cas_ptr (&ptr, cmp_, val_);
-#elif defined ZMQ_ATOMIC_PTR_X86
+#elif defined XS_ATOMIC_PTR_X86
             T *old;
             __asm__ volatile (
                 "lock; cmpxchg %2, %3"
@@ -117,7 +117,7 @@ namespace zmq
                 : "r" (val_), "m" (ptr), "0" (cmp_)
                 : "cc");
             return old;
-#elif defined ZMQ_ATOMIC_PTR_MUTEX
+#elif defined XS_ATOMIC_PTR_MUTEX
             sync.lock ();
             T *old = (T*) ptr;
             if (ptr == cmp_)
@@ -132,7 +132,7 @@ namespace zmq
     private:
 
         volatile T *ptr;
-#if defined ZMQ_ATOMIC_PTR_MUTEX
+#if defined XS_ATOMIC_PTR_MUTEX
         mutex_t sync;
 #endif
 
@@ -143,17 +143,17 @@ namespace zmq
 }
 
 //  Remove macros local to this file.
-#if defined ZMQ_ATOMIC_PTR_WINDOWS
-#undef ZMQ_ATOMIC_PTR_WINDOWS
+#if defined XS_ATOMIC_PTR_WINDOWS
+#undef XS_ATOMIC_PTR_WINDOWS
 #endif
-#if defined ZMQ_ATOMIC_PTR_ATOMIC_H
-#undef ZMQ_ATOMIC_PTR_ATOMIC_H
+#if defined XS_ATOMIC_PTR_ATOMIC_H
+#undef XS_ATOMIC_PTR_ATOMIC_H
 #endif
-#if defined ZMQ_ATOMIC_PTR_X86
-#undef ZMQ_ATOMIC_PTR_X86
+#if defined XS_ATOMIC_PTR_X86
+#undef XS_ATOMIC_PTR_X86
 #endif
-#if defined ZMQ_ATOMIC_PTR_MUTEX
-#undef ZMQ_ATOMIC_PTR_MUTEX
+#if defined XS_ATOMIC_PTR_MUTEX
+#undef XS_ATOMIC_PTR_MUTEX
 #endif
 
 #endif

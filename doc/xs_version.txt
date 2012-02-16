@@ -1,0 +1,53 @@
+xs_version(3)
+=============
+
+
+NAME
+----
+xs_version - report Crossroads library version
+
+
+SYNOPSIS
+--------
+*void xs_version (int '*major', int '*minor', int '*patch');*
+
+
+DESCRIPTION
+-----------
+The _xs_version()_ function shall fill in the integer variables pointed to by
+the 'major', 'minor' and 'patch' arguments with the major, minor and patch level
+components of the Crossroads library version.
+
+This functionality is intended for applications or language bindings
+dynamically linking to the Crossroads library that wish to determine the actual
+version of the Crossroads library they are using.
+
+
+RETURN VALUE
+------------
+There is no return value.
+
+
+ERRORS
+------
+No errors are defined.
+
+
+EXAMPLE
+-------
+.Printing out the version of the Crossroads library
+----
+int major, minor, patch;
+xs_version (&major, &minor, &patch);
+printf ("Current Crossroads version is %d.%d.%d\n", major, minor, patch);
+----
+
+
+SEE ALSO
+--------
+linkxs:xs[7]
+
+AUTHORS
+-------
+The Crossroads documentation was written by Martin Sustrik <sustrik@250bpm.com>
+and Martin Lucina <martin@lucina.net>.

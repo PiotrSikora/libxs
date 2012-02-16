@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2010-2011 250bpm s.r.o.
+    Copyright (c) 2010-2012 250bpm s.r.o.
     Copyright (c) 2011 iMatix Corporation
     Copyright (c) 2010-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -27,28 +27,28 @@ int main (int argc, char *argv [])
 {
     fprintf (stderr, "test_pair_tcp running...\n");
 
-    void *ctx = zmq_init (1);
+    void *ctx = xs_init (1);
     assert (ctx);
 
-    void *sb = zmq_socket (ctx, ZMQ_PAIR);
+    void *sb = xs_socket (ctx, XS_PAIR);
     assert (sb);
-    int rc = zmq_bind (sb, "tcp://127.0.0.1:5560");
+    int rc = xs_bind (sb, "tcp://127.0.0.1:5560");
     assert (rc == 0);
 
-    void *sc = zmq_socket (ctx, ZMQ_PAIR);
+    void *sc = xs_socket (ctx, XS_PAIR);
     assert (sc);
-    rc = zmq_connect (sc, "tcp://127.0.0.1:5560");
+    rc = xs_connect (sc, "tcp://127.0.0.1:5560");
     assert (rc == 0);
     
     bounce (sb, sc);
 
-    rc = zmq_close (sc);
+    rc = xs_close (sc);
     assert (rc == 0);
 
-    rc = zmq_close (sb);
+    rc = xs_close (sb);
     assert (rc == 0);
 
-    rc = zmq_term (ctx);
+    rc = xs_term (ctx);
     assert (rc == 0);
 
     return 0 ;

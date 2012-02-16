@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -20,7 +20,7 @@
 */
 
 #include "poll.hpp"
-#if defined ZMQ_USE_POLL
+#if defined XS_USE_POLL
 
 #include <sys/types.h>
 #include <sys/time.h>
@@ -32,18 +32,18 @@
 #include "config.hpp"
 #include "i_poll_events.hpp"
 
-zmq::poll_t::poll_t () :
+xs::poll_t::poll_t () :
     retired (false),
     stopping (false)
 {
 }
 
-zmq::poll_t::~poll_t ()
+xs::poll_t::~poll_t ()
 {
     worker.stop ();
 }
 
-zmq::poll_t::handle_t zmq::poll_t::add_fd (fd_t fd_, i_poll_events *events_)
+xs::poll_t::handle_t xs::poll_t::add_fd (fd_t fd_, i_poll_events *events_)
 {
     //  If the file descriptor table is too small expand it.
     fd_table_t::size_type sz = fd_table.size ();
@@ -68,7 +68,7 @@ zmq::poll_t::handle_t zmq::poll_t::add_fd (fd_t fd_, i_poll_events *events_)
     return fd_;
 }
 
-void zmq::poll_t::rm_fd (handle_t handle_)
+void xs::poll_t::rm_fd (handle_t handle_)
 {
     fd_t index = fd_table [handle_].index;
     assert (index != retired_fd);
@@ -82,41 +82,41 @@ void zmq::poll_t::rm_fd (handle_t handle_)
     adjust_load (-1);
 }
 
-void zmq::poll_t::set_pollin (handle_t handle_)
+void xs::poll_t::set_pollin (handle_t handle_)
 {
     int index = fd_table [handle_].index;
     pollset [index].events |= POLLIN;
 }
 
-void zmq::poll_t::reset_pollin (handle_t handle_)
+void xs::poll_t::reset_pollin (handle_t handle_)
 {
     int index = fd_table [handle_].index;
     pollset [index].events &= ~((short) POLLIN);
 }
 
-void zmq::poll_t::set_pollout (handle_t handle_)
+void xs::poll_t::set_pollout (handle_t handle_)
 {
     int index = fd_table [handle_].index;
     pollset [index].events |= POLLOUT;
 }
 
-void zmq::poll_t::reset_pollout (handle_t handle_)
+void xs::poll_t::reset_pollout (handle_t handle_)
 {
     int index = fd_table [handle_].index;
     pollset [index].events &= ~((short) POLLOUT);
 }
 
-void zmq::poll_t::start ()
+void xs::poll_t::start ()
 {
     worker.start (worker_routine, this);
 }
 
-void zmq::poll_t::stop ()
+void xs::poll_t::stop ()
 {
     stopping = true;
 }
 
-void zmq::poll_t::loop ()
+void xs::poll_t::loop ()
 {
     while (!stopping) {
 
@@ -137,7 +137,7 @@ void zmq::poll_t::loop ()
 
         for (pollset_t::size_type i = 0; i != pollset.size (); i++) {
 
-            zmq_assert (!(pollset [i].revents & POLLNVAL));
+            xs_assert (!(pollset [i].revents & POLLNVAL));
             if (pollset [i].fd == retired_fd)
                continue;
             if (pollset [i].revents & (POLLERR | POLLHUP))
@@ -168,7 +168,7 @@ void zmq::poll_t::loop ()
     }
 }
 
-void zmq::poll_t::worker_routine (void *arg_)
+void xs::poll_t::worker_routine (void *arg_)
 {
     ((poll_t*) arg_)->loop ();
 }

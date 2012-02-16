@@ -2,14 +2,14 @@
     Copyright (c) 2010-2012 250bpm s.r.o.
     Copyright (c) 2010-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -18,8 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ZMQ_XPUB_HPP_INCLUDED__
-#define __ZMQ_XPUB_HPP_INCLUDED__
+#ifndef __XS_XPUB_HPP_INCLUDED__
+#define __XS_XPUB_HPP_INCLUDED__
 
 #include <deque>
 #include <string>
@@ -30,7 +30,7 @@
 #include "array.hpp"
 #include "dist.hpp"
 
-namespace zmq
+namespace xs
 {
 
     class ctx_t;
@@ -43,18 +43,18 @@ namespace zmq
     {
     public:
 
-        xpub_t (zmq::ctx_t *parent_, uint32_t tid_, int sid_);
+        xpub_t (xs::ctx_t *parent_, uint32_t tid_, int sid_);
         ~xpub_t ();
 
         //  Implementations of virtual functions from socket_base_t.
-        void xattach_pipe (zmq::pipe_t *pipe_);
-        int xsend (zmq::msg_t *msg_, int flags_);
+        void xattach_pipe (xs::pipe_t *pipe_);
+        int xsend (xs::msg_t *msg_, int flags_);
         bool xhas_out ();
-        int xrecv (zmq::msg_t *msg_, int flags_);
+        int xrecv (xs::msg_t *msg_, int flags_);
         bool xhas_in ();
-        void xread_activated (zmq::pipe_t *pipe_);
-        void xwrite_activated (zmq::pipe_t *pipe_);
-        void xterminated (zmq::pipe_t *pipe_);
+        void xread_activated (xs::pipe_t *pipe_);
+        void xwrite_activated (xs::pipe_t *pipe_);
+        void xterminated (xs::pipe_t *pipe_);
 
     private:
 
@@ -64,7 +64,7 @@ namespace zmq
             void *arg_);
 
         //  Function to be applied to each matching pipes.
-        static void mark_as_matching (zmq::pipe_t *pipe_, void *arg_);
+        static void mark_as_matching (xs::pipe_t *pipe_, void *arg_);
 
         //  List of all subscriptions mapped to corresponding pipes.
         mtrie_t subscriptions;
@@ -89,7 +89,7 @@ namespace zmq
     {
     public:
 
-        xpub_session_t (zmq::io_thread_t *io_thread_, bool connect_,
+        xpub_session_t (xs::io_thread_t *io_thread_, bool connect_,
             socket_base_t *socket_, const options_t &options_,
             const char *protocol_, const char *address_);
         ~xpub_session_t ();

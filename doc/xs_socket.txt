@@ -1,0 +1,347 @@
+xs_socket(3)
+============
+
+
+NAME
+----
+xs_socket - create Crossroads socket
+
+
+SYNOPSIS
+--------
+*void *xs_socket (void '*context', int 'type');*
+
+
+DESCRIPTION
+-----------
+The 'xs_socket()' function shall create a Crossroads socket within the specified
+'context' and return an opaque handle to the newly created socket. The 'type'
+argument specifies the socket type, which determines the semantics of
+communication over the socket.
+
+The newly created socket is initially unbound, and not associated with any
+endpoints. In order to establish a message flow a socket must first be
+connected to at least one endpoint with linkxs:xs_connect[3], or at least one
+endpoint must be created for accepting incoming connections with
+linkxs:xs_bind[3].
+
+.Key differences to conventional sockets
+Generally speaking, conventional sockets present a _synchronous_ interface to
+either connection-oriented reliable byte streams (SOCK_STREAM), or
+connection-less unreliable datagrams (SOCK_DGRAM). In comparison, Crossroads
+sockets present an abstraction of an asynchronous _message queue_, with the
+exact queueing semantics depending on the socket type in use. Where conventional
+sockets transfer streams of bytes or discrete datagrams, Crossroads sockets
+transfer discrete _messages_.
+
+Crossroads sockets being _asynchronous_ means that the timings of the physical
+connection setup and tear down, reconnect and effective delivery are transparent
+to the user and organized by Crossroads library itself. Further, messages may
+be _queued_ in the event that a peer is unavailable to receive them.
+
+Conventional sockets allow only strict one-to-one (two peers), many-to-one
+(many clients, one server), or in some cases one-to-many (multicast)
+relationships. With the exception of 'XS_PAIR', Crossroads sockets may be
+connected *to multiple endpoints* using _xs_connect()_, while simultaneously
+accepting incoming connections *from multiple endpoints* bound to the socket
+using _xs_bind()_, thus allowing many-to-many relationships.
+
+.Thread safety
+Crossroads 'sockets' are _not_ thread safe. Applications MUST NOT use a socket
+from multiple threads except after migrating a socket from one thread to 
+another with a "full fence" memory barrier.
+
+.Socket types
+Crossroads defines several messaging patterns which encapsulate exact semantics
+of a particular topology. For example, publush-subscribe pattern defines data
+distribution trees while request-reply defines networks of shared stateless
+services. Each pattern defines several socket types (roles in the pattern).
+
+The following sections present the socket types defined by Crossroads library:
+
+
+Request-reply pattern
+~~~~~~~~~~~~~~~~~~~~~
+The request-reply pattern is used for sending requests from a _client_ to one
+or more instances of a stateless _service_, and receiving subsequent replies
+to each request sent.
+
+
+XS_REQ
+^^^^^^
+A socket of type 'XS_REQ' is used by a _client_ to send requests to and
+receive replies from a _service_. This socket type allows only an alternating
+sequence of _xs_send(request)_ and subsequent _xs_recv(reply)_ calls. Each
+request sent is load-balanced among all _services_, and each reply received is
+matched with the last issued request.
+
+When a 'XS_REQ' socket enters an exceptional state due to having reached the
+high water mark for all _services_, or if there are no _services_ at all, then
+any linkxs:xs_send[3] operations on the socket shall block until the
+exceptional state ends or at least one _service_ becomes available for sending;
+messages are not discarded.
+
+[horizontal]
+.Summary of XS_REQ characteristics
+Compatible peer sockets:: 'XS_REP'
+Send/receive pattern:: Send, Receive, Send, Receive, ...
+Outgoing routing strategy:: Load-balanced
+Incoming routing strategy:: Last peer
+XS_HWM option action:: Block
+
+
+XS_REP
+^^^^^^
+A socket of type 'XS_REP' is used by a _service_ to receive requests from and
+send replies to a _client_. This socket type allows only an alternating
+sequence of _xs_recv(request)_ and subsequent _xs_send(reply)_ calls. Each
+request received is fair-queued from among all _clients_, and each reply sent
+is routed to the _client_ that issued the last request. If the original
+requester doesn't exist any more the reply is silently discarded.
+
+When a 'XS_REP' socket enters an exceptional state due to having reached the
+high water mark for a _client_, then any replies sent to the _client_ in
+question shall be dropped until the exceptional state ends.
+
+[horizontal]
+.Summary of XS_REP characteristics
+Compatible peer sockets:: 'XS_REQ'
+Send/receive pattern:: Receive, Send, Receive, Send, ...
+Incoming routing strategy:: Fair-queued
+Outgoing routing strategy:: Last peer
+XS_HWM option action:: Drop
+
+
+XS_XREQ
+^^^^^^^
+A socket of type 'XS_XREQ' is a socket type underlying 'XS_REQ'. It doesn't
+impose the strict order of sends and recvs as 'XS_REQ' does and it is
+intended for use in intermediate devices in request-reply topologies.
+
+Each message sent is load-balanced among all connected
+peers, and each message received is fair-queued from all connected peers.
+
+When a 'XS_XREQ' socket enters an exceptional state due to having reached the
+high water mark for all peers, or if there are no peers at all, then any
+linkxs:xs_send[3] operations on the socket shall block until the exceptional
+state ends or at least one peer becomes available for sending; messages are not
+discarded.
+
+[horizontal]
+.Summary of XS_XREQ characteristics
+Compatible peer sockets:: 'XS_XREP', 'XS_REP'
+Send/receive pattern:: Unrestricted
+Outgoing routing strategy:: Load-balanced
+Incoming routing strategy:: Fair-queued
+XS_HWM option action:: Block
+
+
+XS_XREP
+^^^^^^^
+A socket of type 'XS_XREP' is a socket type underlying 'XS_REP'. It doesn't
+impose the strict order of sends and recvs as 'XS_REQ' does and it is
+intended for use in intermediate devices in request-reply topologies.
+
+Messages received are fair-queued from among all connected peers. The outbound
+messages are routed to a specific peer, as explained below.
+
+When a 'XS_XREP' socket enters an exceptional state due to having reached the
+high water mark for all peers, or if there are no peers at all, then any
+messages sent to the socket shall be dropped until the exceptional state ends.
+Likewise, any messages to be routed to a non-existent peer or a peer for which
+the individual high water mark has been reached shall also be dropped.
+
+[horizontal]
+.Summary of XS_XREP characteristics
+Compatible peer sockets:: 'XS_XREQ', 'XS_REQ'
+Send/receive pattern:: Unrestricted
+Outgoing routing strategy:: See text
+Incoming routing strategy:: Fair-queued
+XS_HWM option action:: Drop
+
+
+Publish-subscribe pattern
+~~~~~~~~~~~~~~~~~~~~~~~~~
+The publish-subscribe pattern is used for one-to-many distribution of data from
+a single _publisher_ to multiple _subscribers_ in a fan out fashion.
+
+
+XS_PUB
+^^^^^^
+A socket of type 'XS_PUB' is used by a _publisher_ to distribute data.
+Messages sent are distributed in a fan out fashion to all connected peers.
+The linkxs:xs_recv[3] function is not implemented for this socket type.
+
+When a 'XS_PUB' socket enters an exceptional state due to having reached the
+high water mark for a _subscriber_, then any messages that would be sent to the
+_subscriber_ in question shall instead be dropped until the exceptional state
+ends. The _xs_send()_ function shall never block for this socket type.
+
+[horizontal]
+.Summary of XS_PUB characteristics
+Compatible peer sockets:: 'XS_SUB', 'XS_XSUB'
+Send/receive pattern:: Send only
+Incoming routing strategy:: N/A
+Outgoing routing strategy:: Fan out
+XS_HWM option action:: Drop
+
+
+XS_SUB
+^^^^^^
+A socket of type 'XS_SUB' is used by a _subscriber_ to subscribe to data
+distributed by a _publisher_. Initially a 'XS_SUB' socket is not subscribed to
+any messages, use the 'XS_SUBSCRIBE' option of linkxs:xs_setsockopt[3] to
+specify which messages to subscribe to. The _xs_send()_ function is not
+implemented for this socket type.
+
+[horizontal]
+.Summary of XS_SUB characteristics
+Compatible peer sockets:: 'XS_PUB', 'XS_XPUB'
+Send/receive pattern:: Receive only
+Incoming routing strategy:: Fair-queued
+Outgoing routing strategy:: N/A
+XS_HWM option action:: Drop
+
+
+XS_XPUB
+^^^^^^^
+Same as XS_PUB except that you can receive subscriptions from the peers
+in form of incoming messages. Subscription message is a byte 1 (for
+subscriptions) or byte 0 (for unsubscriptions) followed by the subscription
+body.
+
+[horizontal]
+.Summary of XS_XPUB characteristics
+Compatible peer sockets:: 'XS_SUB', 'XS_XSUB'
+Send/receive pattern:: Send messages, receive subscriptions
+Incoming routing strategy:: N/A
+Outgoing routing strategy:: Fan out
+XS_HWM option action:: Drop
+
+
+XS_XSUB
+^^^^^^^
+Same as XS_SUB except that you subscribe by sending subscription messages to
+the socket. Subscription message is a byte 1 (for subscriptions) or byte 0
+(for unsubscriptions) followed by the subscription body.
+
+[horizontal]
+.Summary of XS_XSUB characteristics
+Compatible peer sockets:: 'XS_PUB', 'XS_XPUB'
+Send/receive pattern:: Receive messages, send subscriptions
+Incoming routing strategy:: Fair-queued
+Outgoing routing strategy:: N/A
+XS_HWM option action:: Drop
+
+
+Pipeline pattern
+~~~~~~~~~~~~~~~~
+The pipeline pattern is used for distributing data to _nodes_ arranged in
+a pipeline. Data always flows down the pipeline, and each stage of the pipeline
+is connected to at least one _node_. When a pipeline stage is connected to
+multiple _nodes_ data is load-balanced among all connected _nodes_.
+
+
+XS_PUSH
+^^^^^^^
+A socket of type 'XS_PUSH' is used by a pipeline _node_ to send messages
+to downstream pipeline _nodes_. Messages are load-balanced to all connected
+downstream _nodes_. The _xs_recv()_ function is not implemented for this
+socket type.
+
+When a 'XS_PUSH' socket enters an exceptional state due to having reached the
+high water mark for all downstream _nodes_, or if there are no downstream
+_nodes_ at all, then any linkxs:xs_send[3] operations on the socket shall
+block until the exceptional state ends or at least one downstream _node_
+becomes available for sending; messages are not discarded.
+
+[horizontal]
+.Summary of XS_PUSH characteristics
+Compatible peer sockets:: 'XS_PULL'
+Direction:: Unidirectional
+Send/receive pattern:: Send only
+Incoming routing strategy:: N/A
+Outgoing routing strategy:: Load-balanced
+XS_HWM option action:: Block
+
+
+XS_PULL
+^^^^^^^
+A socket of type 'XS_PULL' is used by a pipeline _node_ to receive messages
+from upstream pipeline _nodes_. Messages are fair-queued from among all
+connected upstream _nodes_. The _xs_send()_ function is not implemented for
+this socket type.
+
+[horizontal]
+.Summary of XS_PULL characteristics
+Compatible peer sockets:: 'XS_PUSH'
+Direction:: Unidirectional
+Send/receive pattern:: Receive only
+Incoming routing strategy:: Fair-queued
+Outgoing routing strategy:: N/A
+XS_HWM option action:: N/A
+
+
+Exclusive pair pattern
+~~~~~~~~~~~~~~~~~~~~~~
+The exclusive pair is an advanced pattern used for communicating exclusively
+between two peers.
+
+
+XS_PAIR
+^^^^^^^
+A socket of type 'XS_PAIR' can only be connected to a single peer at any one
+time.  No message routing or filtering is performed on messages sent over a
+'XS_PAIR' socket.
+
+When a 'XS_PAIR' socket enters an exceptional state due to having reached the
+high water mark for the connected peer, or if no peer is connected, then
+any linkxs:xs_send[3] operations on the socket shall block until the peer
+becomes available for sending; messages are not discarded.
+
+NOTE: 'XS_PAIR' sockets are experimental, and are currently missing several
+features such as auto-reconnection.
+
+[horizontal]
+.Summary of XS_PAIR characteristics
+Compatible peer sockets:: 'XS_PAIR'
+Direction:: Bidirectional
+Send/receive pattern:: Unrestricted
+Incoming routing strategy:: N/A
+Outgoing routing strategy:: N/A
+XS_HWM option action:: Block
+
+
+RETURN VALUE
+------------
+The _xs_socket()_ function shall return an opaque handle to the newly created
+socket if successful. Otherwise, it shall return NULL and set 'errno' to one of
+the values defined below.
+
+
+ERRORS
+------
+*EINVAL*::
+The requested socket 'type' is invalid.
+*EFAULT*::
+The provided 'context' is invalid.
+*EMFILE*::
+The limit on the total number of open Crossroads sockets has been reached.
+*ETERM*::
+The context specified was terminated.
+
+SEE ALSO
+--------
+linkxs:xs_init[3]
+linkxs:xs_setsockopt[3]
+linkxs:xs_bind[3]
+linkxs:xs_connect[3]
+linkxs:xs_send[3]
+linkxs:xs_recv[3]
+linkxs:xs[7]
+
+
+AUTHORS
+-------
+The Crossroads documentation was written by Martin Sustrik <sustrik@250bpm.com>
+and Martin Lucina <martin@lucina.net>.

@@ -4,14 +4,14 @@
     Copyright (c) 2011 VMware, Inc.
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -27,19 +27,19 @@
 #include "random.hpp"
 #include "likely.hpp"
 
-zmq::req_t::req_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
+xs::req_t::req_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     xreq_t (parent_, tid_, sid_),
     receiving_reply (false),
     message_begins (true)
 {
-    options.type = ZMQ_REQ;
+    options.type = XS_REQ;
 }
 
-zmq::req_t::~req_t ()
+xs::req_t::~req_t ()
 {
 }
 
-int zmq::req_t::xsend (msg_t *msg_, int flags_)
+int xs::req_t::xsend (msg_t *msg_, int flags_)
 {
     //  If we've sent a request and we still haven't got the reply,
     //  we can't send another request.
@@ -75,7 +75,7 @@ int zmq::req_t::xsend (msg_t *msg_, int flags_)
     return 0;
 }
 
-int zmq::req_t::xrecv (msg_t *msg_, int flags_)
+int xs::req_t::xrecv (msg_t *msg_, int flags_)
 {
     //  If request wasn't send, we can't wait for reply.
     if (!receiving_reply) {
@@ -119,7 +119,7 @@ int zmq::req_t::xrecv (msg_t *msg_, int flags_)
     return 0;
 }
 
-bool zmq::req_t::xhas_in ()
+bool xs::req_t::xhas_in ()
 {
     //  TODO: Duplicates should be removed here.
 
@@ -129,7 +129,7 @@ bool zmq::req_t::xhas_in ()
     return xreq_t::xhas_in ();
 }
 
-bool zmq::req_t::xhas_out ()
+bool xs::req_t::xhas_out ()
 {
     if (receiving_reply)
         return false;
@@ -137,7 +137,7 @@ bool zmq::req_t::xhas_out ()
     return xreq_t::xhas_out ();
 }
 
-zmq::req_session_t::req_session_t (io_thread_t *io_thread_, bool connect_,
+xs::req_session_t::req_session_t (io_thread_t *io_thread_, bool connect_,
       socket_base_t *socket_, const options_t &options_,
       const char *protocol_, const char *address_) :
     xreq_session_t (io_thread_, connect_, socket_, options_, protocol_,
@@ -146,12 +146,12 @@ zmq::req_session_t::req_session_t (io_thread_t *io_thread_, bool connect_,
 {
 }
 
-zmq::req_session_t::~req_session_t ()
+xs::req_session_t::~req_session_t ()
 {
     state = options.recv_identity ? identity : bottom;
 }
 
-int zmq::req_session_t::write (msg_t *msg_)
+int xs::req_session_t::write (msg_t *msg_)
 {
     switch (state) {
     case bottom:

@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -19,8 +19,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ZMQ_IO_THREAD_HPP_INCLUDED__
-#define __ZMQ_IO_THREAD_HPP_INCLUDED__
+#ifndef __XS_IO_THREAD_HPP_INCLUDED__
+#define __XS_IO_THREAD_HPP_INCLUDED__
 
 #include <vector>
 
@@ -30,7 +30,7 @@
 #include "i_poll_events.hpp"
 #include "mailbox.hpp"
 
-namespace zmq
+namespace xs
 {
 
     class ctx_t;
@@ -42,7 +42,7 @@ namespace zmq
     {
     public:
 
-        io_thread_t (zmq::ctx_t *ctx_, uint32_t tid_);
+        io_thread_t (xs::ctx_t *ctx_, uint32_t tid_);
 
         //  Clean-up. If the thread was started, it's neccessary to call 'stop'
         //  before invoking destructor. Otherwise the destructor would hang up.

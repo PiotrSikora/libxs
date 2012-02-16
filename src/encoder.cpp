@@ -1,17 +1,17 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2011 VMware, Inc.
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -25,7 +25,7 @@
 #include "likely.hpp"
 #include "wire.hpp"
 
-zmq::encoder_t::encoder_t (size_t bufsize_) :
+xs::encoder_t::encoder_t (size_t bufsize_) :
     encoder_base_t <encoder_t> (bufsize_),
     session (NULL)
 {
@@ -36,18 +36,18 @@ zmq::encoder_t::encoder_t (size_t bufsize_) :
     next_step (NULL, 0, &encoder_t::message_ready, true);
 }
 
-zmq::encoder_t::~encoder_t ()
+xs::encoder_t::~encoder_t ()
 {
     int rc = in_progress.close ();
     errno_assert (rc == 0);
 }
 
-void zmq::encoder_t::set_session (session_base_t *session_)
+void xs::encoder_t::set_session (session_base_t *session_)
 {
     session = session_;
 }
 
-bool zmq::encoder_t::size_ready ()
+bool xs::encoder_t::size_ready ()
 {
     //  Write message body into the buffer.
     next_step (in_progress.data (), in_progress.size (),
@@ -55,7 +55,7 @@ bool zmq::encoder_t::size_ready ()
     return true;
 }
 
-bool zmq::encoder_t::message_ready ()
+bool xs::encoder_t::message_ready ()
 {
     //  Destroy content of the old message.
     int rc = in_progress.close ();

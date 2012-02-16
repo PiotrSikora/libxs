@@ -1,15 +1,15 @@
 /*
-    Copyright (c) 2011 250bpm s.r.o.
+    Copyright (c) 2011-2012 250bpm s.r.o.
     Copyright (c) 2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -23,7 +23,7 @@
 
 #include "platform.hpp"
 
-#if !defined ZMQ_HAVE_WINDOWS && !defined ZMQ_HAVE_OPENVMS
+#if !defined XS_HAVE_WINDOWS && !defined XS_HAVE_OPENVMS
 
 #include "fd.hpp"
 #include "own.hpp"
@@ -31,7 +31,7 @@
 #include "io_object.hpp"
 #include "ipc_address.hpp"
 
-namespace zmq
+namespace xs
 {
 
     class io_thread_t;
@@ -43,8 +43,8 @@ namespace zmq
 
         //  If 'delay' is true connecter first waits for a while, then starts
         //  connection process.
-        ipc_connecter_t (zmq::io_thread_t *io_thread_,
-            zmq::session_base_t *session_, const options_t &options_,
+        ipc_connecter_t (xs::io_thread_t *io_thread_,
+            xs::session_base_t *session_, const options_t &options_,
             const char *address_, bool delay_);
         ~ipc_connecter_t ();
 
@@ -104,7 +104,7 @@ namespace zmq
         bool wait;
 
         //  Reference to the session we belong to.
-        zmq::session_base_t *session;
+        xs::session_base_t *session;
 
         //  Current reconnect ivl, updated for backoff strategy
         int current_reconnect_ivl;

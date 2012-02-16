@@ -1,0 +1,58 @@
+xs_msg_init_size(3)
+===================
+
+
+NAME
+----
+xs_msg_init_size - initialise Crossroads message of a specified size
+
+
+SYNOPSIS
+--------
+*int xs_msg_init_size (xs_msg_t '*msg', size_t 'size');*
+
+
+DESCRIPTION
+-----------
+The _xs_msg_init_size()_ function shall allocate any resources required to
+store a message 'size' bytes long and initialise the message object referenced
+by 'msg' to represent the newly allocated message.
+
+The implementation shall choose whether to store message content on the stack
+(small messages) or on the heap (large messages). For performance reasons
+_xs_msg_init_size()_ shall not clear the message data.
+
+CAUTION: Never access 'xs_msg_t' members directly, instead always use the
+_xs_msg_ family of functions.
+
+CAUTION: The functions _xs_msg_init()_, _xs_msg_init_data()_ and
+_xs_msg_init_size()_ are mutually exclusive. Never initialize the same
+'xs_msg_t' twice.
+
+
+RETURN VALUE
+------------
+The _xs_msg_init_size()_ function shall return zero if successful. Otherwise
+it shall return `-1` and set 'errno' to one of the values defined below.
+
+
+ERRORS
+------
+*ENOMEM*::
+Insufficient storage space is available.
+
+
+SEE ALSO
+--------
+linkxs:xs_msg_init_data[3]
+linkxs:xs_msg_init[3]
+linkxs:xs_msg_close[3]
+linkxs:xs_msg_data[3]
+linkxs:xs_msg_size[3]
+linkxs:xs[7]
+
+
+AUTHORS
+-------
+The Crossroads documentation was written by Martin Sustrik <sustrik@250bpm.com>
+and Martin Lucina <martin@lucina.net>.

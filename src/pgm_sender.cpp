@@ -1,17 +1,17 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2010-2011 Miru Limited
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -22,9 +22,9 @@
 
 #include "platform.hpp"
 
-#if defined ZMQ_HAVE_OPENPGM
+#if defined XS_HAVE_OPENPGM
 
-#ifdef ZMQ_HAVE_WINDOWS
+#ifdef XS_HAVE_WINDOWS
 #include "windows.hpp"
 #endif
 
@@ -37,7 +37,7 @@
 #include "wire.hpp"
 #include "stdint.hpp"
 
-zmq::pgm_sender_t::pgm_sender_t (io_thread_t *parent_, 
+xs::pgm_sender_t::pgm_sender_t (io_thread_t *parent_, 
       const options_t &options_) :
     io_object_t (parent_),
     has_tx_timer (false),
@@ -51,7 +51,7 @@ zmq::pgm_sender_t::pgm_sender_t (io_thread_t *parent_,
 {
 }
 
-int zmq::pgm_sender_t::init (bool udp_encapsulation_, const char *network_)
+int xs::pgm_sender_t::init (bool udp_encapsulation_, const char *network_)
 {
     int rc = pgm_socket.init (udp_encapsulation_, network_);
     if (rc != 0)
@@ -64,7 +64,7 @@ int zmq::pgm_sender_t::init (bool udp_encapsulation_, const char *network_)
     return rc;
 }
 
-void zmq::pgm_sender_t::plug (io_thread_t *io_thread_, session_base_t *session_)
+void xs::pgm_sender_t::plug (io_thread_t *io_thread_, session_base_t *session_)
 {
     //  Alocate 2 fds for PGM socket.
     fd_t downlink_socket_fd = retired_fd;
@@ -99,11 +99,11 @@ void zmq::pgm_sender_t::plug (io_thread_t *io_thread_, session_base_t *session_)
     msg.init_size (1);
     *(unsigned char*) msg.data () = 1;
     bool ok = session_->write (&msg);
-    zmq_assert (ok);
+    xs_assert (ok);
     session_->flush ();
 }
 
-void zmq::pgm_sender_t::unplug ()
+void xs::pgm_sender_t::unplug ()
 {
     if (has_rx_timer) {
         cancel_timer (rx_timer_id);
@@ -122,24 +122,24 @@ void zmq::pgm_sender_t::unplug ()
     encoder.set_session (NULL);
 }
 
-void zmq::pgm_sender_t::terminate ()
+void xs::pgm_sender_t::terminate ()
 {
     unplug ();
     delete this;
 }
 
-void zmq::pgm_sender_t::activate_out ()
+void xs::pgm_sender_t::activate_out ()
 {
     set_pollout (handle);
     out_event ();
 }
 
-void zmq::pgm_sender_t::activate_in ()
+void xs::pgm_sender_t::activate_in ()
 {
-    zmq_assert (false);
+    xs_assert (false);
 }
 
-zmq::pgm_sender_t::~pgm_sender_t ()
+xs::pgm_sender_t::~pgm_sender_t ()
 {
     if (out_buffer) {
         free (out_buffer);
@@ -147,7 +147,7 @@ zmq::pgm_sender_t::~pgm_sender_t ()
     }
 }
 
-void zmq::pgm_sender_t::in_event ()
+void xs::pgm_sender_t::in_event ()
 {
     if (has_rx_timer) {
         cancel_timer (rx_timer_id);
@@ -163,7 +163,7 @@ void zmq::pgm_sender_t::in_event ()
     }
 }
 
-void zmq::pgm_sender_t::out_event ()
+void xs::pgm_sender_t::out_event ()
 {
     //  POLLOUT event from send socket. If write buffer is empty, 
     //  try to read new data from the encoder.
@@ -200,18 +200,18 @@ void zmq::pgm_sender_t::out_event ()
     if (nbytes == write_size) {
         write_size = 0;
     } else {
-        zmq_assert (nbytes == 0);
+        xs_assert (nbytes == 0);
 
         if (errno == ENOMEM) {
             const long timeout = pgm_socket.get_tx_timeout ();
             add_timer (timeout, tx_timer_id);
             has_tx_timer = true;
         } else
-            zmq_assert (errno == EBUSY);
+            xs_assert (errno == EBUSY);
     }
 }
 
-void zmq::pgm_sender_t::timer_event (int token)
+void xs::pgm_sender_t::timer_event (int token)
 {
     //  Timer cancels on return by poller_base.
     if (token == rx_timer_id) {
@@ -221,7 +221,7 @@ void zmq::pgm_sender_t::timer_event (int token)
         has_tx_timer = false;
         out_event ();
     } else
-        zmq_assert (false);
+        xs_assert (false);
 }
 
 #endif

@@ -4,14 +4,14 @@
     Copyright (c) 2011 VMware, Inc.
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -20,8 +20,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ZMQ_SESSION_BASE_HPP_INCLUDED__
-#define __ZMQ_SESSION_BASE_HPP_INCLUDED__
+#ifndef __XS_SESSION_BASE_HPP_INCLUDED__
+#define __XS_SESSION_BASE_HPP_INCLUDED__
 
 #include <string>
 
@@ -29,7 +29,7 @@
 #include "io_object.hpp"
 #include "pipe.hpp"
 
-namespace zmq
+namespace xs
 {
 
     class pipe_t;
@@ -45,13 +45,13 @@ namespace zmq
     public:
 
         //  Create a session of the particular type.
-        static session_base_t *create (zmq::io_thread_t *io_thread_,
-            bool connect_, zmq::socket_base_t *socket_,
+        static session_base_t *create (xs::io_thread_t *io_thread_,
+            bool connect_, xs::socket_base_t *socket_,
             const options_t &options_, const char *protocol_,
             const char *address_);
 
         //  To be used once only, when creating the session.
-        void attach_pipe (zmq::pipe_t *pipe_);
+        void attach_pipe (xs::pipe_t *pipe_);
 
         //  Following functions are the interface exposed towards the engine.
         virtual int read (msg_t *msg_);
@@ -60,15 +60,15 @@ namespace zmq
         void detach ();
 
         //  i_pipe_events interface implementation.
-        void read_activated (zmq::pipe_t *pipe_);
-        void write_activated (zmq::pipe_t *pipe_);
-        void hiccuped (zmq::pipe_t *pipe_);
-        void terminated (zmq::pipe_t *pipe_);
+        void read_activated (xs::pipe_t *pipe_);
+        void write_activated (xs::pipe_t *pipe_);
+        void hiccuped (xs::pipe_t *pipe_);
+        void terminated (xs::pipe_t *pipe_);
 
     protected:
 
-        session_base_t (zmq::io_thread_t *io_thread_, bool connect_,
-            zmq::socket_base_t *socket_, const options_t &options_,
+        session_base_t (xs::io_thread_t *io_thread_, bool connect_,
+            xs::socket_base_t *socket_, const options_t &options_,
             const char *protocol_, const char *address_);
         ~session_base_t ();
 
@@ -80,7 +80,7 @@ namespace zmq
 
         //  Handlers for incoming commands.
         void process_plug ();
-        void process_attach (zmq::i_engine *engine_);
+        void process_attach (xs::i_engine *engine_);
         void process_term (int linger_);
 
         //  i_poll_events handlers.
@@ -98,7 +98,7 @@ namespace zmq
         bool connect;
 
         //  Pipe connecting the session to its socket.
-        zmq::pipe_t *pipe;
+        xs::pipe_t *pipe;
 
         //  This flag is true if the remainder of the message being processed
         //  is still in the in pipe.
@@ -109,14 +109,14 @@ namespace zmq
         bool pending;
 
         //  The protocol I/O engine connected to the session.
-        zmq::i_engine *engine;
+        xs::i_engine *engine;
 
         //  The socket the session belongs to.
-        zmq::socket_base_t *socket;
+        xs::socket_base_t *socket;
 
         //  I/O thread the session is living in. It will be used to plug in
         //  the engines into the same thread.
-        zmq::io_thread_t *io_thread;
+        xs::io_thread_t *io_thread;
 
         //  ID of the linger timer
         enum {linger_timer_id = 0x20};

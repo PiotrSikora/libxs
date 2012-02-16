@@ -1,0 +1,80 @@
+xs_ipc(7)
+=========
+
+
+NAME
+----
+xs_ipc - local inter-process transport
+
+
+SYNOPSIS
+--------
+The inter-process transport passes messages between local processes using a
+system-dependent IPC mechanism.
+
+NOTE: The inter-process transport is currently only implemented on operating
+systems that provide UNIX domain sockets.
+
+
+ADDRESSING
+----------
+A Crossroads address string consists of two parts as follows:
+'transport'`://`'endpoint'. The 'transport' part specifies the underlying
+transport protocol to use, and for the inter-process transport shall be set to
+`ipc`.  The meaning of the 'endpoint' part for the inter-process transport is
+defined below.
+
+
+Assigning a local address to a socket
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+When assigning a local address to a 'socket' using _xs_bind()_ with the 'ipc'
+transport, the 'endpoint' shall be interpreted as an arbitrary string
+identifying the 'pathname' to create. The 'pathname' must be unique within the
+operating system namespace used by the 'ipc' implementation, and must fulfill
+any restrictions placed by the operating system on the format and length of a
+'pathname'.
+
+Connecting a socket
+~~~~~~~~~~~~~~~~~~~
+When connecting a 'socket' to a peer address using _xs_connect()_ with the
+'ipc' transport, the 'endpoint' shall be interpreted as an arbitrary string
+identifying the 'pathname' to connect to.  The 'pathname' must have been
+previously created within the operating system namespace by assigning it to a
+'socket' with _xs_bind()_.
+
+
+WIRE FORMAT
+-----------
+Not applicable.
+
+
+EXAMPLES
+--------
+.Assigning a local address to a socket
+----
+/* Assign the pathname "/tmp/feeds/0" */
+rc = xs_bind(socket, "ipc:///tmp/feeds/0");
+assert (rc == 0);
+----
+
+.Connecting a socket
+----
+/* Connect to the pathname "/tmp/feeds/0" */
+rc = xs_connect(socket, "ipc:///tmp/feeds/0");
+assert (rc == 0);
+----
+
+SEE ALSO
+--------
+linkxs:xs_bind[3]
+linkxs:xs_connect[3]
+linkxs:xs_inproc[7]
+linkxs:xs_tcp[7]
+linkxs:xs_pgm[7]
+linkxs:xs[7]
+
+
+AUTHORS
+-------
+The Crossroads documentation was written by Martin Sustrik <sustrik@250bpm.com>
+and Martin Lucina <martin@lucina.net>.

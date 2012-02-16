@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -19,8 +19,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ZMQ_STREAM_ENGINE_HPP_INCLUDED__
-#define __ZMQ_STREAM_ENGINE_HPP_INCLUDED__
+#ifndef __XS_STREAM_ENGINE_HPP_INCLUDED__
+#define __XS_STREAM_ENGINE_HPP_INCLUDED__
 
 #include <stddef.h>
 
@@ -31,7 +31,7 @@
 #include "decoder.hpp"
 #include "options.hpp"
 
-namespace zmq
+namespace xs
 {
 
     class io_thread_t;
@@ -48,8 +48,8 @@ namespace zmq
         ~stream_engine_t ();
 
         //  i_engine interface implementation.
-        void plug (zmq::io_thread_t *io_thread_,
-           zmq::session_base_t *session_);
+        void plug (xs::io_thread_t *io_thread_,
+           xs::session_base_t *session_);
         void unplug ();
         void terminate ();
         void activate_in ();
@@ -89,10 +89,10 @@ namespace zmq
         encoder_t encoder;
 
         //  The session this engine is attached to.
-        zmq::session_base_t *session;
+        xs::session_base_t *session;
 
         //  Detached transient session.
-        zmq::session_base_t *leftover_session;
+        xs::session_base_t *leftover_session;
 
         options_t options;
 

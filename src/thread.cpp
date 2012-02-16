@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2010-2011 250bpm s.r.o.
+    Copyright (c) 2010-2012 250bpm s.r.o.
     Copyright (c) 2007-2011 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -23,19 +23,19 @@
 #include "err.hpp"
 #include "platform.hpp"
 
-#ifdef ZMQ_HAVE_WINDOWS
+#ifdef XS_HAVE_WINDOWS
 
 extern "C"
 {
     static unsigned int __stdcall thread_routine (void *arg_)
     {
-        zmq::thread_t *self = (zmq::thread_t*) arg_;
+        xs::thread_t *self = (xs::thread_t*) arg_;
         self->tfn (self->arg);
         return 0;
     }
 }
 
-void zmq::thread_t::start (thread_fn *tfn_, void *arg_)
+void xs::thread_t::start (thread_fn *tfn_, void *arg_)
 {
     tfn = tfn_;
     arg =arg_;
@@ -44,7 +44,7 @@ void zmq::thread_t::start (thread_fn *tfn_, void *arg_)
     win_assert (descriptor != NULL);    
 }
 
-void zmq::thread_t::stop ()
+void xs::thread_t::stop ()
 {
     DWORD rc = WaitForSingleObject (descriptor, INFINITE);
     win_assert (rc != WAIT_FAILED);
@@ -60,7 +60,7 @@ extern "C"
 {
     static void *thread_routine (void *arg_)
     {
-#if !defined ZMQ_HAVE_OPENVMS && !defined ZMQ_HAVE_ANDROID
+#if !defined XS_HAVE_OPENVMS && !defined XS_HAVE_ANDROID
         //  Following code will guarantee more predictable latencies as it'll
         //  disallow any signal handling in the I/O thread.
         sigset_t signal_set;
@@ -70,13 +70,13 @@ extern "C"
         posix_assert (rc);
 #endif
 
-        zmq::thread_t *self = (zmq::thread_t*) arg_;   
+        xs::thread_t *self = (xs::thread_t*) arg_;   
         self->tfn (self->arg);
         return NULL;
     }
 }
 
-void zmq::thread_t::start (thread_fn *tfn_, void *arg_)
+void xs::thread_t::start (thread_fn *tfn_, void *arg_)
 {
     tfn = tfn_;
     arg =arg_;
@@ -84,7 +84,7 @@ void zmq::thread_t::start (thread_fn *tfn_, void *arg_)
     posix_assert (rc);
 }
 
-void zmq::thread_t::stop ()
+void xs::thread_t::stop ()
 {
     int rc = pthread_join (descriptor, NULL);
     posix_assert (rc);

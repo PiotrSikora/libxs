@@ -1,0 +1,85 @@
+xs_msg_init_data(3)
+===================
+
+
+NAME
+----
+xs_msg_init_data - initialise Crossroads message from a supplied buffer
+
+
+SYNOPSIS
+--------
+*typedef void (xs_free_fn) (void '*data', void '*hint');*
+
+*int xs_msg_init_data (xs_msg_t '*msg', void '*data', size_t 'size', xs_free_fn '*ffn', void '*hint');*
+
+
+DESCRIPTION
+-----------
+The _xs_msg_init_data()_ function shall initialise the message object
+referenced by 'msg' to represent the content referenced by the buffer located
+at address 'data', 'size' bytes long. No copy of 'data' shall be performed and
+the library shall take ownership of the supplied buffer.
+
+If provided, the deallocation function 'ffn' shall be called once the data
+buffer is no longer required by the library, with the 'data' and 'hint'
+arguments supplied to _xs_msg_init_data()_.
+
+CAUTION: Never access 'xs_msg_t' members directly, instead always use the
+_xs_msg_ family of functions.
+
+CAUTION: The deallocation function 'ffn' needs to be thread-safe, since it
+will be called from an arbitrary thread.
+
+CAUTION: The functions _xs_msg_init()_, _xs_msg_init_data()_ and
+_xs_msg_init_size()_ are mutually exclusive. Never initialize the same
+'xs_msg_t' twice.
+
+
+RETURN VALUE
+------------
+The _xs_msg_init_data()_ function shall return zero if successful. Otherwise
+it shall return `-1` and set 'errno' to one of the values defined below.
+
+
+ERRORS
+------
+*ENOMEM*::
+Insufficient storage space is available.
+
+
+
+EXAMPLE
+-------
+.Initialising a message from a supplied buffer
+----
+void my_free (void *data, void *hint) 
+{
+    free (data);
+}
+
+    /*  ...  */
+
+void *data = malloc (6);
+assert (data);
+memcpy (data, "ABCDEF", 6);
+xs_msg_t msg;
+rc = xs_msg_init_data (&msg, data, 6, my_free, NULL);
+assert (rc == 0);
+----
+
+
+SEE ALSO
+--------
+linkxs:xs_msg_init_size[3]
+linkxs:xs_msg_init[3]
+linkxs:xs_msg_close[3]
+linkxs:xs_msg_data[3]
+linkxs:xs_msg_size[3]
+linkxs:xs[7]
+
+
+AUTHORS
+-------
+The Crossroads documentation was written by Martin Sustrik <sustrik@250bpm.com>
+and Martin Lucina <martin@lucina.net>.

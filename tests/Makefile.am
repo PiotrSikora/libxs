@@ -1,7 +1,7 @@
 INCLUDES = -I$(top_builddir)/include \
            -I$(top_srcdir)/include
 
-LDADD = $(top_builddir)/src/libzmq.la
+LDADD = $(top_builddir)/src/libxs.la
 
 noinst_PROGRAMS = test_pair_inproc \
                   test_pair_tcp \

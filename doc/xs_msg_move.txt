@@ -1,0 +1,52 @@
+xs_msg_move(3)
+==============
+
+
+NAME
+----
+xs_msg_move - move content of a message to another message
+
+
+SYNOPSIS
+--------
+*int xs_msg_move (xs_msg_t '*dest', xs_msg_t '*src');*
+
+
+DESCRIPTION
+-----------
+The _xs_msg_move()_ function shall move the content of the message object
+referenced by 'src' to the message object referenced by 'dest'. No actual
+copying of message content is performed, 'dest' is simply updated to reference
+the new content. 'src' becomes an empty message after calling _xs_msg_move()_.
+The original content of 'dest', if any, shall be released.
+
+CAUTION: Never access 'xs_msg_t' members directly, instead always use the
+_xs_msg_ family of functions.
+
+
+RETURN VALUE
+------------
+The _xs_msg_move()_ function shall return zero if successful. Otherwise it
+shall return `-1` and set 'errno' to one of the values defined below.
+
+
+ERRORS
+------
+*EFAULT*::
+Invalid message.
+
+
+SEE ALSO
+--------
+linkxs:xs_msg_copy[3]
+linkxs:xs_msg_init[3]
+linkxs:xs_msg_init_size[3]
+linkxs:xs_msg_init_data[3]
+linkxs:xs_msg_close[3]
+linkxs:xs[7]
+
+
+AUTHORS
+-------
+The Crossroads documentation was written by Martin Sustrik <sustrik@250bpm.com>
+and Martin Lucina <martin@lucina.net>.

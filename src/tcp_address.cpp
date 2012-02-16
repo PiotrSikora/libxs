@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -28,7 +28,7 @@
 #include "err.hpp"
 #include "ip.hpp"
 
-#ifdef ZMQ_HAVE_WINDOWS
+#ifdef XS_HAVE_WINDOWS
 #include "windows.hpp"
 #else
 #include <sys/types.h>
@@ -44,7 +44,7 @@
 #define AI_ADDRCONFIG 0
 #endif
 
-#if defined ZMQ_HAVE_SOLARIS
+#if defined XS_HAVE_SOLARIS
 
 #include <sys/sockio.h>
 #include <net/if.h>
@@ -52,21 +52,21 @@
 #include <stdlib.h>
 
 //  On Solaris platform, network interface name can be queried by ioctl.
-int zmq::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
+int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
 {
     //  TODO: Unused parameter, IPv6 support not implemented for Solaris.
     (void) ipv4only_;
 
     //  Create a socket.
     int fd = open_socket (AF_INET, SOCK_DGRAM, 0);
-    zmq_assert (fd != -1);
+    xs_assert (fd != -1);
 
     //  Retrieve number of interfaces.
     lifnum ifn;
     ifn.lifn_family = AF_INET;
     ifn.lifn_flags = 0;
     int rc = ioctl (fd, SIOCGLIFNUM, (char*) &ifn);
-    zmq_assert (rc != -1);
+    xs_assert (rc != -1);
 
     //  Allocate memory to get interface names.
     size_t ifr_size = sizeof (struct lifreq) * ifn.lifn_count;
@@ -80,7 +80,7 @@ int zmq::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
     ifc.lifc_len = ifr_size;
     ifc.lifc_buf = ifr;
     rc = ioctl (fd, SIOCGLIFCONF, (char*) &ifc);
-    zmq_assert (rc != -1);
+    xs_assert (rc != -1);
 
     //  Find the interface with the specified name and AF_INET family.
     bool found = false;
@@ -89,7 +89,7 @@ int zmq::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
           n ++, ifrp ++) {
         if (!strcmp (nic_, ifrp->lifr_name)) {
             rc = ioctl (fd, SIOCGLIFADDR, (char*) ifrp);
-            zmq_assert (rc != -1);
+            xs_assert (rc != -1);
             if (ifrp->lifr_addr.ss_family == AF_INET) {
                 address.ipv4 = *(sockaddr_in*) &ifrp->lifr_addr;
                 found = true;
@@ -110,21 +110,21 @@ int zmq::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
     return 0;
 }
 
-#elif defined ZMQ_HAVE_AIX || defined ZMQ_HAVE_HPUX || defined ZMQ_HAVE_ANDROID
+#elif defined XS_HAVE_AIX || defined XS_HAVE_HPUX || defined XS_HAVE_ANDROID
 
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
 
-int zmq::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
+int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
 {
     //  TODO: Unused parameter, IPv6 support not implemented for AIX or HP/UX.
     (void) ipv4only_;
 
     //  Create a socket.
     int sd = open_socket (AF_INET, SOCK_DGRAM, 0);
-    zmq_assert (sd != -1);
+    xs_assert (sd != -1);
 
     struct ifreq ifr; 
 
@@ -148,22 +148,22 @@ int zmq::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
     return 0;    
 }
 
-#elif ((defined ZMQ_HAVE_LINUX || defined ZMQ_HAVE_FREEBSD ||\
-    defined ZMQ_HAVE_OSX || defined ZMQ_HAVE_OPENBSD ||\
-    defined ZMQ_HAVE_QNXNTO || defined ZMQ_HAVE_NETBSD)\
-    && defined ZMQ_HAVE_IFADDRS)
+#elif ((defined XS_HAVE_LINUX || defined XS_HAVE_FREEBSD ||\
+    defined XS_HAVE_OSX || defined XS_HAVE_OPENBSD ||\
+    defined XS_HAVE_QNXNTO || defined XS_HAVE_NETBSD)\
+    && defined XS_HAVE_IFADDRS)
 
 #include <ifaddrs.h>
 
 //  On these platforms, network interface name can be queried
 //  using getifaddrs function.
-int zmq::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
+int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
 {
     //  Get the addresses.
     ifaddrs* ifa = NULL;
     int rc = getifaddrs (&ifa);
-    zmq_assert (rc == 0);    
-    zmq_assert (ifa != NULL);
+    xs_assert (rc == 0);    
+    xs_assert (ifa != NULL);
 
     //  Find the corresponding network interface.
     bool found = false;
@@ -201,7 +201,7 @@ int zmq::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
 
 //  On other platforms we assume there are no sane interface names.
 //  This is true especially of Windows.
-int zmq::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
+int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
 {
     //  All unused parameters.
     (void) nic_;
@@ -213,7 +213,7 @@ int zmq::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
 
 #endif
 
-int zmq::tcp_address_t::resolve_interface (char const *interface_,
+int xs::tcp_address_t::resolve_interface (char const *interface_,
     bool ipv4only_)
 {
     //  Initialize temporary output pointers with storage address.
@@ -241,7 +241,7 @@ int zmq::tcp_address_t::resolve_interface (char const *interface_,
 
     //  * resolves to INADDR_ANY or in6addr_any.
     if (strcmp (interface_, "*") == 0) {
-        zmq_assert (out_addrlen <= (socklen_t) sizeof (address));
+        xs_assert (out_addrlen <= (socklen_t) sizeof (address));
         memcpy (&address, out_addr, out_addrlen);
         return 0;
     }
@@ -251,13 +251,13 @@ int zmq::tcp_address_t::resolve_interface (char const *interface_,
     if (rc != 0 && errno != ENODEV)
         return rc;
     if (rc == 0) {
-        zmq_assert (out_addrlen <= (socklen_t) sizeof (address));
+        xs_assert (out_addrlen <= (socklen_t) sizeof (address));
         memcpy (&address, out_addr, out_addrlen);
         return 0;
     }
 
     //  There's no such interface name. Assume literal address.
-#if defined ZMQ_HAVE_OPENVMS && defined __ia64
+#if defined XS_HAVE_OPENVMS && defined __ia64
     __addrinfo64 *res = NULL;
     __addrinfo64 req;
 #else
@@ -277,7 +277,7 @@ int zmq::tcp_address_t::resolve_interface (char const *interface_,
     //  service-name irregularity due to indeterminate socktype.
     req.ai_flags = AI_PASSIVE | AI_NUMERICHOST;
 
-#ifndef ZMQ_HAVE_WINDOWS
+#ifndef XS_HAVE_WINDOWS
     //  Windows by default maps IPv4 addresses into IPv6. In this API we only
     //  require IPv4-mapped addresses when no native IPv6 interfaces are
     //  available (~AI_ALL).  This saves an additional DNS roundtrip for IPv4
@@ -295,7 +295,7 @@ int zmq::tcp_address_t::resolve_interface (char const *interface_,
     }
 
     //  Use the first result.
-    zmq_assert ((size_t) (res->ai_addrlen) <= sizeof (address));
+    xs_assert ((size_t) (res->ai_addrlen) <= sizeof (address));
     memcpy (&address, res->ai_addr, res->ai_addrlen);
 
     //  Cleanup getaddrinfo after copying the possibly referenced result.
@@ -305,10 +305,10 @@ int zmq::tcp_address_t::resolve_interface (char const *interface_,
     return 0;
 }
 
-int zmq::tcp_address_t::resolve_hostname (const char *hostname_, bool ipv4only_)
+int xs::tcp_address_t::resolve_hostname (const char *hostname_, bool ipv4only_)
 {
     //  Set up the query.
-#if defined ZMQ_HAVE_OPENVMS && defined __ia64 && __INITIAL_POINTER_SIZE == 64
+#if defined XS_HAVE_OPENVMS && defined __ia64 && __INITIAL_POINTER_SIZE == 64
     __addrinfo64 req;
 #else
     addrinfo req;
@@ -323,7 +323,7 @@ int zmq::tcp_address_t::resolve_hostname (const char *hostname_, bool ipv4only_)
     //  doesn't really matter, since it's not included in the addr-output.
     req.ai_socktype = SOCK_STREAM;
     
-#ifndef ZMQ_HAVE_WINDOWS
+#ifndef XS_HAVE_WINDOWS
     //  Windows by default maps IPv4 addresses into IPv6. In this API we only
     //  require IPv4-mapped addresses when no native IPv6 interfaces are
     //  available.  This saves an additional DNS roundtrip for IPv4 addresses.
@@ -333,7 +333,7 @@ int zmq::tcp_address_t::resolve_hostname (const char *hostname_, bool ipv4only_)
 
     //  Resolve host name. Some of the error info is lost in case of error,
     //  however, there's no way to report EAI errors via errno.
-#if defined ZMQ_HAVE_OPENVMS && defined __ia64 && __INITIAL_POINTER_SIZE == 64
+#if defined XS_HAVE_OPENVMS && defined __ia64 && __INITIAL_POINTER_SIZE == 64
     __addrinfo64 *res;
 #else
     addrinfo *res;
@@ -352,7 +352,7 @@ int zmq::tcp_address_t::resolve_hostname (const char *hostname_, bool ipv4only_)
     }
 
     //  Copy first result to output addr with hostname and service.
-    zmq_assert ((size_t) (res->ai_addrlen) <= sizeof (address));
+    xs_assert ((size_t) (res->ai_addrlen) <= sizeof (address));
     memcpy (&address, res->ai_addr, res->ai_addrlen);
  
     freeaddrinfo (res);
@@ -360,16 +360,16 @@ int zmq::tcp_address_t::resolve_hostname (const char *hostname_, bool ipv4only_)
     return 0;
 }
 
-zmq::tcp_address_t::tcp_address_t ()
+xs::tcp_address_t::tcp_address_t ()
 {
     memset (&address, 0, sizeof (address));
 }
 
-zmq::tcp_address_t::~tcp_address_t ()
+xs::tcp_address_t::~tcp_address_t ()
 {
 }
 
-int zmq::tcp_address_t::resolve (const char *name_, bool local_, bool ipv4only_)
+int xs::tcp_address_t::resolve (const char *name_, bool local_, bool ipv4only_)
 {
     //  Find the ':' at end that separates address from the port number.
     const char *delimiter = strrchr (name_, ':');
@@ -412,12 +412,12 @@ int zmq::tcp_address_t::resolve (const char *name_, bool local_, bool ipv4only_)
     return 0;
 }
 
-sockaddr *zmq::tcp_address_t::addr ()
+sockaddr *xs::tcp_address_t::addr ()
 {
     return &address.generic;
 }
 
-socklen_t zmq::tcp_address_t::addrlen ()
+socklen_t xs::tcp_address_t::addrlen ()
 {
     if (address.generic.sa_family == AF_INET6)
         return (socklen_t) sizeof (address.ipv6);
@@ -425,10 +425,10 @@ socklen_t zmq::tcp_address_t::addrlen ()
         return (socklen_t) sizeof (address.ipv4);
 }
 
-#if defined ZMQ_HAVE_WINDOWS
-unsigned short zmq::tcp_address_t::family ()
+#if defined XS_HAVE_WINDOWS
+unsigned short xs::tcp_address_t::family ()
 #else
-sa_family_t zmq::tcp_address_t::family ()
+sa_family_t xs::tcp_address_t::family ()
 #endif
 {
     return address.generic.sa_family;

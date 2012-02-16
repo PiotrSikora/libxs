@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -20,7 +20,7 @@
 */
 
 #include "devpoll.hpp"
-#if defined ZMQ_USE_DEVPOLL
+#if defined XS_USE_DEVPOLL
 
 #include <sys/devpoll.h>
 #include <sys/time.h>
@@ -37,27 +37,27 @@
 #include "config.hpp"
 #include "i_poll_events.hpp"
 
-zmq::devpoll_t::devpoll_t () :
+xs::devpoll_t::devpoll_t () :
     stopping (false)
 {
     devpoll_fd = open ("/dev/poll", O_RDWR);
     errno_assert (devpoll_fd != -1);
 }
 
-zmq::devpoll_t::~devpoll_t ()
+xs::devpoll_t::~devpoll_t ()
 {
     worker.stop ();
     close (devpoll_fd);
 }
 
-void zmq::devpoll_t::devpoll_ctl (fd_t fd_, short events_)
+void xs::devpoll_t::devpoll_ctl (fd_t fd_, short events_)
 {
     struct pollfd pfd = {fd_, events_, 0};
     ssize_t rc = write (devpoll_fd, &pfd, sizeof pfd);
-    zmq_assert (rc == sizeof pfd);
+    xs_assert (rc == sizeof pfd);
 }
 
-zmq::devpoll_t::handle_t zmq::devpoll_t::add_fd (fd_t fd_,
+xs::devpoll_t::handle_t xs::devpoll_t::add_fd (fd_t fd_,
     i_poll_events *reactor_)
 {
     //  If the file descriptor table is too small expand it.
@@ -86,7 +86,7 @@ zmq::devpoll_t::handle_t zmq::devpoll_t::add_fd (fd_t fd_,
     return fd_;
 }
 
-void zmq::devpoll_t::rm_fd (handle_t handle_)
+void xs::devpoll_t::rm_fd (handle_t handle_)
 {
     assert (fd_table [handle_].valid);
 
@@ -97,45 +97,45 @@ void zmq::devpoll_t::rm_fd (handle_t handle_)
     adjust_load (-1);
 }
 
-void zmq::devpoll_t::set_pollin (handle_t handle_)
+void xs::devpoll_t::set_pollin (handle_t handle_)
 {
     devpoll_ctl (handle_, POLLREMOVE);
     fd_table [handle_].events |= POLLIN;
     devpoll_ctl (handle_, fd_table [handle_].events);
 }
 
-void zmq::devpoll_t::reset_pollin (handle_t handle_)
+void xs::devpoll_t::reset_pollin (handle_t handle_)
 {
     devpoll_ctl (handle_, POLLREMOVE);
     fd_table [handle_].events &= ~((short) POLLIN);
     devpoll_ctl (handle_, fd_table [handle_].events);
 }
 
-void zmq::devpoll_t::set_pollout (handle_t handle_)
+void xs::devpoll_t::set_pollout (handle_t handle_)
 {
     devpoll_ctl (handle_, POLLREMOVE);
     fd_table [handle_].events |= POLLOUT;
     devpoll_ctl (handle_, fd_table [handle_].events);
 }
 
-void zmq::devpoll_t::reset_pollout (handle_t handle_)
+void xs::devpoll_t::reset_pollout (handle_t handle_)
 {
     devpoll_ctl (handle_, POLLREMOVE);
     fd_table [handle_].events &= ~((short) POLLOUT);
     devpoll_ctl (handle_, fd_table [handle_].events);
 }
 
-void zmq::devpoll_t::start ()
+void xs::devpoll_t::start ()
 {
     worker.start (worker_routine, this);
 }
 
-void zmq::devpoll_t::stop ()
+void xs::devpoll_t::stop ()
 {
     stopping = true;
 }
 
-void zmq::devpoll_t::loop ()
+void xs::devpoll_t::loop ()
 {
     while (!stopping) {
 
@@ -152,7 +152,7 @@ void zmq::devpoll_t::loop ()
         //  Wait for events.
         //  On Solaris, we can retrieve no more then (OPEN_MAX - 1) events.
         poll_req.dp_fds = &ev_buf [0];
-#if defined ZMQ_HAVE_SOLARIS
+#if defined XS_HAVE_SOLARIS
         poll_req.dp_nfds = std::min ((int) max_io_events, OPEN_MAX - 1);
 #else
         poll_req.dp_nfds = max_io_events;
@@ -182,7 +182,7 @@ void zmq::devpoll_t::loop ()
     }
 }
 
-void zmq::devpoll_t::worker_routine (void *arg_)
+void xs::devpoll_t::worker_routine (void *arg_)
 {
     ((devpoll_t*) arg_)->loop ();
 }

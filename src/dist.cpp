@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2011 250bpm s.r.o.
+    Copyright (c) 2011-2012 250bpm s.r.o.
     Copyright (c) 2011 VMware, Inc.
     Copyright (c) 2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -25,7 +25,7 @@
 #include "msg.hpp"
 #include "likely.hpp"
 
-zmq::dist_t::dist_t () :
+xs::dist_t::dist_t () :
     matching (0),
     active (0),
     eligible (0),
@@ -33,12 +33,12 @@ zmq::dist_t::dist_t () :
 {
 }
 
-zmq::dist_t::~dist_t ()
+xs::dist_t::~dist_t ()
 {
-    zmq_assert (pipes.empty ());
+    xs_assert (pipes.empty ());
 }
 
-void zmq::dist_t::attach (pipe_t *pipe_)
+void xs::dist_t::attach (pipe_t *pipe_)
 {
     //  If we are in the middle of sending a message, we'll add new pipe
     //  into the list of eligible pipes. Otherwise we add it to the list
@@ -56,7 +56,7 @@ void zmq::dist_t::attach (pipe_t *pipe_)
     }
 }
 
-void zmq::dist_t::match (pipe_t *pipe_)
+void xs::dist_t::match (pipe_t *pipe_)
 {
     //  If pipe is already matching do nothing.
     if (pipes.index (pipe_) < matching)
@@ -71,12 +71,12 @@ void zmq::dist_t::match (pipe_t *pipe_)
     matching++;    
 }
 
-void zmq::dist_t::unmatch ()
+void xs::dist_t::unmatch ()
 {
     matching = 0;
 }
 
-void zmq::dist_t::terminated (pipe_t *pipe_)
+void xs::dist_t::terminated (pipe_t *pipe_)
 {
     //  Remove the pipe from the list; adjust number of matching, active and/or
     //  eligible pipes accordingly.
@@ -89,7 +89,7 @@ void zmq::dist_t::terminated (pipe_t *pipe_)
     pipes.erase (pipe_);
 }
 
-void zmq::dist_t::activated (pipe_t *pipe_)
+void xs::dist_t::activated (pipe_t *pipe_)
 {
     //  Move the pipe from passive to eligible state.
     pipes.swap (pipes.index (pipe_), eligible);
@@ -103,13 +103,13 @@ void zmq::dist_t::activated (pipe_t *pipe_)
     }
 }
 
-int zmq::dist_t::send_to_all (msg_t *msg_, int flags_)
+int xs::dist_t::send_to_all (msg_t *msg_, int flags_)
 {
     matching = active;
     return send_to_matching (msg_, flags_);
 }
 
-int zmq::dist_t::send_to_matching (msg_t *msg_, int flags_)
+int xs::dist_t::send_to_matching (msg_t *msg_, int flags_)
 {
     //  Is this end of a multipart message?
     bool msg_more = msg_->flags () & msg_t::more ? true : false;
@@ -126,14 +126,14 @@ int zmq::dist_t::send_to_matching (msg_t *msg_, int flags_)
     return 0;
 }
 
-void zmq::dist_t::distribute (msg_t *msg_, int flags_)
+void xs::dist_t::distribute (msg_t *msg_, int flags_)
 {
     //  If there are no matching pipes available, simply drop the message.
     if (matching == 0) {
         int rc = msg_->close ();
         errno_assert (rc == 0);
         rc = msg_->init ();
-        zmq_assert (rc == 0);
+        xs_assert (rc == 0);
         return;
     }
 
@@ -165,12 +165,12 @@ void zmq::dist_t::distribute (msg_t *msg_, int flags_)
     errno_assert (rc == 0);
 }
 
-bool zmq::dist_t::has_out ()
+bool xs::dist_t::has_out ()
 {
     return true;
 }
 
-bool zmq::dist_t::write (pipe_t *pipe_, msg_t *msg_)
+bool xs::dist_t::write (pipe_t *pipe_, msg_t *msg_)
 {
     if (!pipe_->write (msg_)) {
         pipes.swap (pipes.index (pipe_), matching - 1);

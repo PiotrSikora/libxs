@@ -1,15 +1,15 @@
 /*
-    Copyright (c) 2010-2011 250bpm s.r.o.
+    Copyright (c) 2010-2012 250bpm s.r.o.
     Copyright (c) 2010-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -20,35 +20,35 @@
 
 #include "platform.hpp"
 
-#if defined ZMQ_FORCE_SELECT
-#define ZMQ_SIGNALER_WAIT_BASED_ON_SELECT
-#elif defined ZMQ_FORCE_POLL
-#define ZMQ_SIGNALER_WAIT_BASED_ON_POLL
-#elif defined ZMQ_HAVE_LINUX || defined ZMQ_HAVE_FREEBSD ||\
-    defined ZMQ_HAVE_OPENBSD || defined ZMQ_HAVE_SOLARIS ||\
-    defined ZMQ_HAVE_OSX || defined ZMQ_HAVE_QNXNTO ||\
-    defined ZMQ_HAVE_HPUX || defined ZMQ_HAVE_AIX ||\
-    defined ZMQ_HAVE_NETBSD
-#define ZMQ_SIGNALER_WAIT_BASED_ON_POLL
-#elif defined ZMQ_HAVE_WINDOWS || defined ZMQ_HAVE_OPENVMS ||\
-	defined ZMQ_HAVE_CYGWIN
-#define ZMQ_SIGNALER_WAIT_BASED_ON_SELECT
+#if defined XS_FORCE_SELECT
+#define XS_SIGNALER_WAIT_BASED_ON_SELECT
+#elif defined XS_FORCE_POLL
+#define XS_SIGNALER_WAIT_BASED_ON_POLL
+#elif defined XS_HAVE_LINUX || defined XS_HAVE_FREEBSD ||\
+    defined XS_HAVE_OPENBSD || defined XS_HAVE_SOLARIS ||\
+    defined XS_HAVE_OSX || defined XS_HAVE_QNXNTO ||\
+    defined XS_HAVE_HPUX || defined XS_HAVE_AIX ||\
+    defined XS_HAVE_NETBSD
+#define XS_SIGNALER_WAIT_BASED_ON_POLL
+#elif defined XS_HAVE_WINDOWS || defined XS_HAVE_OPENVMS ||\
+	defined XS_HAVE_CYGWIN
+#define XS_SIGNALER_WAIT_BASED_ON_SELECT
 #endif
 
-//  On AIX, poll.h has to be included before zmq.h to get consistent
+//  On AIX, poll.h has to be included before xs.h to get consistent
 //  definition of pollfd structure (AIX uses 'reqevents' and 'retnevents'
 //  instead of 'events' and 'revents' and defines macros to map from POSIX-y
 //  names to AIX-specific names).
-#if defined ZMQ_SIGNALER_WAIT_BASED_ON_POLL
+#if defined XS_SIGNALER_WAIT_BASED_ON_POLL
 #include <poll.h>
-#elif defined ZMQ_SIGNALER_WAIT_BASED_ON_SELECT
-#if defined ZMQ_HAVE_WINDOWS
+#elif defined XS_SIGNALER_WAIT_BASED_ON_SELECT
+#if defined XS_HAVE_WINDOWS
 #include "windows.hpp"
-#elif defined ZMQ_HAVE_HPUX
+#elif defined XS_HAVE_HPUX
 #include <sys/param.h>
 #include <sys/types.h>
 #include <sys/time.h>
-#elif defined ZMQ_HAVE_OPENVMS
+#elif defined XS_HAVE_OPENVMS
 #include <sys/types.h>
 #include <sys/time.h>
 #else
@@ -64,11 +64,11 @@
 #include "fd.hpp"
 #include "ip.hpp"
 
-#if defined ZMQ_HAVE_EVENTFD
+#if defined XS_HAVE_EVENTFD
 #include <sys/eventfd.h>
 #endif
 
-#if defined ZMQ_HAVE_WINDOWS
+#if defined XS_HAVE_WINDOWS
 #include "windows.hpp"
 #else
 #include <unistd.h>
@@ -78,7 +78,7 @@
 #include <sys/socket.h>
 #endif
 
-zmq::signaler_t::signaler_t ()
+xs::signaler_t::signaler_t ()
 {
     //  Create the socketpair for signaling.
     int rc = make_fdpair (&r, &w);
@@ -89,12 +89,12 @@ zmq::signaler_t::signaler_t ()
     unblock_socket (r);
 }
 
-zmq::signaler_t::~signaler_t ()
+xs::signaler_t::~signaler_t ()
 {
-#if defined ZMQ_HAVE_EVENTFD
+#if defined XS_HAVE_EVENTFD
     int rc = close (r);
     errno_assert (rc == 0);
-#elif defined ZMQ_HAVE_WINDOWS
+#elif defined XS_HAVE_WINDOWS
     int rc = closesocket (w);
     wsa_assert (rc != SOCKET_ERROR);
     rc = closesocket (r);
@@ -107,55 +107,55 @@ zmq::signaler_t::~signaler_t ()
 #endif
 }
 
-zmq::fd_t zmq::signaler_t::get_fd ()
+xs::fd_t xs::signaler_t::get_fd ()
 {
     return r;
 }
 
-void zmq::signaler_t::send ()
+void xs::signaler_t::send ()
 {
-#if defined ZMQ_HAVE_EVENTFD
+#if defined XS_HAVE_EVENTFD
     const uint64_t inc = 1;
     ssize_t sz = write (w, &inc, sizeof (inc));
     errno_assert (sz == sizeof (inc));
-#elif defined ZMQ_HAVE_WINDOWS
+#elif defined XS_HAVE_WINDOWS
     unsigned char dummy = 0;
     int nbytes = ::send (w, (char*) &dummy, sizeof (dummy), 0);
     wsa_assert (nbytes != SOCKET_ERROR);
-    zmq_assert (nbytes == sizeof (dummy));
+    xs_assert (nbytes == sizeof (dummy));
 #else
     unsigned char dummy = 0;
     while (true) {
         ssize_t nbytes = ::send (w, &dummy, sizeof (dummy), 0);
         if (unlikely (nbytes == -1 && errno == EINTR))
             continue;
-        zmq_assert (nbytes == sizeof (dummy));
+        xs_assert (nbytes == sizeof (dummy));
         break;
     }
 #endif
 }
 
-int zmq::signaler_t::wait (int timeout_)
+int xs::signaler_t::wait (int timeout_)
 {
-#ifdef ZMQ_SIGNALER_WAIT_BASED_ON_POLL
+#ifdef XS_SIGNALER_WAIT_BASED_ON_POLL
 
     struct pollfd pfd;
     pfd.fd = r;
     pfd.events = POLLIN;
     int rc = poll (&pfd, 1, timeout_);
     if (unlikely (rc < 0)) {
-        zmq_assert (errno == EINTR);
+        xs_assert (errno == EINTR);
         return -1;
     }
     else if (unlikely (rc == 0)) {
         errno = EAGAIN;
         return -1;
     }
-    zmq_assert (rc == 1);
-    zmq_assert (pfd.revents & POLLIN);
+    xs_assert (rc == 1);
+    xs_assert (pfd.revents & POLLIN);
     return 0;
 
-#elif defined ZMQ_SIGNALER_WAIT_BASED_ON_SELECT
+#elif defined XS_SIGNALER_WAIT_BASED_ON_SELECT
 
     fd_set fds;
     FD_ZERO (&fds);
@@ -165,7 +165,7 @@ int zmq::signaler_t::wait (int timeout_)
         timeout.tv_sec = timeout_ / 1000;
         timeout.tv_usec = timeout_ % 1000 * 1000;
     }
-#ifdef ZMQ_HAVE_WINDOWS
+#ifdef XS_HAVE_WINDOWS
     int rc = select (0, &fds, NULL, NULL,
         timeout_ >= 0 ? &timeout : NULL);
     wsa_assert (rc != SOCKET_ERROR);
@@ -173,7 +173,7 @@ int zmq::signaler_t::wait (int timeout_)
     int rc = select (r + 1, &fds, NULL, NULL,
         timeout_ >= 0 ? &timeout : NULL);
     if (unlikely (rc < 0)) {
-        zmq_assert (errno == EINTR);
+        xs_assert (errno == EINTR);
         return -1;
     }
 #endif
@@ -181,7 +181,7 @@ int zmq::signaler_t::wait (int timeout_)
         errno = EAGAIN;
         return -1;
     }
-    zmq_assert (rc == 1);
+    xs_assert (rc == 1);
     return 0;
 
 #else
@@ -189,10 +189,10 @@ int zmq::signaler_t::wait (int timeout_)
 #endif
 }
 
-void zmq::signaler_t::recv ()
+void xs::signaler_t::recv ()
 {
     //  Attempt to read a signal.
-#if defined ZMQ_HAVE_EVENTFD
+#if defined XS_HAVE_EVENTFD
     uint64_t dummy;
     ssize_t sz = read (r, &dummy, sizeof (dummy));
     errno_assert (sz == sizeof (dummy));
@@ -206,24 +206,24 @@ void zmq::signaler_t::recv ()
         return;
     }
 
-    zmq_assert (dummy == 1);
+    xs_assert (dummy == 1);
 #else
     unsigned char dummy;
-#if defined ZMQ_HAVE_WINDOWS
+#if defined XS_HAVE_WINDOWS
     int nbytes = ::recv (r, (char*) &dummy, sizeof (dummy), 0);
     wsa_assert (nbytes != SOCKET_ERROR);
 #else
     ssize_t nbytes = ::recv (r, &dummy, sizeof (dummy), 0);
     errno_assert (nbytes >= 0);
 #endif
-    zmq_assert (nbytes == sizeof (dummy));
-    zmq_assert (dummy == 0);
+    xs_assert (nbytes == sizeof (dummy));
+    xs_assert (dummy == 0);
 #endif
 }
 
-int zmq::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
+int xs::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
 {
-#if defined ZMQ_HAVE_EVENTFD
+#if defined XS_HAVE_EVENTFD
 
     // Create eventfd object.
     fd_t fd = eventfd (0, 0);
@@ -232,18 +232,18 @@ int zmq::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
     *r_ = fd;
     return 0;
 
-#elif defined ZMQ_HAVE_WINDOWS
+#elif defined XS_HAVE_WINDOWS
 
     //  This function has to be in a system-wide critical section so that
     //  two instances of the library don't accidentally create signaler
     //  crossing the process boundary.
     //  We'll use named event object to implement the critical section.
-    HANDLE sync = CreateEvent (NULL, FALSE, TRUE, "zmq-signaler-port-sync");
+    HANDLE sync = CreateEvent (NULL, FALSE, TRUE, "xs-signaler-port-sync");
     win_assert (sync != NULL);
 
     //  Enter the critical section.
     DWORD dwrc = WaitForSingleObject (sync, INFINITE);
-    zmq_assert (dwrc == WAIT_OBJECT_0);
+    xs_assert (dwrc == WAIT_OBJECT_0);
 
     //  Windows has no 'socketpair' function. CreatePipe is no good as pipe
     //  handles cannot be polled on. Here we create the socketpair by hand.
@@ -305,7 +305,7 @@ int zmq::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
 
     return 0;
 
-#elif defined ZMQ_HAVE_OPENVMS
+#elif defined XS_HAVE_OPENVMS
 
     //  Whilst OpenVMS supports socketpair - it maps to AF_INET only.  Further,
     //  it does not set the socket options TCP_NODELAY and TCP_NODELACK which
@@ -371,10 +371,10 @@ int zmq::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
 #endif
 }
 
-#if defined ZMQ_SIGNALER_WAIT_BASED_ON_SELECT
-#undef ZMQ_SIGNALER_WAIT_BASED_ON_SELECT
+#if defined XS_SIGNALER_WAIT_BASED_ON_SELECT
+#undef XS_SIGNALER_WAIT_BASED_ON_SELECT
 #endif
-#if defined ZMQ_SIGNALER_WAIT_BASED_ON_POLL
-#undef ZMQ_SIGNALER_WAIT_BASED_ON_POLL
+#if defined XS_SIGNALER_WAIT_BASED_ON_POLL
+#undef XS_SIGNALER_WAIT_BASED_ON_POLL
 #endif
 

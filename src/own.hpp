@@ -1,15 +1,15 @@
 /*
-    Copyright (c) 2010-2011 250bpm s.r.o.
+    Copyright (c) 2010-2012 250bpm s.r.o.
     Copyright (c) 2010-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -18,8 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ZMQ_OWN_HPP_INCLUDED__
-#define __ZMQ_OWN_HPP_INCLUDED__
+#ifndef __XS_OWN_HPP_INCLUDED__
+#define __XS_OWN_HPP_INCLUDED__
 
 #include <set>
 #include <algorithm>
@@ -29,7 +29,7 @@
 #include "atomic_counter.hpp"
 #include "stdint.hpp"
 
-namespace zmq
+namespace xs
 {
 
     class ctx_t;
@@ -46,11 +46,11 @@ namespace zmq
         //  It'll be supplied later on when the object is plugged in.
 
         //  The object is not living within an I/O thread. It has it's own
-        //  thread outside of 0MQ infrastructure.
-        own_t (zmq::ctx_t *parent_, uint32_t tid_);
+        //  thread outside of Crossroads infrastructure.
+        own_t (xs::ctx_t *parent_, uint32_t tid_);
 
         //  The object is living within I/O thread.
-        own_t (zmq::io_thread_t *io_thread_, const options_t &options_);
+        own_t (xs::io_thread_t *io_thread_, const options_t &options_);
 
         //  When another owned object wants to send command to this object
         //  it calls this function to let it know it should not shut down

@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -19,8 +19,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ZMQ_DECODER_HPP_INCLUDED__
-#define __ZMQ_DECODER_HPP_INCLUDED__
+#ifndef __XS_DECODER_HPP_INCLUDED__
+#define __XS_DECODER_HPP_INCLUDED__
 
 #include <stddef.h>
 #include <string.h>
@@ -31,14 +31,14 @@
 #include "msg.hpp"
 #include "stdint.hpp"
 
-namespace zmq
+namespace xs
 {
 
     class session_base_t;
 
     //  Helper base class for decoders that know the amount of data to read
     //  in advance at any moment. Knowing the amount in advance is a property
-    //  of the protocol used. 0MQ framing protocol is based size-prefixed
+    //  of the protocol used. Crossroads framing protocol is based size-prefixed
     //  paradigm, whixh qualifies it to be parsed by this class.
     //  On the other hand, XML-based transports (like XMPP or SOAP) don't allow
     //  for knowing the size of data to read in advance and should use different
@@ -186,7 +186,8 @@ namespace zmq
         const decoder_base_t &operator = (const decoder_base_t&);
     };
 
-    //  Decoder for 0MQ framing protocol. Converts data batches into messages.
+    //  Decoder for Crossroads framing protocol.
+    //  Converts data batches into messages.
 
     class decoder_t : public decoder_base_t <decoder_t>
     {
@@ -195,7 +196,7 @@ namespace zmq
         decoder_t (size_t bufsize_, int64_t maxmsgsize_);
         ~decoder_t ();
 
-        void set_session (zmq::session_base_t *session_);
+        void set_session (xs::session_base_t *session_);
 
     private:
 
@@ -204,7 +205,7 @@ namespace zmq
         bool flags_ready ();
         bool message_ready ();
 
-        zmq::session_base_t *session;
+        xs::session_base_t *session;
         unsigned char tmpbuf [8];
         msg_t in_progress;
 

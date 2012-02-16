@@ -3,14 +3,14 @@
     Copyright (c) 2011 VMware, Inc.
     Copyright (c) 2010-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -26,20 +26,20 @@
 #include "err.hpp"
 #include "msg.hpp"
 
-zmq::xpub_t::xpub_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
+xs::xpub_t::xpub_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     socket_base_t (parent_, tid_, sid_),
     more (false)
 {
-    options.type = ZMQ_XPUB;
+    options.type = XS_XPUB;
 }
 
-zmq::xpub_t::~xpub_t ()
+xs::xpub_t::~xpub_t ()
 {
 }
 
-void zmq::xpub_t::xattach_pipe (pipe_t *pipe_)
+void xs::xpub_t::xattach_pipe (pipe_t *pipe_)
 {
-    zmq_assert (pipe_);
+    xs_assert (pipe_);
     dist.attach (pipe_);
 
     //  The pipe is active when attached. Let's read the subscriptions from
@@ -47,7 +47,7 @@ void zmq::xpub_t::xattach_pipe (pipe_t *pipe_)
     xread_activated (pipe_);
 }
 
-void zmq::xpub_t::xread_activated (pipe_t *pipe_)
+void xs::xpub_t::xread_activated (pipe_t *pipe_)
 {
     //  There are some subscriptions waiting. Let's process them.
     msg_t sub;
@@ -63,7 +63,7 @@ void zmq::xpub_t::xread_activated (pipe_t *pipe_)
         //  Apply the subscription to the trie.
         unsigned char *data = (unsigned char*) sub.data ();
         size_t size = sub.size ();
-        zmq_assert (size > 0 && (*data == 0 || *data == 1));
+        xs_assert (size > 0 && (*data == 0 || *data == 1));
         bool unique;
 		if (*data == 0)
 		    unique = subscriptions.rm (data + 1, size - 1, pipe_);
@@ -72,18 +72,18 @@ void zmq::xpub_t::xread_activated (pipe_t *pipe_)
 
         //  If the subscription is not a duplicate store it so that it can be
         //  passed to used on next recv call.
-        if (unique && options.type != ZMQ_PUB)
+        if (unique && options.type != XS_PUB)
             pending.push_back (blob_t ((unsigned char*) sub.data (),
                 sub.size ()));
     }
 }
 
-void zmq::xpub_t::xwrite_activated (pipe_t *pipe_)
+void xs::xpub_t::xwrite_activated (pipe_t *pipe_)
 {
     dist.activated (pipe_);
 }
 
-void zmq::xpub_t::xterminated (pipe_t *pipe_)
+void xs::xpub_t::xterminated (pipe_t *pipe_)
 {
     //  Remove the pipe from the trie. If there are topics that nobody
     //  is interested in anymore, send corresponding unsubscriptions
@@ -93,13 +93,13 @@ void zmq::xpub_t::xterminated (pipe_t *pipe_)
     dist.terminated (pipe_);
 }
 
-void zmq::xpub_t::mark_as_matching (pipe_t *pipe_, void *arg_)
+void xs::xpub_t::mark_as_matching (pipe_t *pipe_, void *arg_)
 {
     xpub_t *self = (xpub_t*) arg_;
     self->dist.match (pipe_);
 }
 
-int zmq::xpub_t::xsend (msg_t *msg_, int flags_)
+int xs::xpub_t::xsend (msg_t *msg_, int flags_)
 {
     bool msg_more = msg_->flags () & msg_t::more ? true : false;
 
@@ -124,12 +124,12 @@ int zmq::xpub_t::xsend (msg_t *msg_, int flags_)
     return 0;
 }
 
-bool zmq::xpub_t::xhas_out ()
+bool xs::xpub_t::xhas_out ()
 {
     return dist.has_out ();
 }
 
-int zmq::xpub_t::xrecv (msg_t *msg_, int flags_)
+int xs::xpub_t::xrecv (msg_t *msg_, int flags_)
 {
     //  If there is at least one 
     if (pending.empty ()) {
@@ -147,17 +147,17 @@ int zmq::xpub_t::xrecv (msg_t *msg_, int flags_)
     return 0;
 }
 
-bool zmq::xpub_t::xhas_in ()
+bool xs::xpub_t::xhas_in ()
 {
     return !pending.empty ();
 }
 
-void zmq::xpub_t::send_unsubscription (unsigned char *data_, size_t size_,
+void xs::xpub_t::send_unsubscription (unsigned char *data_, size_t size_,
     void *arg_)
 {
     xpub_t *self = (xpub_t*) arg_;
 
-    if (self->options.type != ZMQ_PUB) {
+    if (self->options.type != XS_PUB) {
 
 		//  Place the unsubscription to the queue of pending (un)sunscriptions
 		//  to be retrived by the user later on.
@@ -169,7 +169,7 @@ void zmq::xpub_t::send_unsubscription (unsigned char *data_, size_t size_,
     }
 }
 
-zmq::xpub_session_t::xpub_session_t (io_thread_t *io_thread_, bool connect_,
+xs::xpub_session_t::xpub_session_t (io_thread_t *io_thread_, bool connect_,
       socket_base_t *socket_, const options_t &options_,
       const char *protocol_, const char *address_) :
     session_base_t (io_thread_, connect_, socket_, options_, protocol_,
@@ -177,7 +177,7 @@ zmq::xpub_session_t::xpub_session_t (io_thread_t *io_thread_, bool connect_,
 {
 }
 
-zmq::xpub_session_t::~xpub_session_t ()
+xs::xpub_session_t::~xpub_session_t ()
 {
 }
 

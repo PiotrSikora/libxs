@@ -1,17 +1,17 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2011 VMware, Inc.
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -25,26 +25,26 @@
 #include "err.hpp"
 #include "msg.hpp"
 
-zmq::fq_t::fq_t () :
+xs::fq_t::fq_t () :
     active (0),
     current (0),
     more (false)
 {
 }
 
-zmq::fq_t::~fq_t ()
+xs::fq_t::~fq_t ()
 {
-    zmq_assert (pipes.empty ());
+    xs_assert (pipes.empty ());
 }
 
-void zmq::fq_t::attach (pipe_t *pipe_)
+void xs::fq_t::attach (pipe_t *pipe_)
 {
     pipes.push_back (pipe_);
     pipes.swap (active, pipes.size () - 1);
     active++;
 }
 
-void zmq::fq_t::terminated (pipe_t *pipe_)
+void xs::fq_t::terminated (pipe_t *pipe_)
 {
     //  Remove the pipe from the list; adjust number of active pipes
     //  accordingly.
@@ -56,19 +56,19 @@ void zmq::fq_t::terminated (pipe_t *pipe_)
     pipes.erase (pipe_);
 }
 
-void zmq::fq_t::activated (pipe_t *pipe_)
+void xs::fq_t::activated (pipe_t *pipe_)
 {
     //  Move the pipe to the list of active pipes.
     pipes.swap (pipes.index (pipe_), active);
     active++;
 }
 
-int zmq::fq_t::recv (msg_t *msg_, int flags_)
+int xs::fq_t::recv (msg_t *msg_, int flags_)
 {
     return recvpipe (msg_, flags_, NULL);
 }
 
-int zmq::fq_t::recvpipe (msg_t *msg_, int flags_, pipe_t **pipe_)
+int xs::fq_t::recvpipe (msg_t *msg_, int flags_, pipe_t **pipe_)
 {
     //  Deallocate old content of the message.
     int rc = msg_->close ();
@@ -84,7 +84,7 @@ int zmq::fq_t::recvpipe (msg_t *msg_, int flags_, pipe_t **pipe_)
         //  Check the atomicity of the message. If we've already received the
         //  first part of the message we should get the remaining parts
         //  without blocking.
-        zmq_assert (!(more && !fetched));
+        xs_assert (!(more && !fetched));
 
         //  Note that when message is not fetched, current pipe is deactivated
         //  and replaced by another active pipe. Thus we don't have to increase
@@ -117,7 +117,7 @@ int zmq::fq_t::recvpipe (msg_t *msg_, int flags_, pipe_t **pipe_)
     return -1;
 }
 
-bool zmq::fq_t::has_in ()
+bool xs::fq_t::has_in ()
 {
     //  There are subsequent parts of the partly-read message available.
     if (more)

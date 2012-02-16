@@ -1,0 +1,55 @@
+xs_strerror(3)
+==============
+
+
+NAME
+----
+xs_strerror - get error message string
+
+
+SYNOPSIS
+--------
+*const char *xs_strerror (int 'errnum');*
+
+
+DESCRIPTION
+-----------
+The _xs_strerror()_ function shall return a pointer to an error message string
+corresponding to the error number specified by the 'errnum' argument.
+As Crossroads define additional error numbers over and above those defined
+by the operating system, applications should use _xs_strerror()_ in preference
+to the standard _strerror()_ function.
+
+
+RETURN VALUE
+------------
+The _xs_strerror()_ function shall return a pointer to an error message
+string.
+
+
+ERRORS
+------
+No errors are defined.
+
+
+EXAMPLE
+-------
+.Displaying an error message when the context cannot be initialised
+----
+void *ctx = xs_init (1, 1, 0);
+if (!ctx) {
+    printf ("Error occurred during xs_init(): %s\n", xs_strerror (errno));
+    abort ();
+}
+----
+
+
+SEE ALSO
+--------
+linkxs:xs[7]
+
+
+AUTHORS
+-------
+The Crossroads documentation was written by Martin Sustrik <sustrik@250bpm.com>
+and Martin Lucina <martin@lucina.net>.

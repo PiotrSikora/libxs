@@ -1,15 +1,15 @@
 /*
-    Copyright (c) 2011 250bpm s.r.o.
+    Copyright (c) 2011-2012 250bpm s.r.o.
     Copyright (c) 2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -22,7 +22,7 @@
 #include "socket_base.hpp"
 #include "err.hpp"
 
-zmq::reaper_t::reaper_t (class ctx_t *ctx_, uint32_t tid_) :
+xs::reaper_t::reaper_t (class ctx_t *ctx_, uint32_t tid_) :
     object_t (ctx_, tid_),
     sockets (0),
     terminating (false)
@@ -34,28 +34,28 @@ zmq::reaper_t::reaper_t (class ctx_t *ctx_, uint32_t tid_) :
     poller->set_pollin (mailbox_handle);
 }
 
-zmq::reaper_t::~reaper_t ()
+xs::reaper_t::~reaper_t ()
 {
     delete poller;
 }
 
-zmq::mailbox_t *zmq::reaper_t::get_mailbox ()
+xs::mailbox_t *xs::reaper_t::get_mailbox ()
 {
     return &mailbox;
 }
 
-void zmq::reaper_t::start ()
+void xs::reaper_t::start ()
 {
     //  Start the thread.
     poller->start ();
 }
 
-void zmq::reaper_t::stop ()
+void xs::reaper_t::stop ()
 {
     send_stop ();
 }
 
-void zmq::reaper_t::in_event ()
+void xs::reaper_t::in_event ()
 {
     while (true) {
 
@@ -73,17 +73,17 @@ void zmq::reaper_t::in_event ()
     }
 }
 
-void zmq::reaper_t::out_event ()
+void xs::reaper_t::out_event ()
 {
-    zmq_assert (false);
+    xs_assert (false);
 }
 
-void zmq::reaper_t::timer_event (int id_)
+void xs::reaper_t::timer_event (int id_)
 {
-    zmq_assert (false);
+    xs_assert (false);
 }
 
-void zmq::reaper_t::process_stop ()
+void xs::reaper_t::process_stop ()
 {
     terminating = true;
 
@@ -95,7 +95,7 @@ void zmq::reaper_t::process_stop ()
     }
 }
 
-void zmq::reaper_t::process_reap (socket_base_t *socket_)
+void xs::reaper_t::process_reap (socket_base_t *socket_)
 {
     //  Add the socket to the poller.
     socket_->start_reaping (poller);
@@ -103,7 +103,7 @@ void zmq::reaper_t::process_reap (socket_base_t *socket_)
     ++sockets;
 }
 
-void zmq::reaper_t::process_reaped ()
+void xs::reaper_t::process_reaped ()
 {
     --sockets;
 

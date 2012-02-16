@@ -1,0 +1,50 @@
+xs_errno(3)
+===========
+
+
+NAME
+----
+xs_errno - retrieve value of errno for the calling thread
+
+
+SYNOPSIS
+--------
+*int xs_errno (void);*
+
+
+DESCRIPTION
+-----------
+The _xs_errno()_ function shall retrieve the value of the 'errno' variable for
+the calling thread.
+
+The _xs_errno()_ function is provided to assist users on non-POSIX systems who
+are experiencing issues with retrieving the correct value of 'errno' directly.
+Specifically, users on Win32 systems whose application is using a different C
+run-time library from the C run-time library in use by Crossroads will need to
+use _xs_errno()_ for correct operation.
+
+IMPORTANT: Users not experiencing issues with retrieving the correct value of
+'errno' should not use this function and should instead access the 'errno'
+variable directly.
+
+
+RETURN VALUE
+------------
+The _xs_errno()_ function shall return the value of the 'errno' variable for
+the calling thread.
+
+
+ERRORS
+------
+No errors are defined.
+
+
+SEE ALSO
+--------
+linkxs:xs[7]
+
+
+AUTHORS
+-------
+The Crossroads documentation was written by Martin Sustrik <sustrik@250bpm.com>
+and Martin Lucina <martin@lucina.net>.

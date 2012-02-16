@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2010 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -32,7 +32,7 @@
 #include "err.hpp"
 #include "ip.hpp"
 
-#ifdef ZMQ_HAVE_WINDOWS
+#ifdef XS_HAVE_WINDOWS
 #include "windows.hpp"
 #else
 #include <unistd.h>
@@ -44,11 +44,11 @@
 #include <fcntl.h>
 #endif
 
-#ifdef ZMQ_HAVE_OPENVMS
+#ifdef XS_HAVE_OPENVMS
 #include <ioctl.h>
 #endif
 
-zmq::tcp_listener_t::tcp_listener_t (io_thread_t *io_thread_,
+xs::tcp_listener_t::tcp_listener_t (io_thread_t *io_thread_,
       socket_base_t *socket_, const options_t &options_) :
     own_t (io_thread_, options_),
     io_object_t (io_thread_),
@@ -58,26 +58,26 @@ zmq::tcp_listener_t::tcp_listener_t (io_thread_t *io_thread_,
 {
 }
 
-zmq::tcp_listener_t::~tcp_listener_t ()
+xs::tcp_listener_t::~tcp_listener_t ()
 {
     if (s != retired_fd)
         close ();
 }
 
-void zmq::tcp_listener_t::process_plug ()
+void xs::tcp_listener_t::process_plug ()
 {
     //  Start polling for incoming connections.
     handle = add_fd (s);
     set_pollin (handle);
 }
 
-void zmq::tcp_listener_t::process_term (int linger_)
+void xs::tcp_listener_t::process_term (int linger_)
 {
     rm_fd (handle);
     own_t::process_term (linger_);
 }
 
-void zmq::tcp_listener_t::in_event ()
+void xs::tcp_listener_t::in_event ()
 {
     fd_t fd = accept ();
 
@@ -95,7 +95,7 @@ void zmq::tcp_listener_t::in_event ()
     //  Choose I/O thread to run connecter in. Given that we are already
     //  running in an I/O thread, there must be at least one available.
     io_thread_t *io_thread = choose_io_thread (options.affinity);
-    zmq_assert (io_thread);
+    xs_assert (io_thread);
 
     //  Create and launch a session object. 
     session_base_t *session = session_base_t::create (io_thread, false, socket,
@@ -106,10 +106,10 @@ void zmq::tcp_listener_t::in_event ()
     send_attach (session, engine, false);
 }
 
-void zmq::tcp_listener_t::close ()
+void xs::tcp_listener_t::close ()
 {
-    zmq_assert (s != retired_fd);
-#ifdef ZMQ_HAVE_WINDOWS
+    xs_assert (s != retired_fd);
+#ifdef XS_HAVE_WINDOWS
     int rc = closesocket (s);
     wsa_assert (rc != SOCKET_ERROR);
 #else
@@ -119,7 +119,7 @@ void zmq::tcp_listener_t::close ()
     s = retired_fd;
 }
 
-int zmq::tcp_listener_t::set_address (const char *addr_)
+int xs::tcp_listener_t::set_address (const char *addr_)
 {
     //  Convert the textual address into address structure.
     int rc = address.resolve (addr_, true, options.ipv4only ? true : false);
@@ -128,7 +128,7 @@ int zmq::tcp_listener_t::set_address (const char *addr_)
 
     //  Create a listening socket.
     s = open_socket (address.family (), SOCK_STREAM, IPPROTO_TCP);
-#ifdef ZMQ_HAVE_WINDOWS
+#ifdef XS_HAVE_WINDOWS
     if (s == INVALID_SOCKET)
         wsa_error_to_errno ();
 #endif
@@ -142,7 +142,7 @@ int zmq::tcp_listener_t::set_address (const char *addr_)
         s = ::socket (address.family (), SOCK_STREAM, IPPROTO_TCP);
     }
 
-#ifdef ZMQ_HAVE_WINDOWS
+#ifdef XS_HAVE_WINDOWS
     if (s == INVALID_SOCKET) {
         wsa_error_to_errno ();
         return -1;
@@ -159,7 +159,7 @@ int zmq::tcp_listener_t::set_address (const char *addr_)
 
     //  Allow reusing of the address.
     int flag = 1;
-#ifdef ZMQ_HAVE_WINDOWS
+#ifdef XS_HAVE_WINDOWS
     rc = setsockopt (s, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
         (const char*) &flag, sizeof (int));
     wsa_assert (rc != SOCKET_ERROR);
@@ -170,7 +170,7 @@ int zmq::tcp_listener_t::set_address (const char *addr_)
 
     //  Bind the socket to the network interface and port.
     rc = bind (s, address.addr (), address.addrlen ());
-#ifdef ZMQ_HAVE_WINDOWS
+#ifdef XS_HAVE_WINDOWS
     if (rc == SOCKET_ERROR) {
         wsa_error_to_errno ();
         return -1;
@@ -182,7 +182,7 @@ int zmq::tcp_listener_t::set_address (const char *addr_)
 
     //  Listen for incomming connections.
     rc = listen (s, options.backlog);
-#ifdef ZMQ_HAVE_WINDOWS
+#ifdef XS_HAVE_WINDOWS
     if (rc == SOCKET_ERROR) {
         wsa_error_to_errno ();
         return -1;
@@ -195,12 +195,12 @@ int zmq::tcp_listener_t::set_address (const char *addr_)
     return 0;
 }
 
-zmq::fd_t zmq::tcp_listener_t::accept ()
+xs::fd_t xs::tcp_listener_t::accept ()
 {
     //  Accept one connection and deal with different failure modes.
-    zmq_assert (s != retired_fd);
+    xs_assert (s != retired_fd);
     fd_t sock = ::accept (s, NULL, NULL);
-#ifdef ZMQ_HAVE_WINDOWS
+#ifdef XS_HAVE_WINDOWS
     if (sock == INVALID_SOCKET) {
         wsa_assert (WSAGetLastError () == WSAEWOULDBLOCK ||
             WSAGetLastError () == WSAECONNRESET);

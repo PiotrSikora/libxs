@@ -4,14 +4,14 @@
     Copyright (c) 2011 VMware, Inc.
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -25,7 +25,7 @@
 #include "options.hpp"
 #include "err.hpp"
 
-zmq::options_t::options_t () :
+xs::options_t::options_t () :
     sndhwm (1000),
     rcvhwm (1000),
     affinity (0),
@@ -53,12 +53,12 @@ zmq::options_t::options_t () :
 {
 }
 
-int zmq::options_t::setsockopt (int option_, const void *optval_,
+int xs::options_t::setsockopt (int option_, const void *optval_,
     size_t optvallen_)
 {
     switch (option_) {
 
-    case ZMQ_SNDHWM:
+    case XS_SNDHWM:
         if (optvallen_ != sizeof (int) || *((int*) optval_) < 0) {
             errno = EINVAL;
             return -1;
@@ -66,7 +66,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
         sndhwm = *((int*) optval_);
         return 0;
 
-    case ZMQ_RCVHWM:
+    case XS_RCVHWM:
         if (optvallen_ != sizeof (int) || *((int*) optval_) < 0) {
             errno = EINVAL;
             return -1;
@@ -74,7 +74,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
         rcvhwm = *((int*) optval_);
         return 0;
 
-    case ZMQ_AFFINITY:
+    case XS_AFFINITY:
         if (optvallen_ != sizeof (uint64_t)) {
             errno = EINVAL;
             return -1;
@@ -82,7 +82,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
         affinity = *((uint64_t*) optval_);
         return 0;
 
-    case ZMQ_IDENTITY:
+    case XS_IDENTITY:
 
         //  Empty identity is invalid as well as identity longer than
         //  255 bytes. Identity starting with binary zero is invalid
@@ -96,7 +96,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
         memcpy (identity, optval_, identity_size);
         return 0;
 
-    case ZMQ_RATE:
+    case XS_RATE:
         if (optvallen_ != sizeof (int) || *((int*) optval_) <= 0) {
             errno = EINVAL;
             return -1;
@@ -104,7 +104,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
         rate = *((int*) optval_);
         return 0;
         
-    case ZMQ_RECOVERY_IVL:
+    case XS_RECOVERY_IVL:
         if (optvallen_ != sizeof (int) || *((int*) optval_) < 0) {
             errno = EINVAL;
             return -1;
@@ -112,7 +112,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
         recovery_ivl = *((int*) optval_);
         return 0;
 
-    case ZMQ_SNDBUF:
+    case XS_SNDBUF:
         if (optvallen_ != sizeof (int) || *((int*) optval_) < 0) {
             errno = EINVAL;
             return -1;
@@ -120,7 +120,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
         sndbuf = *((int*) optval_);
         return 0;
 
-    case ZMQ_RCVBUF:
+    case XS_RCVBUF:
         if (optvallen_ != sizeof (int) || *((int*) optval_) < 0) {
             errno = EINVAL;
             return -1;
@@ -128,7 +128,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
         rcvbuf = *((int*) optval_);
         return 0;
 
-    case ZMQ_LINGER:
+    case XS_LINGER:
         if (optvallen_ != sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -136,7 +136,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
         linger = *((int*) optval_);
         return 0;
 
-    case ZMQ_RECONNECT_IVL:
+    case XS_RECONNECT_IVL:
         if (optvallen_ != sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -148,7 +148,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
         reconnect_ivl = *((int*) optval_);
         return 0;
 
-    case ZMQ_RECONNECT_IVL_MAX:
+    case XS_RECONNECT_IVL_MAX:
         if (optvallen_ != sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -160,7 +160,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
         reconnect_ivl_max = *((int*) optval_);
         return 0;
 
-    case ZMQ_BACKLOG:
+    case XS_BACKLOG:
         if (optvallen_ != sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -168,7 +168,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
         backlog = *((int*) optval_);
         return 0;
 
-    case ZMQ_MAXMSGSIZE:
+    case XS_MAXMSGSIZE:
         if (optvallen_ != sizeof (int64_t)) {
             errno = EINVAL;
             return -1;
@@ -176,7 +176,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
         maxmsgsize = *((int64_t*) optval_);
         return 0;
 
-    case ZMQ_MULTICAST_HOPS:
+    case XS_MULTICAST_HOPS:
         if (optvallen_ != sizeof (int) || *((int*) optval_) <= 0) {
             errno = EINVAL;
             return -1;
@@ -184,7 +184,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
         multicast_hops = *((int*) optval_);
         return 0;
 
-    case ZMQ_RCVTIMEO:
+    case XS_RCVTIMEO:
         if (optvallen_ != sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -192,7 +192,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
         rcvtimeo = *((int*) optval_);
         return 0;
 
-    case ZMQ_SNDTIMEO:
+    case XS_SNDTIMEO:
         if (optvallen_ != sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -200,7 +200,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
         sndtimeo = *((int*) optval_);
         return 0;
 
-    case ZMQ_IPV4ONLY:
+    case XS_IPV4ONLY:
         {
             if (optvallen_ != sizeof (int)) {
                 errno = EINVAL;
@@ -221,11 +221,11 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
     return -1;
 }
 
-int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
+int xs::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
 {
     switch (option_) {
 
-    case ZMQ_SNDHWM:
+    case XS_SNDHWM:
         if (*optvallen_ < sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -234,7 +234,7 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = sizeof (int);
         return 0;
 
-    case ZMQ_RCVHWM:
+    case XS_RCVHWM:
         if (*optvallen_ < sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -243,7 +243,7 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = sizeof (int);
         return 0;
 
-    case ZMQ_AFFINITY:
+    case XS_AFFINITY:
         if (*optvallen_ < sizeof (uint64_t)) {
             errno = EINVAL;
             return -1;
@@ -252,7 +252,7 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = sizeof (uint64_t);
         return 0;
 
-    case ZMQ_IDENTITY:
+    case XS_IDENTITY:
         if (*optvallen_ < identity_size) {
             errno = EINVAL;
             return -1;
@@ -261,7 +261,7 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = identity_size;
         return 0;
 
-    case ZMQ_RATE:
+    case XS_RATE:
         if (*optvallen_ < sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -270,7 +270,7 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = sizeof (int);
         return 0;
         
-    case ZMQ_RECOVERY_IVL:
+    case XS_RECOVERY_IVL:
         if (*optvallen_ < sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -279,7 +279,7 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = sizeof (int);
         return 0;
 
-    case ZMQ_SNDBUF:
+    case XS_SNDBUF:
         if (*optvallen_ < sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -288,7 +288,7 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = sizeof (int);
         return 0;
 
-    case ZMQ_RCVBUF:
+    case XS_RCVBUF:
         if (*optvallen_ < sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -297,7 +297,7 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = sizeof (int);
         return 0;
 
-    case ZMQ_TYPE:
+    case XS_TYPE:
         if (*optvallen_ < sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -306,7 +306,7 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = sizeof (int);
         return 0;
 
-    case ZMQ_LINGER:
+    case XS_LINGER:
         if (*optvallen_ < sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -315,7 +315,7 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = sizeof (int);
         return 0;
 
-    case ZMQ_RECONNECT_IVL:
+    case XS_RECONNECT_IVL:
         if (*optvallen_ < sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -324,7 +324,7 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = sizeof (int);
         return 0;
 
-    case ZMQ_RECONNECT_IVL_MAX:
+    case XS_RECONNECT_IVL_MAX:
         if (*optvallen_ < sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -333,7 +333,7 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = sizeof (int);
         return 0;
 
-    case ZMQ_BACKLOG:
+    case XS_BACKLOG:
         if (*optvallen_ < sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -342,7 +342,7 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = sizeof (int);
         return 0;
 
-    case ZMQ_MAXMSGSIZE:
+    case XS_MAXMSGSIZE:
         if (*optvallen_ < sizeof (int64_t)) {
             errno = EINVAL;
             return -1;
@@ -351,7 +351,7 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = sizeof (int64_t);
         return 0;
 
-    case ZMQ_MULTICAST_HOPS:
+    case XS_MULTICAST_HOPS:
         if (*optvallen_ < sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -360,7 +360,7 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = sizeof (int);
         return 0;
 
-    case ZMQ_RCVTIMEO:
+    case XS_RCVTIMEO:
         if (*optvallen_ < sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -369,7 +369,7 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = sizeof (int);
         return 0;
 
-    case ZMQ_SNDTIMEO:
+    case XS_SNDTIMEO:
         if (*optvallen_ < sizeof (int)) {
             errno = EINVAL;
             return -1;
@@ -378,7 +378,7 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = sizeof (int);
         return 0;
 
-    case ZMQ_IPV4ONLY:
+    case XS_IPV4ONLY:
         if (*optvallen_ < sizeof (int)) {
             errno = EINVAL;
             return -1;

@@ -1,15 +1,15 @@
 /*
-    Copyright (c) 2010-2011 250bpm s.r.o.
+    Copyright (c) 2010-2012 250bpm s.r.o.
     Copyright (c) 2010-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -18,15 +18,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ZMQ_POLLER_BASE_HPP_INCLUDED__
-#define __ZMQ_POLLER_BASE_HPP_INCLUDED__
+#ifndef __XS_POLLER_BASE_HPP_INCLUDED__
+#define __XS_POLLER_BASE_HPP_INCLUDED__
 
 #include <map>
 
 #include "clock.hpp"
 #include "atomic_counter.hpp"
 
-namespace zmq
+namespace xs
 {
 
     struct i_poll_events;
@@ -45,10 +45,10 @@ namespace zmq
         //  Add a timeout to expire in timeout_ milliseconds. After the
         //  expiration timer_event on sink_ object will be called with
         //  argument set to id_.
-        void add_timer (int timeout_, zmq::i_poll_events *sink_, int id_);
+        void add_timer (int timeout_, xs::i_poll_events *sink_, int id_);
 
         //  Cancel the timer created by sink_ object with ID equal to id_.
-        void cancel_timer (zmq::i_poll_events *sink_, int id_);
+        void cancel_timer (xs::i_poll_events *sink_, int id_);
 
     protected:
 
@@ -67,7 +67,7 @@ namespace zmq
         //  List of active timers.
         struct timer_info_t
         {
-            zmq::i_poll_events *sink;
+            xs::i_poll_events *sink;
             int id;
         };
         typedef std::multimap <uint64_t, timer_info_t> timers_t;

@@ -1,0 +1,55 @@
+xs_msg_close(3)
+===============
+
+
+NAME
+----
+xs_msg_close - release Crossroads message
+
+
+SYNOPSIS
+--------
+*int xs_msg_close (xs_msg_t '*msg');*
+
+
+DESCRIPTION
+-----------
+The _xs_msg_close()_ function shall inform the Crossroads infrastructure that
+any resources associated with the message object referenced by 'msg' are no
+longer required and may be released. Actual release of resources associated with
+the message object shall be postponed by the library until all users of the
+message or underlying data buffer have indicated it is no longer required.
+
+Applications should ensure that _xs_msg_close()_ is called once a message is
+no longer required, otherwise memory leaks may occur.
+
+CAUTION: Never access 'xs_msg_t' members directly, instead always use the
+_xs_msg_ family of functions.
+
+
+RETURN VALUE
+------------
+The _xs_msg_close()_ function shall return zero if successful. Otherwise
+it shall return `-1` and set 'errno' to one of the values defined below.
+
+
+ERRORS
+------
+*EFAULT*::
+Invalid message.
+
+
+SEE ALSO
+--------
+linkxs:xs_msg_init[3]
+linkxs:xs_msg_init_size[3]
+linkxs:xs_msg_init_data[3]
+linkxs:xs_msg_data[3]
+linkxs:xs_msg_size[3]
+linkxs:xs[7]
+
+
+AUTHORS
+-------
+The Crossroads documentation was written by Martin Sustrik <sustrik@250bpm.com>
+and Martin Lucina <martin@lucina.net>.

@@ -1,10 +1,10 @@
-MAN3 = zmq_bind.3 zmq_close.3 zmq_connect.3 zmq_init.3 \
-    zmq_msg_close.3 zmq_msg_copy.3 zmq_msg_data.3 zmq_msg_init.3 \
-    zmq_msg_init_data.3 zmq_msg_init_size.3 zmq_msg_move.3 zmq_msg_size.3 \
-    zmq_poll.3 zmq_recv.3 zmq_send.3 zmq_setsockopt.3 zmq_socket.3 \
-    zmq_strerror.3 zmq_term.3 zmq_version.3 zmq_getsockopt.3 zmq_errno.3 \
-    zmq_sendmsg.3 zmq_recvmsg.3 zmq_getmsgopt.3
-MAN7 = zmq.7 zmq_tcp.7 zmq_pgm.7 zmq_epgm.7 zmq_inproc.7 zmq_ipc.7
+MAN3 = xs_bind.3 xs_close.3 xs_connect.3 xs_init.3 \
+    xs_msg_close.3 xs_msg_copy.3 xs_msg_data.3 xs_msg_init.3 \
+    xs_msg_init_data.3 xs_msg_init_size.3 xs_msg_move.3 xs_msg_size.3 \
+    xs_poll.3 xs_recv.3 xs_send.3 xs_setsockopt.3 xs_socket.3 \
+    xs_strerror.3 xs_term.3 xs_version.3 xs_getsockopt.3 xs_errno.3 \
+    xs_sendmsg.3 xs_recvmsg.3 xs_getmsgopt.3
+MAN7 = xs.7 xs_tcp.7 xs_pgm.7 xs_epgm.7 xs_inproc.7 xs_ipc.7
 
 MAN_DOC = $(MAN1) $(MAN3) $(MAN7)
 
@@ -30,16 +30,16 @@ SUFFIXES=.html .txt .xml .3 .7
 
 .txt.html:
 	asciidoc -d manpage -b xhtml11 -f $(srcdir)/asciidoc.conf \
-		-azmq_version=@PACKAGE_VERSION@ -o$@ $<
+		-axs_version=@PACKAGE_VERSION@ -o$@ $<
 .txt.xml:
 	asciidoc -d manpage -b docbook -f $(srcdir)/asciidoc.conf \
-		-azmq_version=@PACKAGE_VERSION@ -o$@ $<
+		-axs_version=@PACKAGE_VERSION@ -o$@ $<
 .xml.1:
 	xmlto man $<
 .xml.3:
 	xmlto man $<
 .xml.7:
 	xmlto man $<
-zmq_epgm.7: zmq_pgm.7
-	cp zmq_pgm.7 $@
+xs_epgm.7: xs_pgm.7
+	cp xs_pgm.7 $@
 endif

@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -20,16 +20,16 @@
 */
 
 #include "select.hpp"
-#if defined ZMQ_USE_SELECT
+#if defined XS_USE_SELECT
 
 #include "platform.hpp"
-#if defined ZMQ_HAVE_WINDOWS
+#if defined XS_HAVE_WINDOWS
 #include "windows.hpp"
-#elif defined ZMQ_HAVE_HPUX
+#elif defined XS_HAVE_HPUX
 #include <sys/param.h>
 #include <sys/types.h>
 #include <sys/time.h>
-#elif defined ZMQ_HAVE_OPENVMS
+#elif defined XS_HAVE_OPENVMS
 #include <sys/types.h>
 #include <sys/time.h>
 #else
@@ -43,7 +43,7 @@
 #include "config.hpp"
 #include "i_poll_events.hpp"
 
-zmq::select_t::select_t () :
+xs::select_t::select_t () :
     maxfd (retired_fd),
     retired (false),
     stopping (false)
@@ -54,12 +54,12 @@ zmq::select_t::select_t () :
     FD_ZERO (&source_set_err);
 }
 
-zmq::select_t::~select_t ()
+xs::select_t::~select_t ()
 {
     worker.stop ();
 }
 
-zmq::select_t::handle_t zmq::select_t::add_fd (fd_t fd_, i_poll_events *events_)
+xs::select_t::handle_t xs::select_t::add_fd (fd_t fd_, i_poll_events *events_)
 {
     //  Store the file descriptor.
     fd_entry_t entry = {fd_, events_};
@@ -67,7 +67,7 @@ zmq::select_t::handle_t zmq::select_t::add_fd (fd_t fd_, i_poll_events *events_)
 
     //  Ensure we do not attempt to select () on more than FD_SETSIZE
     //  file descriptors.
-    zmq_assert (fds.size () <= FD_SETSIZE);
+    xs_assert (fds.size () <= FD_SETSIZE);
 
     //  Start polling on errors.
     FD_SET (fd_, &source_set_err);
@@ -82,14 +82,14 @@ zmq::select_t::handle_t zmq::select_t::add_fd (fd_t fd_, i_poll_events *events_)
     return fd_;
 }
 
-void zmq::select_t::rm_fd (handle_t handle_)
+void xs::select_t::rm_fd (handle_t handle_)
 {
     //  Mark the descriptor as retired.
     fd_set_t::iterator it;
     for (it = fds.begin (); it != fds.end (); ++it)
         if (it->fd == handle_)
             break;
-    zmq_assert (it != fds.end ());
+    xs_assert (it != fds.end ());
     it->fd = retired_fd;
     retired = true;
 
@@ -116,37 +116,37 @@ void zmq::select_t::rm_fd (handle_t handle_)
     adjust_load (-1);
 }
 
-void zmq::select_t::set_pollin (handle_t handle_)
+void xs::select_t::set_pollin (handle_t handle_)
 {
     FD_SET (handle_, &source_set_in);
 }
 
-void zmq::select_t::reset_pollin (handle_t handle_)
+void xs::select_t::reset_pollin (handle_t handle_)
 {
     FD_CLR (handle_, &source_set_in);
 }
 
-void zmq::select_t::set_pollout (handle_t handle_)
+void xs::select_t::set_pollout (handle_t handle_)
 {
     FD_SET (handle_, &source_set_out);
 }
 
-void zmq::select_t::reset_pollout (handle_t handle_)
+void xs::select_t::reset_pollout (handle_t handle_)
 {
     FD_CLR (handle_, &source_set_out);
 }
 
-void zmq::select_t::start ()
+void xs::select_t::start ()
 {
     worker.start (worker_routine, this);
 }
 
-void zmq::select_t::stop ()
+void xs::select_t::stop ()
 {
     stopping = true;
 }
 
-void zmq::select_t::loop ()
+void xs::select_t::loop ()
 {
     while (!stopping) {
 
@@ -161,7 +161,7 @@ void zmq::select_t::loop ()
         //  Wait for events.
         struct timeval tv = {(long) (timeout / 1000),
             (long) (timeout % 1000 * 1000)};
-#ifdef ZMQ_HAVE_WINDOWS
+#ifdef XS_HAVE_WINDOWS
         int rc = select (0, &readfds, &writefds, &exceptfds,
             timeout ? &tv : NULL);
         wsa_assert (rc != SOCKET_ERROR);
@@ -196,18 +196,18 @@ void zmq::select_t::loop ()
         //  Destroy retired event sources.
         if (retired) {
             fds.erase (std::remove_if (fds.begin (), fds.end (),
-                zmq::select_t::is_retired_fd), fds.end ());
+                xs::select_t::is_retired_fd), fds.end ());
             retired = false;
         }
     }
 }
 
-void zmq::select_t::worker_routine (void *arg_)
+void xs::select_t::worker_routine (void *arg_)
 {
     ((select_t*) arg_)->loop ();
 }
 
-bool zmq::select_t::is_retired_fd (const fd_entry_t &entry)
+bool xs::select_t::is_retired_fd (const fd_entry_t &entry)
 {
     return (entry.fd == retired_fd);
 }

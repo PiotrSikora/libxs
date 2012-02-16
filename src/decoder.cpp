@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -28,7 +28,7 @@
 #include "wire.hpp"
 #include "err.hpp"
 
-zmq::decoder_t::decoder_t (size_t bufsize_, int64_t maxmsgsize_) :
+xs::decoder_t::decoder_t (size_t bufsize_, int64_t maxmsgsize_) :
     decoder_base_t <decoder_t> (bufsize_),
     session (NULL),
     maxmsgsize (maxmsgsize_)
@@ -40,18 +40,18 @@ zmq::decoder_t::decoder_t (size_t bufsize_, int64_t maxmsgsize_) :
     next_step (tmpbuf, 1, &decoder_t::one_byte_size_ready);
 }
 
-zmq::decoder_t::~decoder_t ()
+xs::decoder_t::~decoder_t ()
 {
     int rc = in_progress.close ();
     errno_assert (rc == 0);
 }
 
-void zmq::decoder_t::set_session (session_base_t *session_)
+void xs::decoder_t::set_session (session_base_t *session_)
 {
     session = session_;
 }
 
-bool zmq::decoder_t::one_byte_size_ready ()
+bool xs::decoder_t::one_byte_size_ready ()
 {
     //  First byte of size is read. If it is 0xff read 8-byte size.
     //  Otherwise allocate the buffer for message data and read the
@@ -67,7 +67,7 @@ bool zmq::decoder_t::one_byte_size_ready ()
         }
 
         //  in_progress is initialised at this point so in theory we should
-        //  close it before calling zmq_msg_init_size, however, it's a 0-byte
+        //  close it before calling xs_msg_init_size, however, it's a 0-byte
         //  message and thus we can treat it as uninitialised...
         int rc;
         if (maxmsgsize >= 0 && (int64_t) (*tmpbuf - 1) > maxmsgsize) {
@@ -89,7 +89,7 @@ bool zmq::decoder_t::one_byte_size_ready ()
     return true;
 }
 
-bool zmq::decoder_t::eight_byte_size_ready ()
+bool xs::decoder_t::eight_byte_size_ready ()
 {
     //  8-byte size is read. Allocate the buffer for message body and
     //  read the message data into it.
@@ -102,7 +102,7 @@ bool zmq::decoder_t::eight_byte_size_ready ()
     }
 
     //  in_progress is initialised at this point so in theory we should
-    //  close it before calling zmq_msg_init_size, however, it's a 0-byte
+    //  close it before calling xs_msg_init_size, however, it's a 0-byte
     //  message and thus we can treat it as uninitialised...
     int rc;
     if (maxmsgsize >= 0 && (int64_t) (size - 1) > maxmsgsize) {
@@ -123,7 +123,7 @@ bool zmq::decoder_t::eight_byte_size_ready ()
     return true;
 }
 
-bool zmq::decoder_t::flags_ready ()
+bool xs::decoder_t::flags_ready ()
 {
     //  Store the flags from the wire into the message structure.
     in_progress.set_flags (tmpbuf [0]);
@@ -134,7 +134,7 @@ bool zmq::decoder_t::flags_ready ()
     return true;
 }
 
-bool zmq::decoder_t::message_ready ()
+bool xs::decoder_t::message_ready ()
 {
     //  Message is completely read. Push it further and start reading
     //  new message. (in_progress is a 0-byte message after this point.)

@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -20,7 +20,7 @@
 */
 
 #include "kqueue.hpp"
-#if defined ZMQ_USE_KQUEUE
+#if defined XS_USE_KQUEUE
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -38,13 +38,13 @@
 
 //  NetBSD defines (struct kevent).udata as intptr_t, everyone else
 //  as void *.
-#if defined ZMQ_HAVE_NETBSD
+#if defined XS_HAVE_NETBSD
 #define kevent_udata_t intptr_t
 #else
 #define kevent_udata_t void *
 #endif
 
-zmq::kqueue_t::kqueue_t () :
+xs::kqueue_t::kqueue_t () :
     stopping (false)
 {
     //  Create event queue
@@ -52,13 +52,13 @@ zmq::kqueue_t::kqueue_t () :
     errno_assert (kqueue_fd != -1);
 }
 
-zmq::kqueue_t::~kqueue_t ()
+xs::kqueue_t::~kqueue_t ()
 {
     worker.stop ();
     close (kqueue_fd);
 }
 
-void zmq::kqueue_t::kevent_add (fd_t fd_, short filter_, void *udata_)
+void xs::kqueue_t::kevent_add (fd_t fd_, short filter_, void *udata_)
 {
     struct kevent ev;
 
@@ -67,7 +67,7 @@ void zmq::kqueue_t::kevent_add (fd_t fd_, short filter_, void *udata_)
     errno_assert (rc != -1);
 }
 
-void zmq::kqueue_t::kevent_delete (fd_t fd_, short filter_)
+void xs::kqueue_t::kevent_delete (fd_t fd_, short filter_)
 {
     struct kevent ev;
 
@@ -76,7 +76,7 @@ void zmq::kqueue_t::kevent_delete (fd_t fd_, short filter_)
     errno_assert (rc != -1);
 }
 
-zmq::kqueue_t::handle_t zmq::kqueue_t::add_fd (fd_t fd_,
+xs::kqueue_t::handle_t xs::kqueue_t::add_fd (fd_t fd_,
     i_poll_events *reactor_)
 {
     poll_entry_t *pe = new (std::nothrow) poll_entry_t;
@@ -92,7 +92,7 @@ zmq::kqueue_t::handle_t zmq::kqueue_t::add_fd (fd_t fd_,
     return pe;
 }
 
-void zmq::kqueue_t::rm_fd (handle_t handle_)
+void xs::kqueue_t::rm_fd (handle_t handle_)
 {
     poll_entry_t *pe = (poll_entry_t*) handle_;
     if (pe->flag_pollin)
@@ -105,7 +105,7 @@ void zmq::kqueue_t::rm_fd (handle_t handle_)
     adjust_load (-1);
 }
 
-void zmq::kqueue_t::set_pollin (handle_t handle_)
+void xs::kqueue_t::set_pollin (handle_t handle_)
 {
     poll_entry_t *pe = (poll_entry_t*) handle_;
     if (likely (!pe->flag_pollin)) {
@@ -114,7 +114,7 @@ void zmq::kqueue_t::set_pollin (handle_t handle_)
     }
 }
 
-void zmq::kqueue_t::reset_pollin (handle_t handle_)
+void xs::kqueue_t::reset_pollin (handle_t handle_)
 {
     poll_entry_t *pe = (poll_entry_t*) handle_;
     if (likely (pe->flag_pollin)) {
@@ -123,7 +123,7 @@ void zmq::kqueue_t::reset_pollin (handle_t handle_)
     }
 }
 
-void zmq::kqueue_t::set_pollout (handle_t handle_)
+void xs::kqueue_t::set_pollout (handle_t handle_)
 {
     poll_entry_t *pe = (poll_entry_t*) handle_;
     if (likely (!pe->flag_pollout)) {
@@ -132,7 +132,7 @@ void zmq::kqueue_t::set_pollout (handle_t handle_)
     }
 }
 
-void zmq::kqueue_t::reset_pollout (handle_t handle_)
+void xs::kqueue_t::reset_pollout (handle_t handle_)
 {
     poll_entry_t *pe = (poll_entry_t*) handle_;
     if (likely (pe->flag_pollout)) {
@@ -141,17 +141,17 @@ void zmq::kqueue_t::reset_pollout (handle_t handle_)
    }
 }
 
-void zmq::kqueue_t::start ()
+void xs::kqueue_t::start ()
 {
     worker.start (worker_routine, this);
 }
 
-void zmq::kqueue_t::stop ()
+void xs::kqueue_t::stop ()
 {
     stopping = true;
 }
 
-void zmq::kqueue_t::loop ()
+void xs::kqueue_t::loop ()
 {
     while (!stopping) {
 
@@ -192,7 +192,7 @@ void zmq::kqueue_t::loop ()
     }
 }
 
-void zmq::kqueue_t::worker_routine (void *arg_)
+void xs::kqueue_t::worker_routine (void *arg_)
 {
     ((kqueue_t*) arg_)->loop ();
 }

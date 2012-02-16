@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libxs
+Description: Crossroads library
+Version: @VERSION@
+Libs: -L${libdir} -lxs
+Cflags: -I${includedir}

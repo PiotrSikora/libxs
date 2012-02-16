@@ -4,14 +4,14 @@
     Copyright (c) 2011 VMware, Inc.
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -27,7 +27,7 @@
 #include "likely.hpp"
 #include "err.hpp"
 
-zmq::xrep_t::xrep_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
+xs::xrep_t::xrep_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     socket_base_t (parent_, tid_, sid_),
     prefetched (0),
     more_in (false),
@@ -35,7 +35,7 @@ zmq::xrep_t::xrep_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     more_out (false),
     next_peer_id (generate_random ())
 {
-    options.type = ZMQ_XREP;
+    options.type = XS_XREP;
 
     //  TODO: Uncomment the following line when XREP will become true XREP
     //  rather than generic router socket.
@@ -49,15 +49,15 @@ zmq::xrep_t::xrep_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     prefetched_msg.init ();
 }
 
-zmq::xrep_t::~xrep_t ()
+xs::xrep_t::~xrep_t ()
 {
-    zmq_assert (outpipes.empty ());
+    xs_assert (outpipes.empty ());
     prefetched_msg.close ();
 }
 
-void zmq::xrep_t::xattach_pipe (pipe_t *pipe_)
+void xs::xrep_t::xattach_pipe (pipe_t *pipe_)
 {
-    zmq_assert (pipe_);
+    xs_assert (pipe_);
 
     //  Generate a new unique peer identity.
     unsigned char buf [5];
@@ -70,14 +70,14 @@ void zmq::xrep_t::xattach_pipe (pipe_t *pipe_)
     outpipe_t outpipe = {pipe_, true};
     bool ok = outpipes.insert (outpipes_t::value_type (
         identity, outpipe)).second;
-    zmq_assert (ok);
+    xs_assert (ok);
 
     //  Add the pipe to the list of inbound pipes.
     pipe_->set_identity (identity);
     fq.attach (pipe_);    
 }
 
-void zmq::xrep_t::xterminated (pipe_t *pipe_)
+void xs::xrep_t::xterminated (pipe_t *pipe_)
 {
     fq.terminated (pipe_);
 
@@ -90,33 +90,33 @@ void zmq::xrep_t::xterminated (pipe_t *pipe_)
             return;
         }
     }
-    zmq_assert (false);
+    xs_assert (false);
 }
 
-void zmq::xrep_t::xread_activated (pipe_t *pipe_)
+void xs::xrep_t::xread_activated (pipe_t *pipe_)
 {
     fq.activated (pipe_);
 }
 
-void zmq::xrep_t::xwrite_activated (pipe_t *pipe_)
+void xs::xrep_t::xwrite_activated (pipe_t *pipe_)
 {
     for (outpipes_t::iterator it = outpipes.begin ();
           it != outpipes.end (); ++it) {
         if (it->second.pipe == pipe_) {
-            zmq_assert (!it->second.active);
+            xs_assert (!it->second.active);
             it->second.active = true;
             return;
         }
     }
-    zmq_assert (false);
+    xs_assert (false);
 }
 
-int zmq::xrep_t::xsend (msg_t *msg_, int flags_)
+int xs::xrep_t::xsend (msg_t *msg_, int flags_)
 {
     //  If this is the first part of the message it's the ID of the
     //  peer to send the message to.
     if (!more_out) {
-        zmq_assert (!current_out);
+        xs_assert (!current_out);
 
         //  If we have malformed message (prefix with no subsequent message)
         //  then just silently ignore it.
@@ -178,7 +178,7 @@ int zmq::xrep_t::xsend (msg_t *msg_, int flags_)
     return 0;
 }
 
-int zmq::xrep_t::xrecv (msg_t *msg_, int flags_)
+int xs::xrep_t::xrecv (msg_t *msg_, int flags_)
 {
     //  if there is a prefetched identity, return it.
     if (prefetched == 2)
@@ -212,7 +212,7 @@ int zmq::xrep_t::xrecv (msg_t *msg_, int flags_)
         if (likely (!(msg_->flags () & msg_t::identity)))
             break;
 
-        zmq_assert (!more_in);
+        xs_assert (!more_in);
 
         //  Empty identity means we can preserve the auto-generated identity.
         if (msg_->size () != 0) {
@@ -232,7 +232,7 @@ int zmq::xrep_t::xrecv (msg_t *msg_, int flags_)
                 }
                 ++it;
             }
-            zmq_assert (it != outpipes.end ());
+            xs_assert (it != outpipes.end ());
         }
     }
 
@@ -258,7 +258,7 @@ int zmq::xrep_t::xrecv (msg_t *msg_, int flags_)
     return 0;
 }
 
-int zmq::xrep_t::rollback (void)
+int xs::xrep_t::rollback (void)
 {
     if (current_out) {
         current_out->rollback ();
@@ -268,7 +268,7 @@ int zmq::xrep_t::rollback (void)
     return 0;
 }
 
-bool zmq::xrep_t::xhas_in ()
+bool xs::xrep_t::xhas_in ()
 {
     //  If we are in  the middle of reading the messages, there are
     //  definitely more parts available.
@@ -283,12 +283,12 @@ bool zmq::xrep_t::xhas_in ()
     //  it will be identity of the peer sending the message.
     msg_t id;
     id.init ();
-    int rc = xrep_t::xrecv (&id, ZMQ_DONTWAIT);
+    int rc = xrep_t::xrecv (&id, XS_DONTWAIT);
     if (rc != 0 && errno == EAGAIN) {
         id.close ();
         return false;
     }
-    zmq_assert (rc == 0);
+    xs_assert (rc == 0);
 
     //  We have first part of the message prefetched now. We will store the
     //  prefetched identity as well.
@@ -299,7 +299,7 @@ bool zmq::xrep_t::xhas_in ()
     return true;
 }
 
-bool zmq::xrep_t::xhas_out ()
+bool xs::xrep_t::xhas_out ()
 {
     //  In theory, XREP socket is always ready for writing. Whether actual
     //  attempt to write succeeds depends on whitch pipe the message is going
@@ -307,7 +307,7 @@ bool zmq::xrep_t::xhas_out ()
     return true;
 }
 
-zmq::xrep_session_t::xrep_session_t (io_thread_t *io_thread_, bool connect_,
+xs::xrep_session_t::xrep_session_t (io_thread_t *io_thread_, bool connect_,
       socket_base_t *socket_, const options_t &options_,
       const char *protocol_, const char *address_) :
     session_base_t (io_thread_, connect_, socket_, options_, protocol_,
@@ -315,7 +315,7 @@ zmq::xrep_session_t::xrep_session_t (io_thread_t *io_thread_, bool connect_,
 {
 }
 
-zmq::xrep_session_t::~xrep_session_t ()
+xs::xrep_session_t::~xrep_session_t ()
 {
 }
 

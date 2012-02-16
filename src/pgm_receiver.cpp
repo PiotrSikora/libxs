@@ -1,17 +1,17 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2010-2011 Miru Limited
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -22,11 +22,11 @@
 
 #include "platform.hpp"
 
-#if defined ZMQ_HAVE_OPENPGM
+#if defined XS_HAVE_OPENPGM
 
 #include <new>
 
-#ifdef ZMQ_HAVE_WINDOWS
+#ifdef XS_HAVE_WINDOWS
 #include "windows.hpp"
 #endif
 
@@ -36,7 +36,7 @@
 #include "wire.hpp"
 #include "err.hpp"
 
-zmq::pgm_receiver_t::pgm_receiver_t (class io_thread_t *parent_, 
+xs::pgm_receiver_t::pgm_receiver_t (class io_thread_t *parent_, 
       const options_t &options_) :
     io_object_t (parent_),
     has_rx_timer (false),
@@ -48,18 +48,18 @@ zmq::pgm_receiver_t::pgm_receiver_t (class io_thread_t *parent_,
 {
 }
 
-zmq::pgm_receiver_t::~pgm_receiver_t ()
+xs::pgm_receiver_t::~pgm_receiver_t ()
 {
     //  Destructor should not be called before unplug.
-    zmq_assert (peers.empty ());
+    xs_assert (peers.empty ());
 }
 
-int zmq::pgm_receiver_t::init (bool udp_encapsulation_, const char *network_)
+int xs::pgm_receiver_t::init (bool udp_encapsulation_, const char *network_)
 {
     return pgm_socket.init (udp_encapsulation_, network_);
 }
 
-void zmq::pgm_receiver_t::plug (io_thread_t *io_thread_,
+void xs::pgm_receiver_t::plug (io_thread_t *io_thread_,
     session_base_t *session_)
 {
     //  Retrieve PGM fds and start polling.
@@ -77,7 +77,7 @@ void zmq::pgm_receiver_t::plug (io_thread_t *io_thread_,
     drop_subscriptions ();
 }
 
-void zmq::pgm_receiver_t::unplug ()
+void xs::pgm_receiver_t::unplug ()
 {
     //  Delete decoders.
     for (peers_t::iterator it = peers.begin (); it != peers.end (); ++it) {
@@ -100,18 +100,18 @@ void zmq::pgm_receiver_t::unplug ()
     session = NULL;
 }
 
-void zmq::pgm_receiver_t::terminate ()
+void xs::pgm_receiver_t::terminate ()
 {
     unplug ();
     delete this;
 }
 
-void zmq::pgm_receiver_t::activate_out ()
+void xs::pgm_receiver_t::activate_out ()
 {
     drop_subscriptions ();
 }
 
-void zmq::pgm_receiver_t::activate_in ()
+void xs::pgm_receiver_t::activate_in ()
 {
     //  It is possible that the most recently used decoder
     //  processed the whole buffer but failed to write
@@ -122,8 +122,8 @@ void zmq::pgm_receiver_t::activate_in ()
         return;
     }
 
-    zmq_assert (mru_decoder != NULL);
-    zmq_assert (pending_ptr != NULL);
+    xs_assert (mru_decoder != NULL);
+    xs_assert (pending_ptr != NULL);
 
     //  Ask the decoder to process remaining data.
     size_t n = mru_decoder->process_buffer (pending_ptr, pending_bytes);
@@ -139,13 +139,13 @@ void zmq::pgm_receiver_t::activate_in ()
     in_event ();
 }
 
-void zmq::pgm_receiver_t::in_event ()
+void xs::pgm_receiver_t::in_event ()
 {
     // Read data from the underlying pgm_socket.
     unsigned char *data = NULL;
     const pgm_tsi_t *tsi = NULL;
 
-    zmq_assert (pending_bytes == 0);
+    xs_assert (pending_bytes == 0);
 
     if (has_rx_timer) {
         cancel_timer (rx_timer_id);
@@ -197,7 +197,7 @@ void zmq::pgm_receiver_t::in_event ()
         }
 
         //  Read the offset of the fist message in the current packet.
-        zmq_assert ((size_t) received >= sizeof (uint16_t));
+        xs_assert ((size_t) received >= sizeof (uint16_t));
         uint16_t offset = get_uint16 (data);
         data += sizeof (uint16_t);
         received -= sizeof (uint16_t);
@@ -210,8 +210,8 @@ void zmq::pgm_receiver_t::in_event ()
             if (offset == 0xffff)
                 continue;
 
-            zmq_assert (offset <= received);
-            zmq_assert (it->second.decoder == NULL);
+            xs_assert (offset <= received);
+            xs_assert (it->second.decoder == NULL);
 
             //  We have to move data to the begining of the first message.
             data += offset;
@@ -253,16 +253,16 @@ void zmq::pgm_receiver_t::in_event ()
     session->flush ();
 }
 
-void zmq::pgm_receiver_t::timer_event (int token)
+void xs::pgm_receiver_t::timer_event (int token)
 {
-    zmq_assert (token == rx_timer_id);
+    xs_assert (token == rx_timer_id);
 
     //  Timer cancels on return by poller_base.
     has_rx_timer = false;
     in_event ();
 }
 
-void zmq::pgm_receiver_t::drop_subscriptions ()
+void xs::pgm_receiver_t::drop_subscriptions ()
 {
     msg_t msg;
     while (session->read (&msg))

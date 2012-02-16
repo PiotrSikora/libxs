@@ -1,15 +1,15 @@
 /*
-    Copyright (c) 2010-2011 250bpm s.r.o.
+    Copyright (c) 2010-2012 250bpm s.r.o.
     Copyright (c) 2010-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -30,7 +30,7 @@
 #include <intrin.h>
 #endif
 
-#if !defined ZMQ_HAVE_WINDOWS
+#if !defined XS_HAVE_WINDOWS
 #include <sys/time.h>
 #endif
 
@@ -38,19 +38,19 @@
 #include <time.h>
 #endif
 
-zmq::clock_t::clock_t () :
+xs::clock_t::clock_t () :
     last_tsc (rdtsc ()),
     last_time (now_us () / 1000)
 {
 }
 
-zmq::clock_t::~clock_t ()
+xs::clock_t::~clock_t ()
 {
 }
 
-uint64_t zmq::clock_t::now_us ()
+uint64_t xs::clock_t::now_us ()
 {
-#if defined ZMQ_HAVE_WINDOWS
+#if defined XS_HAVE_WINDOWS
 
     //  Get the high resolution counter's accuracy.
     LARGE_INTEGER ticksPerSecond;
@@ -84,7 +84,7 @@ uint64_t zmq::clock_t::now_us ()
 #endif
 }
 
-uint64_t zmq::clock_t::now_ms ()
+uint64_t xs::clock_t::now_ms ()
 {
     uint64_t tsc = rdtsc ();
 
@@ -103,7 +103,7 @@ uint64_t zmq::clock_t::now_ms ()
     return last_time;
 }
 
-uint64_t zmq::clock_t::rdtsc ()
+uint64_t xs::clock_t::rdtsc ()
 {
 #if (defined _MSC_VER && (defined _M_IX86 || defined _M_X64))
     return __rdtsc ();

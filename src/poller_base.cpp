@@ -1,15 +1,15 @@
 /*
-    Copyright (c) 2010-2011 250bpm s.r.o.
+    Copyright (c) 2010-2012 250bpm s.r.o.
     Copyright (c) 2010-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -22,22 +22,22 @@
 #include "i_poll_events.hpp"
 #include "err.hpp"
 
-zmq::poller_base_t::poller_base_t ()
+xs::poller_base_t::poller_base_t ()
 {
 }
 
-zmq::poller_base_t::~poller_base_t ()
+xs::poller_base_t::~poller_base_t ()
 {
     //  Make sure there is no more load on the shutdown.
-    zmq_assert (get_load () == 0);
+    xs_assert (get_load () == 0);
 }
 
-int zmq::poller_base_t::get_load ()
+int xs::poller_base_t::get_load ()
 {
     return load.get ();
 }
 
-void zmq::poller_base_t::adjust_load (int amount_)
+void xs::poller_base_t::adjust_load (int amount_)
 {
     if (amount_ > 0)
         load.add (amount_);
@@ -45,14 +45,14 @@ void zmq::poller_base_t::adjust_load (int amount_)
         load.sub (-amount_);
 }
 
-void zmq::poller_base_t::add_timer (int timeout_, i_poll_events *sink_, int id_)
+void xs::poller_base_t::add_timer (int timeout_, i_poll_events *sink_, int id_)
 {
     uint64_t expiration = clock.now_ms () + timeout_;
     timer_info_t info = {sink_, id_};
     timers.insert (timers_t::value_type (expiration, info));
 }
 
-void zmq::poller_base_t::cancel_timer (i_poll_events *sink_, int id_)
+void xs::poller_base_t::cancel_timer (i_poll_events *sink_, int id_)
 {
     //  Complexity of this operation is O(n). We assume it is rarely used.
     for (timers_t::iterator it = timers.begin (); it != timers.end (); ++it)
@@ -62,10 +62,10 @@ void zmq::poller_base_t::cancel_timer (i_poll_events *sink_, int id_)
         }
 
     //  Timer not found.
-    zmq_assert (false);
+    xs_assert (false);
 }
 
-uint64_t zmq::poller_base_t::execute_timers ()
+uint64_t xs::poller_base_t::execute_timers ()
 {
     //  Fast track.
     if (timers.empty ())

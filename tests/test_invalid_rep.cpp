@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2010-2011 250bpm s.r.o.
+    Copyright (c) 2010-2012 250bpm s.r.o.
     Copyright (c) 2011 VMware, Inc.
     Copyright (c) 2010-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -19,7 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/zmq.h"
+#include "../include/xs.h"
 #include <assert.h>
 #include <stdio.h>
 
@@ -28,24 +28,24 @@ int main (int argc, char *argv [])
     fprintf (stderr, "test_invalid_rep running...\n");
 
     //  Create REQ/XREP wiring.
-    void *ctx = zmq_init (1);
+    void *ctx = xs_init (1);
     assert (ctx);
-    void *xrep_socket = zmq_socket (ctx, ZMQ_XREP);
+    void *xrep_socket = xs_socket (ctx, XS_XREP);
     assert (xrep_socket);
-    void *req_socket = zmq_socket (ctx, ZMQ_REQ);
+    void *req_socket = xs_socket (ctx, XS_REQ);
     assert (req_socket);
     int linger = 0;
-    int rc = zmq_setsockopt (xrep_socket, ZMQ_LINGER, &linger, sizeof (int));
+    int rc = xs_setsockopt (xrep_socket, XS_LINGER, &linger, sizeof (int));
     assert (rc == 0);
-    rc = zmq_setsockopt (req_socket, ZMQ_LINGER, &linger, sizeof (int));
+    rc = xs_setsockopt (req_socket, XS_LINGER, &linger, sizeof (int));
     assert (rc == 0);
-    rc = zmq_bind (xrep_socket, "inproc://hi");
+    rc = xs_bind (xrep_socket, "inproc://hi");
     assert (rc == 0);
-    rc = zmq_connect (req_socket, "inproc://hi");
+    rc = xs_connect (req_socket, "inproc://hi");
     assert (rc == 0);
 
     //  Initial request.
-    rc = zmq_send (req_socket, "r", 1, 0);
+    rc = xs_send (req_socket, "r", 1, 0);
     assert (rc == 1);
 
     //  Receive the request.
@@ -53,36 +53,36 @@ int main (int argc, char *argv [])
     int addr_size;
     char bottom [1];
     char body [1];
-    addr_size = zmq_recv (xrep_socket, addr, sizeof (addr), 0);
+    addr_size = xs_recv (xrep_socket, addr, sizeof (addr), 0);
     assert (addr_size >= 0);
-    rc = zmq_recv (xrep_socket, bottom, sizeof (bottom), 0);
+    rc = xs_recv (xrep_socket, bottom, sizeof (bottom), 0);
     assert (rc == 0);
-    rc = zmq_recv (xrep_socket, body, sizeof (body), 0);
+    rc = xs_recv (xrep_socket, body, sizeof (body), 0);
     assert (rc == 1);
 
     //  Send invalid reply.
-    rc = zmq_send (xrep_socket, addr, addr_size, 0);
+    rc = xs_send (xrep_socket, addr, addr_size, 0);
     assert (rc == addr_size);
 
     //  Send valid reply.
-    rc = zmq_send (xrep_socket, addr, addr_size, ZMQ_SNDMORE);
+    rc = xs_send (xrep_socket, addr, addr_size, XS_SNDMORE);
     assert (rc == addr_size);
-    rc = zmq_send (xrep_socket, bottom, 0, ZMQ_SNDMORE);
+    rc = xs_send (xrep_socket, bottom, 0, XS_SNDMORE);
     assert (rc == 0);
-    rc = zmq_send (xrep_socket, "b", 1, 0);
+    rc = xs_send (xrep_socket, "b", 1, 0);
     assert (rc == 1);
 
     //  Check whether we've got the valid reply.
-    rc = zmq_recv (req_socket, body, sizeof (body), 0);
+    rc = xs_recv (req_socket, body, sizeof (body), 0);
     assert (rc == 1);
 	assert (body [0] == 'b');
 
     //  Tear down the wiring.
-    rc = zmq_close (xrep_socket);
+    rc = xs_close (xrep_socket);
     assert (rc == 0);
-    rc = zmq_close (req_socket);
+    rc = xs_close (req_socket);
     assert (rc == 0);
-    rc = zmq_term (ctx);
+    rc = xs_term (ctx);
     assert (rc == 0);
 
     return 0;

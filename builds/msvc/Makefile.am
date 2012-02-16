@@ -1,4 +1,4 @@
-LIBZMQ_DIST = libzmq/libzmq.vcproj libzmq/libzmq.vcxproj \
+LIBXS_DIST = libzmq/libzmq.vcproj libzmq/libzmq.vcxproj \
               libzmq/libzmq.vcxproj.filters \
               platform.hpp msvc.sln msvc10.sln
 
@@ -30,4 +30,4 @@ PROPERTIES_DIST = properties/Common.props \
 PRECOMPILED_DIST = ../../src/precompiled.hpp \
                    ../../src/precompiled.cpp
 
-EXTRA_DIST = $(LIBZMQ_DIST) $(PERF_DIST) $(PROPERTIES_DIST) $(PRECOMPILED_DIST)
+EXTRA_DIST = $(LIBXS_DIST) $(PERF_DIST) $(PROPERTIES_DIST) $(PRECOMPILED_DIST)

@@ -1,0 +1,48 @@
+xs_msg_data(3)
+==============
+
+
+NAME
+----
+xs_msg_data - retrieve pointer to message content
+
+
+SYNOPSIS
+--------
+*void *xs_msg_data (xs_msg_t '*msg');*
+
+
+DESCRIPTION
+-----------
+The _xs_msg_data()_ function shall return a pointer to the message content of
+the message object referenced by 'msg'.
+
+CAUTION: Never access 'xs_msg_t' members directly, instead always use the
+_xs_msg_ family of functions.
+
+
+RETURN VALUE
+------------
+Upon successful completion, _xs_msg_data()_ shall return a pointer to the
+message content.
+
+
+ERRORS
+------
+No errors are defined.
+
+
+SEE ALSO
+--------
+linkxs:xs_msg_size[3]
+linkxs:xs_msg_init[3]
+linkxs:xs_msg_init_size[3]
+linkxs:xs_msg_init_data[3]
+linkxs:xs_msg_close[3]
+linkxs:xs[7]
+
+
+AUTHORS
+-------
+The Crossroads documentation was written by Martin Sustrik <sustrik@250bpm.com>
+and Martin Lucina <martin@lucina.net>.

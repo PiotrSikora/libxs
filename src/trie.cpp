@@ -1,16 +1,16 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
+    Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -25,21 +25,21 @@
 #include <algorithm>
 
 #include "platform.hpp"
-#if defined ZMQ_HAVE_WINDOWS
+#if defined XS_HAVE_WINDOWS
 #include "windows.hpp"
 #endif
 
 #include "err.hpp"
 #include "trie.hpp"
 
-zmq::trie_t::trie_t () :
+xs::trie_t::trie_t () :
     refcnt (0),
     min (0),
     count (0)
 {
 }
 
-zmq::trie_t::~trie_t ()
+xs::trie_t::~trie_t ()
 {
     if (count == 1)
         delete next.node;
@@ -51,7 +51,7 @@ zmq::trie_t::~trie_t ()
     }
 }
 
-bool zmq::trie_t::add (unsigned char *prefix_, size_t size_)
+bool xs::trie_t::add (unsigned char *prefix_, size_t size_)
 {
     //  We are at the node corresponding to the prefix. We are done.
     if (!size_) {
@@ -75,7 +75,7 @@ bool zmq::trie_t::add (unsigned char *prefix_, size_t size_)
             count = (min < c ? c - min : min - c) + 1;
             next.table = (trie_t**)
                 malloc (sizeof (trie_t*) * count);
-            zmq_assert (next.table);
+            xs_assert (next.table);
             for (unsigned short i = 0; i != count; ++i)
                 next.table [i] = 0;
             min = std::min (min, c);
@@ -88,7 +88,7 @@ bool zmq::trie_t::add (unsigned char *prefix_, size_t size_)
             count = c - min + 1;
             next.table = (trie_t**) realloc ((void*) next.table,
                 sizeof (trie_t*) * count);
-            zmq_assert (next.table);
+            xs_assert (next.table);
             for (unsigned short i = old_count; i != count; i++)
                 next.table [i] = NULL;
         }
@@ -99,7 +99,7 @@ bool zmq::trie_t::add (unsigned char *prefix_, size_t size_)
             count = (min + old_count) - c;
             next.table = (trie_t**) realloc ((void*) next.table,
                 sizeof (trie_t*) * count);
-            zmq_assert (next.table);
+            xs_assert (next.table);
             memmove (next.table + min - c, next.table,
                 old_count * sizeof (trie_t*));
             for (unsigned short i = 0; i != min - c; i++)
@@ -112,20 +112,20 @@ bool zmq::trie_t::add (unsigned char *prefix_, size_t size_)
     if (count == 1) {
         if (!next.node) {
             next.node = new (std::nothrow) trie_t;
-            zmq_assert (next.node);
+            xs_assert (next.node);
         }
         return next.node->add (prefix_ + 1, size_ - 1);
     }
     else {
         if (!next.table [c - min]) {
             next.table [c - min] = new (std::nothrow) trie_t;
-            zmq_assert (next.table [c - min]);
+            xs_assert (next.table [c - min]);
         }
         return next.table [c - min]->add (prefix_ + 1, size_ - 1);
     }
 }
 
-bool zmq::trie_t::rm (unsigned char *prefix_, size_t size_)
+bool xs::trie_t::rm (unsigned char *prefix_, size_t size_)
 {
      //  TODO: Shouldn't an error be reported if the key does not exist?
 
@@ -149,7 +149,7 @@ bool zmq::trie_t::rm (unsigned char *prefix_, size_t size_)
      return next_node->rm (prefix_ + 1, size_ - 1);
 }
 
-bool zmq::trie_t::check (unsigned char *data_, size_t size_)
+bool xs::trie_t::check (unsigned char *data_, size_t size_)
 {
     //  This function is on critical path. It deliberately doesn't use
     //  recursion to get a bit better performance.
@@ -183,7 +183,7 @@ bool zmq::trie_t::check (unsigned char *data_, size_t size_)
     }
 }
 
-void zmq::trie_t::apply (void (*func_) (unsigned char *data_, size_t size_,
+void xs::trie_t::apply (void (*func_) (unsigned char *data_, size_t size_,
     void *arg_), void *arg_)
 {
     unsigned char *buff = NULL;
@@ -191,7 +191,7 @@ void zmq::trie_t::apply (void (*func_) (unsigned char *data_, size_t size_,
     free (buff);
 }
 
-void zmq::trie_t::apply_helper (
+void xs::trie_t::apply_helper (
     unsigned char **buff_, size_t buffsize_, size_t maxbuffsize_,
     void (*func_) (unsigned char *data_, size_t size_, void *arg_), void *arg_)
 {
@@ -203,7 +203,7 @@ void zmq::trie_t::apply_helper (
     if (buffsize_ >= maxbuffsize_) {
         maxbuffsize_ = buffsize_ + 256;
         *buff_ = (unsigned char*) realloc (*buff_, maxbuffsize_);
-        zmq_assert (*buff_);
+        xs_assert (*buff_);
     }
 
     //  If there are no subnodes in the trie, return.

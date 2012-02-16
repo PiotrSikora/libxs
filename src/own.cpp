@@ -1,15 +1,15 @@
 /*
-    Copyright (c) 2010-2011 250bpm s.r.o.
+    Copyright (c) 2010-2012 250bpm s.r.o.
     Copyright (c) 2010-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -22,7 +22,7 @@
 #include "err.hpp"
 #include "io_thread.hpp"
 
-zmq::own_t::own_t (class ctx_t *parent_, uint32_t tid_) :
+xs::own_t::own_t (class ctx_t *parent_, uint32_t tid_) :
     object_t (parent_, tid_),
     terminating (false),
     sent_seqnum (0),
@@ -32,7 +32,7 @@ zmq::own_t::own_t (class ctx_t *parent_, uint32_t tid_) :
 {
 }
 
-zmq::own_t::own_t (io_thread_t *io_thread_, const options_t &options_) :
+xs::own_t::own_t (io_thread_t *io_thread_, const options_t &options_) :
     object_t (io_thread_),
     options (options_),
     terminating (false),
@@ -43,23 +43,23 @@ zmq::own_t::own_t (io_thread_t *io_thread_, const options_t &options_) :
 {
 }
 
-zmq::own_t::~own_t ()
+xs::own_t::~own_t ()
 {
 }
 
-void zmq::own_t::set_owner (own_t *owner_)
+void xs::own_t::set_owner (own_t *owner_)
 {
-    zmq_assert (!owner);
+    xs_assert (!owner);
     owner = owner_;
 }
 
-void zmq::own_t::inc_seqnum ()
+void xs::own_t::inc_seqnum ()
 {
     //  This function may be called from a different thread!
     sent_seqnum.add (1);
 }
 
-void zmq::own_t::process_seqnum ()
+void xs::own_t::process_seqnum ()
 {
     //  Catch up with counter of processed commands.
     processed_seqnum++;
@@ -68,7 +68,7 @@ void zmq::own_t::process_seqnum ()
     check_term_acks ();
 }
 
-void zmq::own_t::launch_child (own_t *object_)
+void xs::own_t::launch_child (own_t *object_)
 {
     //  Specify the owner of the object.
     object_->set_owner (this);
@@ -80,7 +80,7 @@ void zmq::own_t::launch_child (own_t *object_)
     send_own (this, object_);
 }
 
-void zmq::own_t::launch_sibling (own_t *object_)
+void xs::own_t::launch_sibling (own_t *object_)
 {
     //  At this point it is important that object is plugged in before its
     //  owner has a chance to terminate it. Thus, 'plug' command is sent before
@@ -98,7 +98,7 @@ void zmq::own_t::launch_sibling (own_t *object_)
     send_own (owner, object_);
 }
 
-void zmq::own_t::process_term_req (own_t *object_)
+void xs::own_t::process_term_req (own_t *object_)
 {
     //  When shutting down we can ignore termination requests from owned
     //  objects. The termination request was already sent to the object.
@@ -121,7 +121,7 @@ void zmq::own_t::process_term_req (own_t *object_)
     send_term (object_, options.linger);
 }
 
-void zmq::own_t::process_own (own_t *object_)
+void xs::own_t::process_own (own_t *object_)
 {
     //  If the object is already being shut down, new owned objects are
     //  immediately asked to terminate. Note that linger is set to zero.
@@ -135,7 +135,7 @@ void zmq::own_t::process_own (own_t *object_)
     owned.insert (object_);
 }
 
-void zmq::own_t::terminate ()
+void xs::own_t::terminate ()
 {
     //  If termination is already underway, there's no point
     //  in starting it anew.
@@ -153,15 +153,15 @@ void zmq::own_t::terminate ()
     send_term_req (owner, this);
 }
 
-bool zmq::own_t::is_terminating ()
+bool xs::own_t::is_terminating ()
 {
     return terminating;
 }
 
-void zmq::own_t::process_term (int linger_)
+void xs::own_t::process_term (int linger_)
 {
     //  Double termination should never happen.
-    zmq_assert (!terminating);
+    xs_assert (!terminating);
 
     //  Send termination request to all owned objects.
     for (owned_t::iterator it = owned.begin (); it != owned.end (); ++it)
@@ -175,32 +175,32 @@ void zmq::own_t::process_term (int linger_)
     check_term_acks ();
 }
 
-void zmq::own_t::register_term_acks (int count_)
+void xs::own_t::register_term_acks (int count_)
 {
     term_acks += count_;
 }
 
-void zmq::own_t::unregister_term_ack ()
+void xs::own_t::unregister_term_ack ()
 {
-    zmq_assert (term_acks > 0);
+    xs_assert (term_acks > 0);
     term_acks--;
 
     //  This may be a last ack we are waiting for before termination...
     check_term_acks (); 
 }
 
-void zmq::own_t::process_term_ack ()
+void xs::own_t::process_term_ack ()
 {
     unregister_term_ack ();
 }
 
-void zmq::own_t::check_term_acks ()
+void xs::own_t::check_term_acks ()
 {
     if (terminating && processed_seqnum == sent_seqnum.get () &&
           term_acks == 0) {
 
         //  Sanity check. There should be no active children at this point.
-        zmq_assert (owned.empty ());
+        xs_assert (owned.empty ());
 
         //  The root object has nobody to confirm the termination to.
         //  Other nodes will confirm the termination to the owner.
@@ -212,7 +212,7 @@ void zmq::own_t::check_term_acks ()
     }
 }
 
-void zmq::own_t::process_destroy ()
+void xs::own_t::process_destroy ()
 {
     delete this;
 }

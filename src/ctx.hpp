@@ -3,14 +3,14 @@
     Copyright (c) 2007-2009 iMatix Corporation
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -19,8 +19,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ZMQ_CTX_HPP_INCLUDED__
-#define __ZMQ_CTX_HPP_INCLUDED__
+#ifndef __XS_CTX_HPP_INCLUDED__
+#define __XS_CTX_HPP_INCLUDED__
 
 #include <map>
 #include <vector>
@@ -35,7 +35,7 @@
 #include "options.hpp"
 #include "atomic_counter.hpp"
 
-namespace zmq
+namespace xs
 {
 
     class object_t;
@@ -67,15 +67,15 @@ namespace zmq
         //  Returns false if object is not a context.
         bool check_tag ();
 
-        //  This function is called when user invokes zmq_term. If there are
+        //  This function is called when user invokes xs_term. If there are
         //  no more sockets open it'll cause all the infrastructure to be shut
         //  down. If there are open sockets still, the deallocation happens
         //  after the last one is closed.
         int terminate ();
 
         //  Create and destroy a socket.
-        zmq::socket_base_t *create_socket (int type_);
-        void destroy_socket (zmq::socket_base_t *socket_);
+        xs::socket_base_t *create_socket (int type_);
+        void destroy_socket (xs::socket_base_t *socket_);
 
         //  Send command to the destination thread.
         void send_command (uint32_t tid_, const command_t &command_);
@@ -83,14 +83,14 @@ namespace zmq
         //  Returns the I/O thread that is the least busy at the moment.
         //  Affinity specifies which I/O threads are eligible (0 = all).
         //  Returns NULL is no I/O thread is available.
-        zmq::io_thread_t *choose_io_thread (uint64_t affinity_);
+        xs::io_thread_t *choose_io_thread (uint64_t affinity_);
 
         //  Returns reaper thread object.
-        zmq::object_t *get_reaper ();
+        xs::object_t *get_reaper ();
 
         //  Management of inproc endpoints.
         int register_endpoint (const char *addr_, endpoint_t &endpoint_);
-        void unregister_endpoints (zmq::socket_base_t *socket_);
+        void unregister_endpoints (xs::socket_base_t *socket_);
         endpoint_t find_endpoint (const char *addr_);
 
         //  Logging related functions.
@@ -110,7 +110,7 @@ namespace zmq
         uint32_t tag;
 
         //  Sockets belonging to this context. We need the list so that
-        //  we can notify the sockets when zmq_term() is called. The sockets
+        //  we can notify the sockets when xs_term() is called. The sockets
         //  will return ETERM then.
         typedef array_t <socket_base_t> sockets_t;
         sockets_t sockets;
@@ -119,7 +119,7 @@ namespace zmq
         typedef std::vector <uint32_t> emtpy_slots_t;
         emtpy_slots_t empty_slots;
 
-        //  If true, zmq_term was already called.
+        //  If true, xs_term was already called.
         bool terminating;
 
         //  Synchronisation of accesses to global slot-related data:
@@ -129,17 +129,17 @@ namespace zmq
         mutex_t slot_sync;
 
         //  The reaper thread.
-        zmq::reaper_t *reaper;
+        xs::reaper_t *reaper;
 
         //  I/O threads.
-        typedef std::vector <zmq::io_thread_t*> io_threads_t;
+        typedef std::vector <xs::io_thread_t*> io_threads_t;
         io_threads_t io_threads;
 
         //  Array of pointers to mailboxes for both application and I/O threads.
         uint32_t slot_count;
         mailbox_t **slots;
 
-        //  Mailbox for zmq_term thread.
+        //  Mailbox for xs_term thread.
         mailbox_t term_mailbox;
 
         //  List of inproc endpoints within this context.
@@ -150,14 +150,14 @@ namespace zmq
         mutex_t endpoints_sync;
 
         //  Monitor object attached to the context.
-        zmq::monitor_t *monitor;
+        xs::monitor_t *monitor;
 
         //  Maximum socket ID.
         static atomic_counter_t max_socket_id;
 
         //  PUB socket for logging. The socket is shared among all the threads,
         //  thus it is synchronised by a mutex.
-        zmq::socket_base_t *log_socket;
+        xs::socket_base_t *log_socket;
         mutex_t log_sync;
 
         ctx_t (const ctx_t&);

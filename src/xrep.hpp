@@ -4,14 +4,14 @@
     Copyright (c) 2011 VMware, Inc.
     Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
 
-    This file is part of 0MQ.
+    This file is part of Crossroads project.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Crossroads is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Crossroads is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -20,8 +20,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __ZMQ_XREP_HPP_INCLUDED__
-#define __ZMQ_XREP_HPP_INCLUDED__
+#ifndef __XS_XREP_HPP_INCLUDED__
+#define __XS_XREP_HPP_INCLUDED__
 
 #include <map>
 
@@ -32,7 +32,7 @@
 #include "msg.hpp"
 #include "fq.hpp"
 
-namespace zmq
+namespace xs
 {
 
     class ctx_t;
@@ -44,18 +44,18 @@ namespace zmq
     {
     public:
 
-        xrep_t (zmq::ctx_t *parent_, uint32_t tid_, int sid_);
+        xrep_t (xs::ctx_t *parent_, uint32_t tid_, int sid_);
         ~xrep_t ();
 
         //  Overloads of functions from socket_base_t.
-        void xattach_pipe (zmq::pipe_t *pipe_);
+        void xattach_pipe (xs::pipe_t *pipe_);
         int xsend (msg_t *msg_, int flags_);
         int xrecv (msg_t *msg_, int flags_);
         bool xhas_in ();
         bool xhas_out ();
-        void xread_activated (zmq::pipe_t *pipe_);
-        void xwrite_activated (zmq::pipe_t *pipe_);
-        void xterminated (zmq::pipe_t *pipe_);
+        void xread_activated (xs::pipe_t *pipe_);
+        void xwrite_activated (xs::pipe_t *pipe_);
+        void xterminated (xs::pipe_t *pipe_);
 
     protected:
 
@@ -82,7 +82,7 @@ namespace zmq
 
         struct outpipe_t
         {
-            zmq::pipe_t *pipe;
+            xs::pipe_t *pipe;
             bool active;
         };
 
@@ -91,7 +91,7 @@ namespace zmq
         outpipes_t outpipes;
 
         //  The pipe we are currently writing to.
-        zmq::pipe_t *current_out;
+        xs::pipe_t *current_out;
 
         //  If true, more outgoing message parts are expected.
         bool more_out;
@@ -108,7 +108,7 @@ namespace zmq
     {
     public:
 
-        xrep_session_t (zmq::io_thread_t *io_thread_, bool connect_,
+        xrep_session_t (xs::io_thread_t *io_thread_, bool connect_,
             socket_base_t *socket_, const options_t &options_,
             const char *protocol_, const char *address_);
         ~xrep_session_t ();
