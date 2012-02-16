@@ -115,8 +115,6 @@ namespace xs
         const select_t &operator = (const select_t&);
     };
 
-    typedef select_t poller_t;
-
 }
 
 #endif

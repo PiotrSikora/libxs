@@ -29,8 +29,8 @@
 xs::io_thread_t::io_thread_t (ctx_t *ctx_, uint32_t tid_) :
     object_t (ctx_, tid_)
 {
-    poller = new (std::nothrow) poller_t;
-    alloc_assert (poller);
+    poller = poller_base_t::create ();
+    xs_assert (poller);
 
     mailbox_handle = poller->add_fd (mailbox.get_fd (), this);
     poller->set_pollin (mailbox_handle);
@@ -95,7 +95,7 @@ void xs::io_thread_t::timer_event (int id_)
     xs_assert (false);
 }
 
-xs::poller_t *xs::io_thread_t::get_poller ()
+xs::poller_base_t *xs::io_thread_t::get_poller ()
 {
     xs_assert (poller);
     return poller;

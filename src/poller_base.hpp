@@ -23,6 +23,7 @@
 
 #include <map>
 
+#include "fd.hpp"
 #include "clock.hpp"
 #include "atomic_counter.hpp"
 
@@ -37,12 +38,23 @@ namespace xs
     {
     public:
 
-        poller_base_t ();
+        //  Create optimal poller mechanism for this environment.
+        static poller_base_t *create ();
+
         virtual ~poller_base_t ();
 
         //  Returns load of the poller. Note that this function can be
         //  invoked from a different thread!
         int get_load ();
+
+        virtual handle_t add_fd (fd_t fd_, xs::i_poll_events *events_) = 0;
+        virtual void rm_fd (handle_t handle_) = 0;
+        virtual void set_pollin (handle_t handle_) = 0;
+        virtual void reset_pollin (handle_t handle_) = 0;
+        virtual void set_pollout (handle_t handle_) = 0;
+        virtual void reset_pollout (handle_t handle_) = 0;
+        virtual void start () = 0;
+        virtual void stop () = 0;
 
         //  Add a timeout to expire in timeout_ milliseconds. After the
         //  expiration timer_event on sink_ object will be called with
@@ -53,6 +65,8 @@ namespace xs
         void cancel_timer (xs::i_poll_events *sink_, int id_);
 
     protected:
+
+        poller_base_t ();
 
         //  Called by individual poller implementations to manage the load.
         void adjust_load (int amount_);

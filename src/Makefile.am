@@ -47,7 +47,6 @@ libxs_la_SOURCES = \
     pipe.hpp \
     platform.hpp \
     poll.hpp \
-    poller.hpp \
     poller_base.hpp \
     pair.hpp \
     pub.hpp \

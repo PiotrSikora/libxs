@@ -95,8 +95,6 @@ namespace xs
         const kqueue_t &operator = (const kqueue_t&);
     };
 
-    typedef kqueue_t poller_t;
-
 }
 
 #endif

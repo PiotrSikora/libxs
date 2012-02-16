@@ -23,7 +23,7 @@
 
 #include "object.hpp"
 #include "mailbox.hpp"
-#include "poller.hpp"
+#include "poller_base.hpp"
 #include "i_poll_events.hpp"
 
 namespace xs
@@ -63,7 +63,7 @@ namespace xs
         handle_t mailbox_handle;
 
         //  I/O multiplexing is performed using a poller object.
-        poller_t *poller;
+        poller_base_t *poller;
 
         //  Number of sockets being reaped at the moment.
         int sockets;

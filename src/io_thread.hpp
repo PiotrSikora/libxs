@@ -26,7 +26,7 @@
 
 #include "stdint.hpp"
 #include "object.hpp"
-#include "poller.hpp"
+#include "poller_base.hpp"
 #include "i_poll_events.hpp"
 #include "mailbox.hpp"
 
@@ -63,7 +63,7 @@ namespace xs
         void timer_event (int id_);
 
         //  Used by io_objects to retrieve the assciated poller object.
-        poller_t *get_poller ();
+        poller_base_t *get_poller ();
 
         //  Command handlers.
         void process_stop ();
@@ -80,7 +80,7 @@ namespace xs
         handle_t mailbox_handle;
 
         //  I/O multiplexing is performed using a poller object.
-        poller_t *poller;
+        poller_base_t *poller;
 
         io_thread_t (const io_thread_t&);
         const io_thread_t &operator = (const io_thread_t&);

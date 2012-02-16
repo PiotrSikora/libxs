@@ -28,7 +28,7 @@
 #include "own.hpp"
 #include "array.hpp"
 #include "stdint.hpp"
-#include "poller.hpp"
+#include "poller_base.hpp"
 #include "atomic_counter.hpp"
 #include "i_poll_events.hpp"
 #include "mailbox.hpp"
@@ -82,7 +82,7 @@ namespace xs
 
         //  Using this function reaper thread ask the socket to regiter with
         //  its poller.
-        void start_reaping (poller_t *poller_);
+        void start_reaping (poller_base_t *poller_);
 
         //  i_poll_events implementation. This interface is used when socket
         //  is handled by the poller in the reaper thread.
@@ -180,7 +180,7 @@ namespace xs
         pipes_t pipes;
 
         //  Reaper's poller and handle of this socket within it.
-        poller_t *poller;
+        poller_base_t *poller;
         handle_t handle;
 
         //  Timestamp of when commands were processed the last time.

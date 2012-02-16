@@ -641,7 +641,7 @@ bool xs::socket_base_t::has_out ()
     return xhas_out ();
 }
 
-void xs::socket_base_t::start_reaping (poller_t *poller_)
+void xs::socket_base_t::start_reaping (poller_base_t *poller_)
 {
     //  Plug the socket to the reaper thread.
     poller = poller_;

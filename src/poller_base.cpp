@@ -22,6 +22,30 @@
 #include "i_poll_events.hpp"
 #include "err.hpp"
 
+#include "select.hpp"
+#include "poll.hpp"
+#include "epoll.hpp"
+#include "devpoll.hpp"
+#include "kqueue.hpp"
+
+xs::poller_base_t *xs::poller_base_t::create ()
+{
+    poller_base_t *result;
+#if defined XS_HAVE_SELECT
+    result = new (std::nothrow) select_t;
+#elif defined XS_HAVE_POLL
+    result = new (std::nothrow) poll_t;
+#elif defined XS_HAVE_EPOLL
+    result = new (std::nothrow) epoll_t;
+#elif defined XS_HAVE_DEVPOLL
+    result = new (std::nothrow) devpoll_t;
+#elif defined XS_HAVE_KQUEUE
+    result = new (std::nothrow) kqueue_t;
+#endif
+    alloc_assert (result);
+    return result;
+}
+
 xs::poller_base_t::poller_base_t ()
 {
 }

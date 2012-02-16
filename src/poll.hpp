@@ -94,8 +94,6 @@ namespace xs
         const poll_t &operator = (const poll_t&);
     };
 
-    typedef poll_t poller_t;
-
 }
 
 #endif

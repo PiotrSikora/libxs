@@ -25,7 +25,7 @@
 #include <stddef.h>
 
 #include "stdint.hpp"
-#include "poller.hpp"
+#include "poller_base.hpp"
 #include "i_poll_events.hpp"
 
 namespace xs
@@ -68,7 +68,7 @@ namespace xs
 
     private:
 
-        poller_t *poller;
+        poller_base_t *poller;
 
         io_object_t (const io_object_t&);
         const io_object_t &operator = (const io_object_t&);

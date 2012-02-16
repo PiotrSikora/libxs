@@ -90,8 +90,6 @@ namespace xs
         const epoll_t &operator = (const epoll_t&);
     };
 
-    typedef epoll_t poller_t;
-
 }
 
 #endif
