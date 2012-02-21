@@ -55,7 +55,7 @@ extern "C" {
 /******************************************************************************/
 
 /*  Version macros for compile-time API version detection                     */
-#define XS_VERSION_MAJOR 0
+#define XS_VERSION_MAJOR 1
 #define XS_VERSION_MINOR 0
 #define XS_VERSION_PATCH 0
 
