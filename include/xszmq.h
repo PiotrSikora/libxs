@@ -108,10 +108,18 @@ XSZMQ_EXPORT void zmq_version (int *major, int *minor, int *patch);
 #endif
 
 /*  Native 0MQ error codes.                                                   */
+#ifndef EFSM
 #define EFSM (ZMQ_HAUSNUMERO + 51)
+#endif
+#ifndef ENOCOMPATPROTO
 #define ENOCOMPATPROTO (ZMQ_HAUSNUMERO + 52)
+#endif
+#ifndef ETERM
 #define ETERM (ZMQ_HAUSNUMERO + 53)
+#endif
+#ifndef EMTHREAD
 #define EMTHREAD (ZMQ_HAUSNUMERO + 54)
+#endif
 
 #endif /*  XS_BUILDING_LIBXSZMQ                                               */
 
@@ -273,4 +281,3 @@ XSZMQ_EXPORT int zmq_device (int device, void * insocket, void* outsocket);
 #endif
 
 #endif
-

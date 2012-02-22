@@ -160,10 +160,13 @@
     <ClCompile Include="..\..\..\src\xreq.cpp" />
     <ClCompile Include="..\..\..\src\xsub.cpp" />
     <ClCompile Include="..\..\..\src\xs.cpp" />
+    <ClCompile Include="..\..\..\src\xszmq.cpp" />
     <ClCompile Include="..\..\..\src\xs_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\xs.h" />
+    <ClInclude Include="..\..\..\include\xszmq.h" />
+    <ClInclude Include="..\..\..\include\xszmq_utils.h" />
     <ClInclude Include="..\..\..\include\xs_utils.h" />
     <ClInclude Include="..\..\..\include\zmq.h" />
     <ClInclude Include="..\..\..\src\array.hpp" />
