@@ -1,10 +1,29 @@
+if BUILD_LIBZMQ
+lib_LTLIBRARIES = libxs.la libxszmq.la libzmq.la
+else
 lib_LTLIBRARIES = libxs.la libxszmq.la
+endif
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libxs.pc libxszmq.pc
 
+if BUILD_LIBZMQ
+include_HEADERS = ../include/xs.h ../include/xs_utils.h \
+    ../include/xszmq.h ../include/xszmq_utils.h \
+    ../include/zmq.h ../include/zmq_utils.h
+
+../include/zmq.h: ../include/xszmq.h
+	cp ../include/xszmq.h ../include/zmq.h
+
+../include/zmq_utils.h: ../include/xszmq_utils.h
+	cp ../include/xszmq_utils.h ../include/zmq_utils.h
+
+distclean-local:
+	-rm -f ../include/zmq.h ../include/zmq_utils.h
+else
 include_HEADERS = ../include/xs.h ../include/xs_utils.h \
     ../include/xszmq.h ../include/xszmq_utils.h
+endif
 
 libxs_la_SOURCES = \
     array.hpp \
@@ -153,6 +172,13 @@ if ON_MINGW
 libxszmq_la_LDFLAGS = -no-undefined -avoid-version -version-info @LIBXSZMQ_ABI_VERSION@
 else
 libxszmq_la_LDFLAGS = -version-info @LIBXSZMQ_ABI_VERSION@
+endif
+
+if BUILD_LIBZMQ
+libzmq_la_SOURCES = $(libxszmq_la_SOURCES)
+libzmq_la_CPPFLAGS = $(libxszmq_la_CPPFLAGS)
+libzmq_la_LIBADD = $(libxszmq_la_LIBADD)
+libzmq_la_LDFLAGS = $(libxszmq_la_LDFLAGS)
 endif
 
 dist-hook:

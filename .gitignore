@@ -20,6 +20,8 @@ autom4te.cache
 .*
 *~
 .*~
+include/zmq.h
+include/zmq_utils.h
 tests/pair_inproc
 tests/pair_ipc
 tests/pair_tcp
@@ -54,6 +56,7 @@ doc/*.html
 doc/*.xml
 src/libxs.pc
 src/libxszmq.pc
+src/libzmq.pc
 bin/
 lib/
 obj/

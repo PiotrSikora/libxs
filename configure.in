@@ -277,6 +277,17 @@ AC_HEADER_TIME
 AC_TYPE_UINT32_T
 AC_C_VOLATILE
 
+#  libzmq compatibility mode
+libxs_libzmq_compat="no"
+AC_ARG_ENABLE([libzmq-compat], [AS_HELP_STRING([--enable-libzmq-compat],
+    [install libzmq compatibility library and headers [default=no]])],
+    [enable_libzmq_compat=$enableval], [enable_libzmq_compat=no])
+
+if test "x$enable_libzmq_compat" != "xno"; then
+    AC_MSG_NOTICE([enabling libzmq compatibility library and headers])
+    libxs_libzmq_compat="yes"
+fi
+
 #  PGM extension
 libxs_pgm_ext="no"
 
@@ -369,6 +380,7 @@ if test "x$libxs_pedantic" = "xyes"; then
 fi
 AC_LANG_POP([C++])
 
+AM_CONDITIONAL(BUILD_LIBZMQ, test "x$libxs_libzmq_compat" = "xyes")
 AM_CONDITIONAL(BUILD_PGM, test "x$libxs_pgm_ext" = "xyes")
 AM_CONDITIONAL(ON_MINGW, test "x$libxs_on_mingw32" = "xyes")
 
@@ -391,5 +403,14 @@ AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile
     perf/Makefile src/libxs.pc src/libxszmq.pc \
     builds/msvc/Makefile tests/Makefile \
     foreign/openpgm/Makefile])
+if test "x$libxs_libzmq_compat" == "xyes"; then
+    AC_CONFIG_FILES([src/libzmq.pc])
+fi
 AC_OUTPUT
+
+if test "x$libxs_libzmq_compat" == "xyes"; then
+    AC_MSG_WARN([The --enable-libzmq-compat option was specified:])
+    AC_MSG_WARN([libzmq compatibility library and headers are enabled.])
+    AC_MSG_WARN([This will overwrite any existing installation of libzmq.])
+fi
 

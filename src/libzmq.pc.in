@@ -3,8 +3,8 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: libxszmq
-Description: Crossroads libxszmq compatibility library
+Name: libzmq
+Description: Crossroads libzmq compatibility library
 Version: @VERSION@
-Libs: -L${libdir} -lxszmq
+Libs: -L${libdir} -lzmq
 Cflags: -I${includedir}
