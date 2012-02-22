@@ -1,9 +1,30 @@
-lib_LTLIBRARIES = libxs.la
-
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libxs.pc
 
-include_HEADERS = ../include/xs.h ../include/xs_utils.h ../include/zmq.h
+if BUILD_LIBZMQ
+lib_LTLIBRARIES = libxs.la libxszmq.la libzmq.la
+
+pkgconfig_DATA = libxs.pc libxszmq.pc libzmq.pc
+
+include_HEADERS = ../include/xs.h ../include/xs_utils.h \
+    ../include/xszmq.h ../include/xszmq_utils.h \
+    ../include/zmq.h ../include/zmq_utils.h
+
+../include/zmq.h: ../include/xszmq.h
+	cp ../include/xszmq.h ../include/zmq.h
+
+../include/zmq_utils.h: ../include/xszmq_utils.h
+	cp ../include/xszmq_utils.h ../include/zmq_utils.h
+
+distclean-local:
+	-rm -f ../include/zmq.h ../include/zmq_utils.h
+else
+lib_LTLIBRARIES = libxs.la libxszmq.la
+
+pkgconfig_DATA = libxs.pc libxszmq.pc
+
+include_HEADERS = ../include/xs.h ../include/xs_utils.h \
+    ../include/xszmq.h ../include/xszmq_utils.h
+endif
 
 libxs_la_SOURCES = \
     array.hpp \
@@ -132,9 +153,9 @@ libxs_la_SOURCES = \
     xs_utils.cpp
 
 if ON_MINGW
-libxs_la_LDFLAGS = -no-undefined -avoid-version -version-info @LTVER@ @LIBXS_EXTRA_LDFLAGS@
+libxs_la_LDFLAGS = -no-undefined -avoid-version -version-info @LIBXS_ABI_VERSION@ @LIBXS_EXTRA_LDFLAGS@
 else
-libxs_la_LDFLAGS = -version-info @LTVER@ @LIBXS_EXTRA_LDFLAGS@
+libxs_la_LDFLAGS = -version-info @LIBXS_ABI_VERSION@ @LIBXS_EXTRA_LDFLAGS@
 endif
 
 libxs_la_CXXFLAGS = @LIBXS_EXTRA_CXXFLAGS@
@@ -142,6 +163,23 @@ libxs_la_CXXFLAGS = @LIBXS_EXTRA_CXXFLAGS@
 if BUILD_PGM
 libxs_la_CPPFLAGS = -I$(top_srcdir)/@pgm_srcdir@/include/
 libxs_la_LIBADD = $(top_srcdir)/@pgm_srcdir@/libpgm_noinst.la
+endif
+
+libxszmq_la_SOURCES = xszmq.c
+libxszmq_la_CPPFLAGS = -DXS_BUILDING_LIBXSZMQ
+libxszmq_la_LIBADD = libxs.la
+
+if ON_MINGW
+libxszmq_la_LDFLAGS = -no-undefined -avoid-version -version-info @LIBXSZMQ_ABI_VERSION@
+else
+libxszmq_la_LDFLAGS = -version-info @LIBXSZMQ_ABI_VERSION@
+endif
+
+if BUILD_LIBZMQ
+libzmq_la_SOURCES = $(libxszmq_la_SOURCES)
+libzmq_la_CPPFLAGS = $(libxszmq_la_CPPFLAGS)
+libzmq_la_LIBADD = $(libxszmq_la_LIBADD)
+libzmq_la_LDFLAGS = $(libxszmq_la_LDFLAGS)
 endif
 
 dist-hook:
