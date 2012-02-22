@@ -165,7 +165,7 @@ libxs_la_CPPFLAGS = -I$(top_srcdir)/@pgm_srcdir@/include/
 libxs_la_LIBADD = $(top_srcdir)/@pgm_srcdir@/libpgm_noinst.la
 endif
 
-libxszmq_la_SOURCES = xszmq.c
+libxszmq_la_SOURCES = xszmq.cpp
 libxszmq_la_CPPFLAGS = -DXS_BUILDING_LIBXSZMQ
 libxszmq_la_LIBADD = libxs.la
 
