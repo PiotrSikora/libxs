@@ -1,13 +1,10 @@
+pkgconfigdir = $(libdir)/pkgconfig
+
 if BUILD_LIBZMQ
 lib_LTLIBRARIES = libxs.la libxszmq.la libzmq.la
-else
-lib_LTLIBRARIES = libxs.la libxszmq.la
-endif
 
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libxs.pc libxszmq.pc
+pkgconfig_DATA = libxs.pc libxszmq.pc libzmq.pc
 
-if BUILD_LIBZMQ
 include_HEADERS = ../include/xs.h ../include/xs_utils.h \
     ../include/xszmq.h ../include/xszmq_utils.h \
     ../include/zmq.h ../include/zmq_utils.h
@@ -21,6 +18,10 @@ include_HEADERS = ../include/xs.h ../include/xs_utils.h \
 distclean-local:
 	-rm -f ../include/zmq.h ../include/zmq_utils.h
 else
+lib_LTLIBRARIES = libxs.la libxszmq.la
+
+pkgconfig_DATA = libxs.pc libxszmq.pc
+
 include_HEADERS = ../include/xs.h ../include/xs_utils.h \
     ../include/xszmq.h ../include/xszmq_utils.h
 endif
