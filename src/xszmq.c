@@ -29,6 +29,13 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+void zmq_version (int *major_, int *minor_, int *patch_)
+{
+    *major_ = ZMQ_VERSION_MAJOR;
+    *minor_ = ZMQ_VERSION_MINOR;
+    *patch_ = ZMQ_VERSION_PATCH;
+}
+
 int zmq_errno ()
 {
     return xs_errno ();
