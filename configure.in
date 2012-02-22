@@ -17,15 +17,24 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 # This lets us use PACKAGE_VERSION in Makefiles
 AC_SUBST(PACKAGE_VERSION)
 
-# Libtool -version-info (ABI version)
+# ABI version for libxs (Libtool -version-info)
 #
 # Don't change this unless you know exactly what you're doing and have read and
 # understand:
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 #
 # libxs -version-info current:revision:age
-LTVER="0:0:0"
-AC_SUBST(LTVER)
+LIBXS_ABI_VERSION="0:0:0"
+AC_SUBST(LIBXS_ABI_VERSION)
+
+# ABI version for libxszmq
+#
+# This must be set to the ABI version of libzmq we are emulating.
+# This is currently libzmq 2.1 which is ABI 1.0.0.
+#
+# libxszmq -version-info current:revision:age
+LIBXSZMQ_ABI_VERSION="1:0:0"
+AC_SUBST(LIBXSZMQ_ABI_VERSION)
 
 # Take a copy of original flags
 XS_ORIG_CFLAGS="${CFLAGS:-none}"
@@ -379,7 +388,7 @@ AC_SUBST(LIBXS_EXTRA_CXXFLAGS)
 AC_SUBST(LIBXS_EXTRA_LDFLAGS)
 
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile
-    perf/Makefile src/libxs.pc \
+    perf/Makefile src/libxs.pc src/libxszmq.pc \
     builds/msvc/Makefile tests/Makefile \
     foreign/openpgm/Makefile])
 AC_OUTPUT

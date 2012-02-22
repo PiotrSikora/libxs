@@ -53,6 +53,7 @@ doc/*.7
 doc/*.html
 doc/*.xml
 src/libxs.pc
+src/libxszmq.pc
 bin/
 lib/
 obj/
