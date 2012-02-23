@@ -47,6 +47,7 @@
     </Link>
     <PostBuildEvent>
       <Command>copy ..\..\..\include\xszmq.h ..\..\..\include\zmq.h
+copy ..\..\..\include\xszmq_utils.h ..\..\..\include\zmq_utils.h
 copy ..\..\..\bin\$(PlatformName)\libxs_d.dll ..\..\..\bin\$(PlatformName)\libzmq_d.dll
 copy ..\..\..\lib\$(PlatformName)\libxs_d.lib ..\..\..\lib\$(PlatformName)\libzmq_d.lib
 copy ..\..\..\lib\$(PlatformName)\libxs_d.exp ..\..\..\lib\$(PlatformName)\libzmq_d.exp</Command>
@@ -66,6 +67,7 @@ copy ..\..\..\lib\$(PlatformName)\libxs_d.exp ..\..\..\lib\$(PlatformName)\libzm
     </Link>
     <PostBuildEvent>
       <Command>copy ..\..\..\include\xszmq.h ..\..\..\include\zmq.h
+copy ..\..\..\include\xszmq_utils.h ..\..\..\include\zmq_utils.h
 copy ..\..\..\bin\$(PlatformName)\libxs.dll ..\..\..\bin\$(PlatformName)\libzmq.dll
 copy ..\..\..\lib\$(PlatformName)\libxs.lib ..\..\..\lib\$(PlatformName)\libzmq.lib
 copy ..\..\..\lib\$(PlatformName)\libxs.exp ..\..\..\lib\$(PlatformName)\libzmq.exp</Command>
