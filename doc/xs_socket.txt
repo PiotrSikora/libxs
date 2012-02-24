@@ -53,7 +53,7 @@ another with a "full fence" memory barrier.
 
 .Socket types
 Crossroads defines several messaging patterns which encapsulate exact semantics
-of a particular topology. For example, publush-subscribe pattern defines data
+of a particular topology. For example, publish-subscribe pattern defines data
 distribution trees while request-reply defines networks of shared stateless
 services. Each pattern defines several socket types (roles in the pattern).
 
