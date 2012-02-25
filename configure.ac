@@ -409,6 +409,36 @@ if test "x$libxs_libzmq_compat" == "xyes"; then
 fi
 AC_OUTPUT
 
+# Print configuration
+cat <<EOF | tee -a config.log
+
+## -------------- ##
+## Configuration. ##
+## -------------- ##
+
+Configuration for $PACKAGE_STRING
+    Host OS: $host_os
+    Debugging information: ${enable_debug-no}
+    GCC code coverage reporting: ${XS_GCOV-no}
+    Polling system: $libxs_cv_poller
+    Disable eventfd: $xs_disable_eventfd
+    Build libzmq compatibility library and headers: $libxs_libzmq_compat
+    PGM extension: $with_pgm_ext
+    Use system-provided PGM library: $with_system_pgm_ext
+    Build documentation: $libxs_build_doc
+
+Environment variables:
+    CPPFLAGS: $CPPFLAGS
+    CFLAGS: $CFLAGS
+    CXXFLAGS: $CXXFLAGS
+    LDFLAGS: $LDFLAGS
+
+Installation:
+    Prefix: $prefix
+    Install man pages: $libxs_install_man
+
+EOF
+
 if test "x$libxs_libzmq_compat" == "xyes"; then
     AC_MSG_WARN([The --enable-libzmq-compat option was specified:])
     AC_MSG_WARN([libzmq compatibility library and headers are enabled.])
