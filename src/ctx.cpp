@@ -209,10 +209,6 @@ xs::socket_base_t *xs::ctx_t::create_socket (int type_)
         int hwm = 1;
         rc = log_socket->setsockopt (XS_SNDHWM, &hwm, sizeof (hwm));
         errno_assert (rc == 0);
-    #if !defined XS_HAVE_WINDOWS
-        rc = log_socket->connect ("ipc:///tmp/xslogs.ipc");
-        errno_assert (rc == 0);
-    #endif
 
         //  Create the monitor object.
         io_thread_t *io_thread = choose_io_thread (0);
