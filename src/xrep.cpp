@@ -218,6 +218,7 @@ int xs::xrep_t::xrecv (msg_t *msg_, int flags_)
         if (msg_->size () != 0) {
 
             //  Actual change of the identity.
+            bool changed = false;
             outpipes_t::iterator it = outpipes.begin ();
             while (it != outpipes.end ()) {
                 if (it->second.pipe == pipe) {
@@ -226,13 +227,19 @@ int xs::xrep_t::xrecv (msg_t *msg_, int flags_)
                     pipe->set_identity (identity);
                     outpipes.erase (it);
                     outpipe_t outpipe = {pipe, true};
-                    it = outpipes.insert (outpipes_t::value_type (identity,
-                        outpipe)).first;
+                    if (!outpipes.insert (outpipes_t::value_type (identity,
+                        outpipe)).second) {
+
+                        //  Duplicate identity.
+                        //  TODO: Drop the new connection.
+                        xs_assert (false);
+                    }
+                    changed = true;
                     break;
                 }
                 ++it;
             }
-            xs_assert (it != outpipes.end ());
+            xs_assert (changed);
         }
     }
 
