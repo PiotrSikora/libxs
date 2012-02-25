@@ -6,7 +6,7 @@ AC_PREREQ(2.61)
 # the version.sh script. Hence, it should be updated there.
 # The version in git should reflect the *next* version planned.
 #
-AC_INIT([libxs],[m4_esyscmd([./version.sh])])
+AC_INIT([libxs],[m4_esyscmd([./version.sh])],[crossroads-dev@groups.crossroads.io])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
@@ -22,9 +22,10 @@ AC_SUBST(PACKAGE_VERSION)
 # Don't change this unless you know exactly what you're doing and have read and
 # understand:
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+# This is currently set at ABI 1.0.0.
 #
 # libxs -version-info current:revision:age
-LIBXS_ABI_VERSION="0:0:0"
+LIBXS_ABI_VERSION="1:0:0"
 AC_SUBST(LIBXS_ABI_VERSION)
 
 # ABI version for libxszmq
