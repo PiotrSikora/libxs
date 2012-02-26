@@ -73,6 +73,9 @@ namespace xs
         //  after the last one is closed.
         int terminate ();
 
+        //  Plug in the extension specified.
+        int plug (void *ext_);
+
         //  Set context option.
         int setctxopt (int option_, const void *optval_, size_t optvallen_);
 

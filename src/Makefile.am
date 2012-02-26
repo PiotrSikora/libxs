@@ -7,7 +7,8 @@ pkgconfig_DATA = libxs.pc libxszmq.pc libzmq.pc
 
 include_HEADERS = ../include/xs.h ../include/xs_utils.h \
     ../include/xszmq.h ../include/xszmq_utils.h \
-    ../include/zmq.h ../include/zmq_utils.h
+    ../include/zmq.h ../include/zmq_utils.h \
+    ../include/xs_filter.h
 
 ../include/zmq.h: ../include/xszmq.h
 	cp ../include/xszmq.h ../include/zmq.h
@@ -150,6 +151,7 @@ libxs_la_SOURCES = \
     xreq.cpp \
     xsub.cpp \
     xs.cpp \
+    xs_filter.cpp \
     xs_utils.cpp
 
 if ON_MINGW

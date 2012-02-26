@@ -29,6 +29,8 @@
 #include <new>
 #include <string.h>
 
+#include "../include/xs_filter.h"
+
 #include "ctx.hpp"
 #include "socket_base.hpp"
 #include "monitor.hpp"
@@ -139,6 +141,12 @@ int xs::ctx_t::terminate ()
     delete this;
 
     return 0;
+}
+
+int xs::ctx_t::plug (void *ext_)
+{
+    errno = ENOTSUP;
+    return -1;
 }
 
 int xs::ctx_t::setctxopt (int option_, const void *optval_, size_t optvallen_)
