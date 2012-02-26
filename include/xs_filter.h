@@ -97,7 +97,7 @@ typedef struct {
     /*  the subscriptions by calling xs_filter_subscription function.         */
     /*  If there are multiple identical subscriptions, xs_filter_subscription */
     /*  should be called once only.                                           */
-    void (*enumarate) (void *fset);
+    void (*enumerate) (void *fset);
 
     /*  Checks whether particular message matches at least one subscription   */
     /*  in the filter. Returns 0 if it does not and 1 if it does.             */

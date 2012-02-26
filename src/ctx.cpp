@@ -38,6 +38,7 @@
 #include "pipe.hpp"
 #include "err.hpp"
 #include "msg.hpp"
+#include "prefix_filter.hpp"
 
 xs::ctx_t::ctx_t (uint32_t io_threads_) :
     tag (0xbadcafe0),
@@ -51,6 +52,9 @@ xs::ctx_t::ctx_t (uint32_t io_threads_) :
     max_sockets (512),
     io_thread_count (io_threads_)
 {
+    //  Plug in the standard extensions.
+    int rc = plug (prefix_filter);
+    xs_assert (rc == 0);
 }
 
 bool xs::ctx_t::check_tag ()
@@ -145,8 +149,7 @@ int xs::ctx_t::terminate ()
 
 int xs::ctx_t::plug (void *ext_)
 {
-    errno = ENOTSUP;
-    return -1;
+    return 0;
 }
 
 int xs::ctx_t::setctxopt (int option_, const void *optval_, size_t optvallen_)
