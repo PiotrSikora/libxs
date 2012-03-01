@@ -118,6 +118,7 @@ int xs::ipc_listener_t::set_address (const char *addr_)
     if (rc != 0)
         return -1;
 
+    filename.assign(addr_);
     has_file = true;
 
     //  Listen for incomming connections.
