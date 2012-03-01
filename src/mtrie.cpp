@@ -74,7 +74,9 @@ bool xs::mtrie_t::add_helper (unsigned char *prefix_, size_t size_,
         bool result = !pipes;
         if (!pipes)
             pipes = new pipes_t;
-        pipes->insert (pipe_);
+        pipes_t::iterator it =
+            pipes->insert (pipes_t::value_type (pipe_, 0)).first;
+        ++it->second;
         return result;
     }
 
@@ -162,10 +164,20 @@ void xs::mtrie_t::rm_helper (pipe_t *pipe_, unsigned char **buff_,
     void *arg_)
 {
     //  Remove the subscription from this node.
-    if (pipes && pipes->erase (pipe_) && pipes->empty ()) {
-        func_ (*buff_, buffsize_, arg_);
-        delete pipes;
-        pipes = 0;
+    if (pipes) {
+        pipes_t::iterator it = pipes->find (pipe_);
+        if (it != pipes->end ()) {
+            xs_assert (it->second);
+            --it->second;
+            if (!it->second) {
+                pipes->erase (it);
+                if (pipes->empty ()) {
+                    func_ (*buff_, buffsize_, arg_);
+                    delete pipes;
+                    pipes = 0;
+                }
+            }
+        }
     }
 
     //  Adjust the buffer.
@@ -272,12 +284,20 @@ bool xs::mtrie_t::rm_helper (unsigned char *prefix_, size_t size_,
     pipe_t *pipe_)
 {
     if (!size_) {
+
+        //  Remove the subscription from this node.
         if (pipes) {
-            pipes_t::size_type erased = pipes->erase (pipe_);
-            xs_assert (erased == 1);
-            if (pipes->empty ()) {
-                delete pipes;
-                pipes = 0;
+            pipes_t::iterator it = pipes->find (pipe_);
+            if (it != pipes->end ()) {
+                xs_assert (it->second);
+                --it->second;
+                if (!it->second) {
+                    pipes->erase (it);
+                    if (pipes->empty ()) {
+                        delete pipes;
+                        pipes = 0;
+                    }
+                }
             }
         }
         return !pipes;
@@ -389,7 +409,7 @@ void xs::mtrie_t::match (unsigned char *data_, size_t size_,
         if (current->pipes) {
             for (pipes_t::iterator it = current->pipes->begin ();
                   it != current->pipes->end (); ++it)
-                func_ (*it, arg_);
+                func_ (it->first, arg_);
         }
 
         //  If we are at the end of the message, there's nothing more to match.

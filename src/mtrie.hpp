@@ -23,7 +23,7 @@
 #define __XS_MTRIE_HPP_INCLUDED__
 
 #include <stddef.h>
-#include <set>
+#include <map>
 
 #include "stdint.hpp"
 
@@ -72,7 +72,8 @@ namespace xs
             xs::pipe_t *pipe_);
         bool is_redundant () const;
 
-        typedef std::set <xs::pipe_t*> pipes_t;
+        //  Pointer to particular pipe associated with the reference count.
+        typedef std::map <xs::pipe_t*, int> pipes_t;
         pipes_t *pipes;
 
         unsigned char min;
