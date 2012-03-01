@@ -245,6 +245,9 @@ void xs::wsa_error_to_errno ()
     case WSAEAFNOSUPPORT:
         errno = EAFNOSUPPORT;
         return;
+    case WSAEACCES:
+        errno = EACCES;
+        return;
     default:
         wsa_assert (false);
     }
