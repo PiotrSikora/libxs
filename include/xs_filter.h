@@ -84,13 +84,16 @@ typedef struct {
     /*  Add subscription to the filter. Filter should be able to handle       */
     /*  multiple identical subscriptions (e.g. by reference counting the      */
     /*  subscriptions.) The format of the subscription is not interpreted     */
-    /*  by Crossroads core, just by the filter extension.                     */
-    void (*subscribe) (void *fset, void *fid, unsigned char *data, size_t size);
+    /*  by Crossroads core, just by the filter extension. The function        */
+    /*  returns 0 if the subscription was a duplicate of an existing          */
+    /*  subscription or 1 in the case of fresh subscription.                  */
+    int (*subscribe) (void *fset, void *fid, unsigned char *data, size_t size);
 
     /*  Remove existing subscription. If there are several identical          */
     /*  subscriptions this function should remove one of them, leaving the    */
-    /*  others in place.                                                      */
-    void (*unsubscribe) (void *fset, void *fid, unsigned char *data,
+    /*  others in place. In such case the function returns 0. If the removed  */
+    /*  subscription was an unique one, it returns 1.                         */
+    int (*unsubscribe) (void *fset, void *fid, unsigned char *data,
         size_t size);
 
     /*  List all the subscriptions in the set. The function should announce   */

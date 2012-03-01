@@ -21,12 +21,13 @@
 #ifndef __XS_XPUB_HPP_INCLUDED__
 #define __XS_XPUB_HPP_INCLUDED__
 
+#include "../include/xs_filter.h"
+
 #include <deque>
 #include <string>
 
 #include "socket_base.hpp"
 #include "session_base.hpp"
-#include "trie.hpp"
 #include "array.hpp"
 #include "dist.hpp"
 #include "blob.hpp"
@@ -67,8 +68,9 @@ namespace xs
         //  Function to be applied to each matching pipes.
         static void mark_as_matching (xs::pipe_t *pipe_, void *arg_);
 
-        //  List of all subscriptions mapped to corresponding pipes.
-        trie_t subscriptions;
+        //  Subscriptions.
+        xs_filter_t *filter;
+        void *fset;
 
         //  Distributor of messages holding the list of outbound pipes.
         dist_t dist;

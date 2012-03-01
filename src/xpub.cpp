@@ -25,16 +25,23 @@
 #include "pipe.hpp"
 #include "err.hpp"
 #include "msg.hpp"
+#include "prefix_filter.hpp"
 
 xs::xpub_t::xpub_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     socket_base_t (parent_, tid_, sid_),
     more (false)
 {
     options.type = XS_XPUB;
+
+    //  Set up the filters.
+    filter = (xs_filter_t*) prefix_filter;
+    fset = filter->fset_create ();
+    xs_assert (fset);
 }
 
 xs::xpub_t::~xpub_t ()
 {
+    filter->fset_destroy (fset);
 }
 
 void xs::xpub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
@@ -42,10 +49,13 @@ void xs::xpub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
     xs_assert (pipe_);
     dist.attach (pipe_);
 
+    //  Create a filter for the pipe.
+    filter->create (fset, pipe_);
+
     // If icanhasall_ is specified, the caller would like to subscribe
     // to all data on this pipe, implicitly.
     if (icanhasall_)
-        subscriptions.add (NULL, 0, pipe_);
+        filter->subscribe (fset, pipe_, NULL, 0);
 
     //  The pipe is active when attached. Let's read the subscriptions from
     //  it, if any.
@@ -78,9 +88,11 @@ void xs::xpub_t::xread_activated (pipe_t *pipe_)
 
         bool unique;
 		if (*data == 0)
-		    unique = subscriptions.rm (data + 1, size - 1, pipe_);
+            unique = filter->unsubscribe (fset, pipe_, data + 1, size - 1) ?
+                true : false;
 		else
-		    unique = subscriptions.add (data + 1, size - 1, pipe_);
+            unique = filter->subscribe (fset, pipe_, data + 1, size - 1) ?
+                true : false;
 
         //  If the subscription is not a duplicate store it so that it can be
         //  passed to used on next recv call.
@@ -98,10 +110,8 @@ void xs::xpub_t::xwrite_activated (pipe_t *pipe_)
 
 void xs::xpub_t::xterminated (pipe_t *pipe_)
 {
-    //  Remove the pipe from the trie. If there are topics that nobody
-    //  is interested in anymore, send corresponding unsubscriptions
-    //  upstream.
-    subscriptions.rm (pipe_, send_unsubscription, this);
+    //  Remove the filter associated with the pipe.
+    filter->destroy (fset, pipe_); // TODO: send_unsubscriptions!
 
     dist.terminated (pipe_);
 }
@@ -118,8 +128,8 @@ int xs::xpub_t::xsend (msg_t *msg_, int flags_)
 
     //  For the first part of multi-part message, find the matching pipes.
     if (!more)
-        subscriptions.match ((unsigned char*) msg_->data (), msg_->size (),
-            mark_as_matching, this);
+        filter->match_all (fset, (unsigned char*) msg_->data (), msg_->size ());
+    //  TODO: mark_as_matching, this!
 
     //  Send the message to all the pipes that were marked as matching
     //  in the previous step.

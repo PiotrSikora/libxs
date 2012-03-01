@@ -27,49 +27,50 @@
 
 xs::prefix_filter_t::prefix_filter_t ()
 {
-    xs_assert (false);
 }
 
 xs::prefix_filter_t::~prefix_filter_t ()
 {
-    xs_assert (false);
 }
 
 void xs::prefix_filter_t::create (void *fid_)
 {
-    xs_assert (false);
+    //  Do nothing. There's no need to register filters explicitly.
 }
 
 void xs::prefix_filter_t::destroy (void *fid_)
 {
-    xs_assert (false);
+    //  TODO: Add the callback function.
+    trie.rm ((pipe_t*) fid_, NULL, NULL);
 }
 
-void xs::prefix_filter_t::subscribe (void *fid_, unsigned char *data_,
+int xs::prefix_filter_t::subscribe (void *fid_, unsigned char *data_,
     size_t size_)
 {
-    xs_assert (false);
+    return trie.add (data_, size_, (pipe_t*) fid_) ? 1 : 0;
 }
 
-void xs::prefix_filter_t::unsubscribe (void *fid_, unsigned char *data_,
+int xs::prefix_filter_t::unsubscribe (void *fid_, unsigned char *data_,
     size_t size_)
 {
-    xs_assert (false);
+    return trie.rm (data_, size_, (pipe_t*) fid_) ? 1 : 0;
 }
 
 void xs::prefix_filter_t::enumerate ()
 {
+    //  TODO
     xs_assert (false);
 }
 
 int xs::prefix_filter_t::match (void *fid_, unsigned char *data_, size_t size_)
 {
-    xs_assert (false);
-    return 0;
+    //  TODO: What should we do with fid_?
+    return trie.check (data_, size_) ? 1 : 0;
 }
 
 void xs::prefix_filter_t::match_all (unsigned char *data_, size_t size_)
 {
+    //  TODO
     xs_assert (false);
 }
 
@@ -97,16 +98,16 @@ static void destroy (void *fset_, void *fid_)
     ((xs::prefix_filter_t*) fset_)->destroy (fid_);
 }
 
-static void subscribe (void *fset_, void *fid_, unsigned char *data_,
+static int subscribe (void *fset_, void *fid_, unsigned char *data_,
     size_t size_)
 {
-    ((xs::prefix_filter_t*) fset_)->subscribe (fid_, data_, size_);
+    return ((xs::prefix_filter_t*) fset_)->subscribe (fid_, data_, size_);
 }
 
-static void unsubscribe (void *fset_, void *fid_, unsigned char *data_,
+static int unsubscribe (void *fset_, void *fid_, unsigned char *data_,
     size_t size_)
 {
-    ((xs::prefix_filter_t*) fset_)->unsubscribe (fid_, data_, size_);
+    return ((xs::prefix_filter_t*) fset_)->unsubscribe (fid_, data_, size_);
 }
 
 static void enumerate (void *fset_)

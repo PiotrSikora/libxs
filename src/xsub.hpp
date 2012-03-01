@@ -21,11 +21,12 @@
 #ifndef __XS_XSUB_HPP_INCLUDED__
 #define __XS_XSUB_HPP_INCLUDED__
 
+#include "../include/xs_filter.h"
+
 #include "socket_base.hpp"
 #include "session_base.hpp"
 #include "dist.hpp"
 #include "fq.hpp"
-#include "trie.hpp"
 
 namespace xs
 {
@@ -72,7 +73,8 @@ namespace xs
         dist_t dist;
 
         //  The repository of subscriptions.
-        trie_t subscriptions;
+        xs_filter_t *filter;
+        void *fset;
 
         //  If true, 'message' contains a matching message to return on the
         //  next recv call.

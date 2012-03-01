@@ -21,6 +21,8 @@
 #ifndef __XS_PREFIX_FILTER_HPP_INCLUDED__
 #define __XS_PREFIX_FILTER_HPP_INCLUDED__
 
+#include "trie.hpp"
+
 namespace xs
 {
 
@@ -36,13 +38,15 @@ namespace xs
 
         void create (void *fid_);
         void destroy (void *fid_);
-        void subscribe (void *fid_, unsigned char *data_, size_t size_);
-        void unsubscribe (void *fid_, unsigned char *data_, size_t size_);
+        int subscribe (void *fid_, unsigned char *data_, size_t size_);
+        int unsubscribe (void *fid_, unsigned char *data_, size_t size_);
         void enumerate ();
         int match (void *fid_, unsigned char *data_, size_t size_);
         void match_all (unsigned char *data_, size_t size_);
 
     private:
+
+        trie_t trie;
 
         prefix_filter_t (const prefix_filter_t&);
         const prefix_filter_t &operator = (const prefix_filter_t&);

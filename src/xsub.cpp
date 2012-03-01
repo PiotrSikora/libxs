@@ -23,6 +23,7 @@
 
 #include "xsub.hpp"
 #include "err.hpp"
+#include "prefix_filter.hpp"
 
 xs::xsub_t::xsub_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     socket_base_t (parent_, tid_, sid_),
@@ -40,10 +41,21 @@ xs::xsub_t::xsub_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
 
     int rc = message.init ();
     errno_assert (rc == 0);
+
+    //  Set up the filters.
+    filter = (xs_filter_t*) prefix_filter;
+    fset = filter->fset_create ();
+    xs_assert (fset);
+
+    //  Create a filter for the pipe. We have only a single pipe, so we can
+    //  use NULL as a filter ID.
+    filter->create (fset, NULL);
 }
 
 xs::xsub_t::~xsub_t ()
 {
+    filter->fset_destroy (fset);
+
     int rc = message.close ();
     errno_assert (rc == 0);
 }
@@ -54,9 +66,10 @@ void xs::xsub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
     fq.attach (pipe_);
     dist.attach (pipe_);
 
+//  TODO: Enumarate etc.
     //  Send all the cached subscriptions to the new upstream peer.
-    subscriptions.apply (send_subscription, pipe_);
-    pipe_->flush ();
+//    subscriptions.apply (send_subscription, pipe_);
+//    pipe_->flush ();
 }
 
 void xs::xsub_t::xread_activated (pipe_t *pipe_)
@@ -77,9 +90,11 @@ void xs::xsub_t::xterminated (pipe_t *pipe_)
 
 void xs::xsub_t::xhiccuped (pipe_t *pipe_)
 {
+//  TODO: Enumated the subscriptions etc.
+
     //  Send all the cached subscriptions to the hiccuped pipe.
-    subscriptions.apply (send_subscription, pipe_);
-    pipe_->flush ();
+//    subscriptions.apply (send_subscription, pipe_);
+//    pipe_->flush ();
 }
 
 int xs::xsub_t::xsend (msg_t *msg_, int flags_)
@@ -95,13 +110,13 @@ int xs::xsub_t::xsend (msg_t *msg_, int flags_)
 
     // Process the subscription.
     if (*data == 1) {
-        if (subscriptions.add (data + 1, size - 1, NULL))
+        if (filter->subscribe (fset, NULL, data + 1, size - 1) == 1)
             return dist.send_to_all (msg_, flags_);
         else
             return 0;
     }
     else if (*data == 0) {
-        if (subscriptions.rm (data + 1, size - 1, NULL))
+        if (filter->unsubscribe (fset, NULL, data + 1, size - 1) == 1)
             return dist.send_to_all (msg_, flags_);
         else
             return 0;
@@ -200,7 +215,8 @@ bool xs::xsub_t::xhas_in ()
 
 bool xs::xsub_t::match (msg_t *msg_)
 {
-    return subscriptions.check ((unsigned char*) msg_->data (), msg_->size ());
+    return filter->match (fset, NULL, (unsigned char*) msg_->data (),
+        msg_->size ()) ? true : false;
 }
 
 void xs::xsub_t::send_subscription (unsigned char *data_, size_t size_,
