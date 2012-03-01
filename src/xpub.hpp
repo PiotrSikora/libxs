@@ -26,7 +26,7 @@
 
 #include "socket_base.hpp"
 #include "session_base.hpp"
-#include "mtrie.hpp"
+#include "trie.hpp"
 #include "array.hpp"
 #include "dist.hpp"
 #include "blob.hpp"
@@ -68,7 +68,7 @@ namespace xs
         static void mark_as_matching (xs::pipe_t *pipe_, void *arg_);
 
         //  List of all subscriptions mapped to corresponding pipes.
-        mtrie_t subscriptions;
+        trie_t subscriptions;
 
         //  Distributor of messages holding the list of outbound pipes.
         dist_t dist;

@@ -1,8 +1,7 @@
 /*
-    Copyright (c) 2009-2012 250bpm s.r.o.
-    Copyright (c) 2007-2009 iMatix Corporation
+    Copyright (c) 2011-2012 250bpm s.r.o.
     Copyright (c) 2011-2012 Spotify AB
-    Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
+    Copyright (c) 2011 Other contributors as noted in the AUTHORS file
 
     This file is part of Crossroads I/O project.
 
@@ -31,10 +30,11 @@
 #endif
 
 #include "err.hpp"
+#include "pipe.hpp"
 #include "trie.hpp"
 
 xs::trie_t::trie_t () :
-    refcnt (0),
+    pipes (0),
     min (0),
     count (0),
     live_nodes (0)
@@ -43,6 +43,11 @@ xs::trie_t::trie_t () :
 
 xs::trie_t::~trie_t ()
 {
+    if (pipes) {
+        delete pipes;
+        pipes = 0;
+    }
+
     if (count == 1) {
         xs_assert (next.node);
         delete next.node;
@@ -56,12 +61,23 @@ xs::trie_t::~trie_t ()
     }
 }
 
-bool xs::trie_t::add (unsigned char *prefix_, size_t size_)
+bool xs::trie_t::add (unsigned char *prefix_, size_t size_, pipe_t *pipe_)
+{
+    return add_helper (prefix_, size_, pipe_);
+}
+
+bool xs::trie_t::add_helper (unsigned char *prefix_, size_t size_,
+    pipe_t *pipe_)
 {
     //  We are at the node corresponding to the prefix. We are done.
     if (!size_) {
-        ++refcnt;
-        return refcnt == 1;
+        bool result = !pipes;
+        if (!pipes)
+            pipes = new pipes_t;
+        pipes_t::iterator it =
+            pipes->insert (pipes_t::value_type (pipe_, 0)).first;
+        ++it->second;
+        return result;
     }
 
     unsigned char c = *prefix_;
@@ -117,170 +133,310 @@ bool xs::trie_t::add (unsigned char *prefix_, size_t size_)
     if (count == 1) {
         if (!next.node) {
             next.node = new (std::nothrow) trie_t;
-            xs_assert (next.node);
             ++live_nodes;
-            xs_assert (live_nodes == 1);
+            xs_assert (next.node);
         }
-        return next.node->add (prefix_ + 1, size_ - 1);
+        return next.node->add_helper (prefix_ + 1, size_ - 1, pipe_);
     }
     else {
         if (!next.table [c - min]) {
             next.table [c - min] = new (std::nothrow) trie_t;
-            xs_assert (next.table [c - min]);
             ++live_nodes;
-            xs_assert (live_nodes > 1);
+            xs_assert (next.table [c - min]);
         }
-        return next.table [c - min]->add (prefix_ + 1, size_ - 1);
+        return next.table [c - min]->add_helper (prefix_ + 1, size_ - 1, pipe_);
     }
 }
 
-bool xs::trie_t::rm (unsigned char *prefix_, size_t size_)
+
+void xs::trie_t::rm (pipe_t *pipe_,
+    void (*func_) (unsigned char *data_, size_t size_, void *arg_),
+    void *arg_)
 {
-     //  TODO: Shouldn't an error be reported if the key does not exist?
-
-     if (!size_) {
-         if (!refcnt)
-             return false;
-         refcnt--;
-         return refcnt == 0;
-     }
-
-     unsigned char c = *prefix_;
-     if (!count || c < min || c >= min + count)
-         return false;
-
-     trie_t *next_node =
-         count == 1 ? next.node : next.table [c - min];
-
-     if (!next_node)
-         return false;
-
-     bool ret = next_node->rm (prefix_ + 1, size_ - 1);
-
-     //  Prune redundant nodes
-     if (next_node->is_redundant ()) {
-         delete next_node;
-         xs_assert (count > 0);
-
-         if (count == 1) {
-             //  The just pruned node is was the only live node
-             next.node = 0;
-             count = 0;
-             --live_nodes;
-             xs_assert (live_nodes == 0);
-         }
-         else {
-             next.table [c - min] = 0;
-             xs_assert (live_nodes > 1);
-             --live_nodes;
-
-             //  Compact the table if possible
-             if (live_nodes == 1) {
-                 //  We can switch to using the more compact single-node
-                 //  representation since the table only contains one live node
-                 trie_t *node = 0;
-                 //  Since we always compact the table the pruned node must
-                 //  either be the left-most or right-most ptr in the node
-                 //  table
-                 if (c == min) {
-                     //  The pruned node is the left-most node ptr in the
-                     //  node table => keep the right-most node
-                     node = next.table [count - 1];
-                 }
-                 else if (c == min + count - 1) {
-                     //  The pruned node is the right-most node ptr in the
-                     //  node table => keep the left-most node
-                     node = next.table [0];
-                 }
-
-                 xs_assert (node);
-                 free (next.table);
-                 next.node = node;
-                 count = 1;
-             }
-             else if (c == min) {
-                 //  We can compact the table "from the left".
-                 //  Find the left-most non-null node ptr, which we'll use as
-                 //  our new min
-                 unsigned char new_min = min;
-                 for (unsigned short i = 1; i < count; ++i) {
-                     if (next.table [i]) {
-                         new_min = i + min;
-                         break;
-                     }
-                 }
-                 xs_assert (new_min != min);
-
-                 trie_t **old_table = next.table;
-                 xs_assert (new_min > min);
-                 xs_assert (count > new_min - min);
-
-                 count = count - (new_min - min);
-                 next.table = (trie_t**) malloc (sizeof (trie_t*) * count);
-                 xs_assert (next.table);
-
-                 memmove (next.table, old_table + (new_min - min),
-                          sizeof (trie_t*) * count);
-                 free (old_table);
-
-                 min = new_min;
-             }
-             else if (c == min + count - 1) {
-                 //  We can compact the table "from the right".
-                 //  Find the right-most non-null node ptr, which we'll use to
-                 //  determine the new table size
-                 unsigned short new_count = count;
-                 for (unsigned short i = 1; i < count; ++i) {
-                     if (next.table [count - 1 - i]) {
-                         new_count = count - i;
-                         break;
-                     }
-                 }
-                 xs_assert (new_count != count);
-                 count = new_count;
-
-                 trie_t **old_table = next.table;
-                 next.table = (trie_t**) malloc (sizeof (trie_t*) * count);
-                 xs_assert (next.table);
-
-                 memmove (next.table, old_table, sizeof (trie_t*) * count);
-                 free (old_table);
-             }
-         }
-     }
-
-     return ret;
+    unsigned char *buff = NULL;
+    rm_helper (pipe_, &buff, 0, 0, func_, arg_);
+    free (buff);
 }
 
-bool xs::trie_t::check (unsigned char *data_, size_t size_)
+void xs::trie_t::rm_helper (pipe_t *pipe_, unsigned char **buff_,
+    size_t buffsize_, size_t maxbuffsize_,
+    void (*func_) (unsigned char *data_, size_t size_, void *arg_),
+    void *arg_)
 {
-    //  This function is on critical path. It deliberately doesn't use
-    //  recursion to get a bit better performance.
+    //  Remove the subscription from this node.
+    if (pipes) {
+        pipes_t::iterator it = pipes->find (pipe_);
+        if (it != pipes->end ()) {
+            xs_assert (it->second);
+            --it->second;
+            if (!it->second) {
+                pipes->erase (it);
+                if (pipes->empty ()) {
+                    func_ (*buff_, buffsize_, arg_);
+                    delete pipes;
+                    pipes = 0;
+                }
+            }
+        }
+    }
+
+    //  Adjust the buffer.
+    if (buffsize_ >= maxbuffsize_) {
+        maxbuffsize_ = buffsize_ + 256;
+        *buff_ = (unsigned char*) realloc (*buff_, maxbuffsize_);
+        alloc_assert (*buff_);
+    }
+
+    //  If there are no subnodes in the trie, return.
+    if (count == 0)
+        return;
+
+    //  If there's one subnode (optimisation).
+    if (count == 1) {
+        (*buff_) [buffsize_] = min;
+        buffsize_++;
+        next.node->rm_helper (pipe_, buff_, buffsize_, maxbuffsize_,
+            func_, arg_);
+
+        //  Prune the node if it was made redundant by the removal
+        if (next.node->is_redundant ()) {
+            delete next.node;
+            next.node = 0;
+            count = 0;
+            --live_nodes;
+            xs_assert (live_nodes == 0);
+        }
+        return;
+    }
+
+    //  If there are multiple subnodes.
+    //
+    //  New min non-null character in the node table after the removal.
+    unsigned char new_min = min;
+    //  New max non-null character in the node table after the removal.
+    unsigned char new_max = min + count - 1;
+    for (unsigned short c = 0; c != count; c++) {
+        (*buff_) [buffsize_] = min + c;
+        if (next.table [c]) {
+            next.table [c]->rm_helper (pipe_, buff_, buffsize_ + 1,
+                maxbuffsize_, func_, arg_);
+
+            //  Prune redudant nodes from the the trie.
+            if (next.table [c]->is_redundant ()) {
+                delete next.table [c];
+                next.table [c] = 0;
+
+                xs_assert (live_nodes > 0);
+                --live_nodes;
+            }
+            else {
+                if (c + min > new_min)
+                    new_min = c + min;
+                if (c + min < new_max)
+                    new_max = c + min;
+            }
+        }
+    }
+
+    xs_assert (count > 1);
+
+    //  Compact the node table if possible.
+    if (live_nodes == 1) {
+        //  If there's only one live node in the table we can
+        //  switch to using the more compact single-node
+        //  representation.
+        xs_assert (new_min == new_max);
+        xs_assert (new_min >= min && new_min < min + count);
+        trie_t *node = next.table [new_min - min];
+        xs_assert (node);
+        free (next.table);
+        next.node = node;
+        count = 1;
+        min = new_min;
+    }
+    else if (live_nodes > 1 && (new_min > min || new_max < min + count - 1)) {
+        xs_assert (new_max - new_min + 1 > 1);
+
+        trie_t **old_table = next.table;
+        xs_assert (new_min > min || new_max < min + count - 1);
+        xs_assert (new_min >= min);
+        xs_assert (new_max <= min + count - 1);
+        xs_assert (new_max - new_min + 1 < count);
+
+        count = new_max - new_min + 1;
+        next.table = (trie_t**) malloc (sizeof (trie_t*) * count);
+        xs_assert (next.table);
+
+        memmove (next.table, old_table + (new_min - min),
+                 sizeof (trie_t*) * count);
+        free (old_table);
+
+        min = new_min;
+    }
+}
+
+bool xs::trie_t::rm (unsigned char *prefix_, size_t size_, pipe_t *pipe_)
+{
+    return rm_helper (prefix_, size_, pipe_);
+}
+
+bool xs::trie_t::rm_helper (unsigned char *prefix_, size_t size_,
+    pipe_t *pipe_)
+{
+    if (!size_) {
+
+        //  Remove the subscription from this node.
+        if (pipes) {
+            pipes_t::iterator it = pipes->find (pipe_);
+            if (it != pipes->end ()) {
+                xs_assert (it->second);
+                --it->second;
+                if (!it->second) {
+                    pipes->erase (it);
+                    if (pipes->empty ()) {
+                        delete pipes;
+                        pipes = 0;
+                    }
+                }
+            }
+        }
+        return !pipes;
+    }
+
+    unsigned char c = *prefix_;
+    if (!count || c < min || c >= min + count)
+        return false;
+
+    trie_t *next_node =
+        count == 1 ? next.node : next.table [c - min];
+
+    if (!next_node)
+        return false;
+
+    bool ret = next_node->rm_helper (prefix_ + 1, size_ - 1, pipe_);
+
+    if (next_node->is_redundant ()) {
+        delete next_node;
+        xs_assert (count > 0);
+
+        if (count == 1) {
+            next.node = 0;
+            count = 0;
+            --live_nodes;
+            xs_assert (live_nodes == 0);
+        }
+        else {
+            next.table [c - min] = 0;
+            xs_assert (live_nodes > 1);
+            --live_nodes;
+
+            //  Compact the table if possible.
+            if (live_nodes == 1) {
+                //  If there's only one live node in the table we can
+                //  switch to using the more compact single-node
+                //  representation
+                trie_t *node = 0;
+                for (unsigned short i = 0; i < count; ++i) {
+                    if (next.table [i]) {
+                        node = next.table [i];
+                        min = i + min;
+                        break;
+                    }
+                }
+
+                xs_assert (node);
+                free (next.table);
+                next.node = node;
+                count = 1;
+            }
+            else if (c == min) {
+                //  We can compact the table "from the left".
+                unsigned char new_min = min;
+                for (unsigned short i = 1; i < count; ++i) {
+                    if (next.table [i]) {
+                        new_min = i + min;
+                        break;
+                    }
+                }
+                xs_assert (new_min != min);
+
+                trie_t **old_table = next.table;
+                xs_assert (new_min > min);
+                xs_assert (count > new_min - min);
+
+                count = count - (new_min - min);
+                next.table = (trie_t**) malloc (sizeof (trie_t*) * count);
+                xs_assert (next.table);
+
+                memmove (next.table, old_table + (new_min - min),
+                         sizeof (trie_t*) * count);
+                free (old_table);
+
+                min = new_min;
+            }
+            else if (c == min + count - 1) {
+                //  We can compact the table "from the right".
+                unsigned short new_count = count;
+                for (unsigned short i = 1; i < count; ++i) {
+                    if (next.table [count - 1 - i]) {
+                        new_count = count - i;
+                        break;
+                    }
+                }
+                xs_assert (new_count != count);
+                count = new_count;
+
+                trie_t **old_table = next.table;
+                next.table = (trie_t**) malloc (sizeof (trie_t*) * count);
+                xs_assert (next.table);
+
+                memmove (next.table, old_table, sizeof (trie_t*) * count);
+                free (old_table);
+            }
+        }
+    }
+
+    return ret;
+}
+
+void xs::trie_t::match (unsigned char *data_, size_t size_,
+    void (*func_) (pipe_t *pipe_, void *arg_), void *arg_)
+{
     trie_t *current = this;
     while (true) {
 
-        //  We've found a corresponding subscription!
-        if (current->refcnt)
-            return true;
-
-        //  We've checked all the data and haven't found matching subscription.
-        if (!size_)
-            return false;
-
-        //  If there's no corresponding slot for the first character
-        //  of the prefix, the message does not match.
-        unsigned char c = *data_;
-        if (c < current->min || c >= current->min + current->count)
-            return false;
-
-        //  Move to the next character.
-        if (current->count == 1)
-            current = current->next.node;
-        else {
-            current = current->next.table [c - current->min];
-            if (!current)
-                return false;
+        //  Signal the pipes attached to this node.
+        if (current->pipes) {
+            for (pipes_t::iterator it = current->pipes->begin ();
+                  it != current->pipes->end (); ++it)
+                func_ (it->first, arg_);
         }
+
+        //  If we are at the end of the message, there's nothing more to match.
+        if (!size_)
+            break;
+
+        //  If there are no subnodes in the trie, return.
+        if (current->count == 0)
+            break;
+
+        //  If there's one subnode (optimisation).
+		if (current->count == 1) {
+            if (data_ [0] != current->min)
+                break;
+            current = current->next.node;
+            data_++;
+            size_--;
+		    continue;
+		}
+
+		//  If there are multiple subnodes.
+        if (data_ [0] < current->min || data_ [0] >=
+              current->min + current->count)
+            break;
+        if (!current->next.table [data_ [0] - current->min])
+            break;
+        current = current->next.table [data_ [0] - current->min];
         data_++;
         size_--;
     }
@@ -299,7 +455,7 @@ void xs::trie_t::apply_helper (
     void (*func_) (unsigned char *data_, size_t size_, void *arg_), void *arg_)
 {
     //  If this node is a subscription, apply the function.
-    if (refcnt)
+    if (pipes)
         func_ (*buff_, buffsize_, arg_);
 
     //  Adjust the buffer.
@@ -330,8 +486,42 @@ void xs::trie_t::apply_helper (
     }
 }
 
+bool xs::trie_t::check (unsigned char *data_, size_t size_)
+{
+    //  This function is on critical path. It deliberately doesn't use
+    //  recursion to get a bit better performance.
+    trie_t *current = this;
+    while (true) {
+
+        //  We've found a corresponding subscription!
+        if (current->pipes)
+            return true;
+
+        //  We've checked all the data and haven't found matching subscription.
+        if (!size_)
+            return false;
+
+        //  If there's no corresponding slot for the first character
+        //  of the prefix, the message does not match.
+        unsigned char c = *data_;
+        if (c < current->min || c >= current->min + current->count)
+            return false;
+
+        //  Move to the next character.
+        if (current->count == 1)
+            current = current->next.node;
+        else {
+            current = current->next.table [c - current->min];
+            if (!current)
+                return false;
+        }
+        data_++;
+        size_--;
+    }
+}
+
 bool xs::trie_t::is_redundant () const
 {
-    return refcnt == 0 && live_nodes == 0;
+    return !pipes && live_nodes == 0;
 }
 

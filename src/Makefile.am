@@ -57,7 +57,6 @@ libxs_la_SOURCES = \
     mailbox.hpp \
     monitor.hpp \
     msg.hpp \
-    mtrie.hpp \
     mutex.hpp \
     object.hpp \
     options.hpp \
@@ -118,7 +117,6 @@ libxs_la_SOURCES = \
     mailbox.cpp \
     monitor.cpp \
     msg.cpp \
-    mtrie.cpp \
     object.cpp \
     options.cpp \
     own.cpp \

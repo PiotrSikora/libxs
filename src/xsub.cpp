@@ -95,13 +95,13 @@ int xs::xsub_t::xsend (msg_t *msg_, int flags_)
 
     // Process the subscription.
     if (*data == 1) {
-        if (subscriptions.add (data + 1, size - 1))
+        if (subscriptions.add (data + 1, size - 1, NULL))
             return dist.send_to_all (msg_, flags_);
         else
             return 0;
     }
     else if (*data == 0) {
-        if (subscriptions.rm (data + 1, size - 1))
+        if (subscriptions.rm (data + 1, size - 1, NULL))
             return dist.send_to_all (msg_, flags_);
         else
             return 0;

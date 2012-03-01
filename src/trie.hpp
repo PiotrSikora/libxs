@@ -1,8 +1,7 @@
 /*
-    Copyright (c) 2009-2012 250bpm s.r.o.
-    Copyright (c) 2007-2009 iMatix Corporation
+    Copyright (c) 2011-2012 250bpm s.r.o.
     Copyright (c) 2011-2012 Spotify AB
-    Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
+    Copyright (c) 2011 Other contributors as noted in the AUTHORS file
 
     This file is part of Crossroads I/O project.
 
@@ -24,11 +23,16 @@
 #define __XS_TRIE_HPP_INCLUDED__
 
 #include <stddef.h>
+#include <map>
 
 #include "stdint.hpp"
 
 namespace xs
 {
+
+    class pipe_t;
+
+    //  Multi-trie. Each node in the trie is a set of pointers to pipes.
 
     class trie_t
     {
@@ -37,30 +41,52 @@ namespace xs
         trie_t ();
         ~trie_t ();
 
-        //  Add key to the trie. Returns true if this is a new item in the trie
+        //  Add key to the trie. Returns true if it's a new subscription
         //  rather than a duplicate.
-        bool add (unsigned char *prefix_, size_t size_);
+        bool add (unsigned char *prefix_, size_t size_, xs::pipe_t *pipe_);
 
-        //  Remove key from the trie. Returns true if the item is actually
-        //  removed from the trie.
-        bool rm (unsigned char *prefix_, size_t size_);
+        //  Remove all subscriptions for a specific peer from the trie.
+        //  If there are no subscriptions left on some topics, invoke the
+        //  supplied callback function.
+        void rm (xs::pipe_t *pipe_,
+            void (*func_) (unsigned char *data_, size_t size_, void *arg_),
+            void *arg_);
 
-        //  Check whether particular key is in the trie.
-        bool check (unsigned char *data_, size_t size_);
+        //  Remove specific subscription from the trie. Return true is it was
+        //  actually removed rather than de-duplicated.
+        bool rm (unsigned char *prefix_, size_t size_, xs::pipe_t *pipe_);
+
+        //  Signal all the matching pipes.
+        void match (unsigned char *data_, size_t size_,
+            void (*func_) (xs::pipe_t *pipe_, void *arg_), void *arg_);
 
         //  Apply the function supplied to each subscription in the trie.
         void apply (void (*func_) (unsigned char *data_, size_t size_,
             void *arg_), void *arg_);
 
+        //  Check whether particular key is in the trie.
+        bool check (unsigned char *data_, size_t size_);
+
     private:
 
+        bool add_helper (unsigned char *prefix_, size_t size_,
+            xs::pipe_t *pipe_);
+        void rm_helper (xs::pipe_t *pipe_, unsigned char **buff_,
+            size_t buffsize_, size_t maxbuffsize_,
+            void (*func_) (unsigned char *data_, size_t size_, void *arg_),
+            void *arg_);
+        bool rm_helper (unsigned char *prefix_, size_t size_,
+            xs::pipe_t *pipe_);
         void apply_helper (
             unsigned char **buff_, size_t buffsize_, size_t maxbuffsize_,
             void (*func_) (unsigned char *data_, size_t size_, void *arg_),
             void *arg_);
         bool is_redundant () const;
 
-        uint32_t refcnt;
+        //  Pointer to particular pipe associated with the reference count.
+        typedef std::map <xs::pipe_t*, int> pipes_t;
+        pipes_t *pipes;
+
         unsigned char min;
         unsigned short count;
         unsigned short live_nodes;
