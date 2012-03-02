@@ -51,6 +51,30 @@ int XS_TEST_MAIN ()
     assert (rc == 2);
     assert (buf [0] == 1 && buf [1] == 'b');
 
+    //  Tear down the connection.
+    rc = xs_close (xpub);
+    assert (rc == 0);
+    xs_sleep (1);
+
+    //  Re-establish the connection.
+    xpub = xs_socket (ctx, XS_XPUB);
+    assert (xpub);
+    rc = xs_bind (xpub, "tcp://127.0.0.1:5560");
+    assert (rc == 0);
+
+    //  We have to give control to the SUB socket here so that it has
+    //  chance to resend the subscriptions.
+    rc = xs_recv (sub, buf, sizeof (buf), XS_DONTWAIT);
+    assert (rc == -1 && xs_errno () == EAGAIN);
+
+    //  Check whether subscriptions are correctly generated.
+    rc = xs_recv (xpub, buf, sizeof (buf), 0);
+    assert (rc == 2);
+    assert (buf [0] == 1 && buf [1] == 'a');
+    rc = xs_recv (xpub, buf, sizeof (buf), 0);
+    assert (rc == 2);
+    assert (buf [0] == 1 && buf [1] == 'b');
+
     //  Clean up.
     rc = xs_close (sub);
     assert (rc == 0);

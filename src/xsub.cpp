@@ -89,11 +89,9 @@ void xs::xsub_t::xterminated (pipe_t *pipe_)
 
 void xs::xsub_t::xhiccuped (pipe_t *pipe_)
 {
-//  TODO: Enumated the subscriptions etc.
-
     //  Send all the cached subscriptions to the hiccuped pipe.
-//    subscriptions.apply (send_subscription, pipe_);
-//    pipe_->flush ();
+    filter->enumerate (fset, (void*) pipe_);
+    pipe_->flush ();
 }
 
 int xs::xsub_t::xsend (msg_t *msg_, int flags_)
