@@ -37,14 +37,20 @@ namespace xs
         ~prefix_filter_t ();
 
         void create (void *fid_);
-        void destroy (void *fid_);
+        void destroy (void *fid_, void *arg_);
         int subscribe (void *fid_, unsigned char *data_, size_t size_);
         int unsubscribe (void *fid_, unsigned char *data_, size_t size_);
-        void enumerate ();
+        void enumerate (void *arg_);
         int match (void *fid_, unsigned char *data_, size_t size_);
-        void match_all (unsigned char *data_, size_t size_);
+        void match_all (unsigned char *data_, size_t size_, void *arg_);
 
     private:
+
+        static void subscribed (unsigned char *data_, size_t size_,
+            void *arg_);
+        static void unsubscribed (unsigned char *data_, size_t size_,
+            void *arg_);
+        static void matched (pipe_t *pipe_, void *arg_);
 
         trie_t trie;
 

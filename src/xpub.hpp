@@ -60,20 +60,23 @@ namespace xs
 
     private:
 
+    //  TODO: Should this really be public?
+    public:
         //  Function to be applied to the trie to send all the subsciptions
         //  upstream.
         static void send_unsubscription (unsigned char *data_, size_t size_,
             void *arg_);
-
-        //  Function to be applied to each matching pipes.
-        static void mark_as_matching (xs::pipe_t *pipe_, void *arg_);
+    private:
 
         //  Subscriptions.
         xs_filter_t *filter;
         void *fset;
 
+    //  TODO: Should this really be public?
+    public:
         //  Distributor of messages holding the list of outbound pipes.
         dist_t dist;
+    private:
 
         //  True if we are in the middle of sending a multi-part message.
         bool more;

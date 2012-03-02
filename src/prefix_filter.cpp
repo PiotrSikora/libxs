@@ -38,10 +38,9 @@ void xs::prefix_filter_t::create (void *fid_)
     //  Do nothing. There's no need to register filters explicitly.
 }
 
-void xs::prefix_filter_t::destroy (void *fid_)
+void xs::prefix_filter_t::destroy (void *fid_, void *arg_)
 {
-    //  TODO: Add the callback function.
-    trie.rm ((pipe_t*) fid_, NULL, NULL);
+    trie.rm ((pipe_t*) fid_, unsubscribed, arg_);
 }
 
 int xs::prefix_filter_t::subscribe (void *fid_, unsigned char *data_,
@@ -56,10 +55,9 @@ int xs::prefix_filter_t::unsubscribe (void *fid_, unsigned char *data_,
     return trie.rm (data_, size_, (pipe_t*) fid_) ? 1 : 0;
 }
 
-void xs::prefix_filter_t::enumerate ()
+void xs::prefix_filter_t::enumerate (void *arg_)
 {
-    //  TODO
-    xs_assert (false);
+    trie.apply (subscribed, arg_);
 }
 
 int xs::prefix_filter_t::match (void *fid_, unsigned char *data_, size_t size_)
@@ -68,10 +66,27 @@ int xs::prefix_filter_t::match (void *fid_, unsigned char *data_, size_t size_)
     return trie.check (data_, size_) ? 1 : 0;
 }
 
-void xs::prefix_filter_t::match_all (unsigned char *data_, size_t size_)
+void xs::prefix_filter_t::match_all (unsigned char *data_, size_t size_,
+    void *arg_)
 {
-    //  TODO
-    xs_assert (false);
+    trie.match (data_, size_, matched, arg_);
+}
+
+void xs::prefix_filter_t::subscribed (unsigned char *data_, size_t size_,
+    void *arg_)
+{
+    xs_filter_subscribed (data_, size_, arg_);
+}
+
+void xs::prefix_filter_t::unsubscribed (unsigned char *data_, size_t size_,
+    void *arg_)
+{
+    xs_filter_unsubscribed (data_, size_, arg_);
+}
+
+void xs::prefix_filter_t::matched (pipe_t *pipe_, void *arg_)
+{
+    xs_filter_matching (pipe_, arg_);
 }
 
 //  Implementation of the C interface of the filter.
@@ -93,9 +108,9 @@ static void create (void *fset_, void *fid_)
     ((xs::prefix_filter_t*) fset_)->create (fid_);
 }
 
-static void destroy (void *fset_, void *fid_)
+static void destroy (void *fset_, void *fid_, void *arg_)
 {
-    ((xs::prefix_filter_t*) fset_)->destroy (fid_);
+    ((xs::prefix_filter_t*) fset_)->destroy (fid_, arg_);
 }
 
 static int subscribe (void *fset_, void *fid_, unsigned char *data_,
@@ -110,9 +125,9 @@ static int unsubscribe (void *fset_, void *fid_, unsigned char *data_,
     return ((xs::prefix_filter_t*) fset_)->unsubscribe (fid_, data_, size_);
 }
 
-static void enumerate (void *fset_)
+static void enumerate (void *fset_, void *arg_)
 {
-    ((xs::prefix_filter_t*) fset_)->enumerate ();
+    ((xs::prefix_filter_t*) fset_)->enumerate (arg_);
 }
 
 static int match (void *fset_, void *fid_, unsigned char *data_, size_t size_)
@@ -120,9 +135,10 @@ static int match (void *fset_, void *fid_, unsigned char *data_, size_t size_)
     return ((xs::prefix_filter_t*) fset_)->match (fid_, data_, size_);
 }
 
-static void match_all (void *fset_, unsigned char *data_, size_t size_)
+static void match_all (void *fset_, unsigned char *data_, size_t size_,
+    void *arg_)
 {
-    ((xs::prefix_filter_t*) fset_)->match_all (data_, size_);
+    ((xs::prefix_filter_t*) fset_)->match_all (data_, size_, arg_);
 }
 
 #define XS_PREFIX_FILTER 1

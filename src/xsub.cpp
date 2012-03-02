@@ -66,10 +66,9 @@ void xs::xsub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
     fq.attach (pipe_);
     dist.attach (pipe_);
 
-//  TODO: Enumarate etc.
     //  Send all the cached subscriptions to the new upstream peer.
-//    subscriptions.apply (send_subscription, pipe_);
-//    pipe_->flush ();
+    filter->enumerate (fset, (void*) pipe_);
+    pipe_->flush ();
 }
 
 void xs::xsub_t::xread_activated (pipe_t *pipe_)

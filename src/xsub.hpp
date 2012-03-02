@@ -61,10 +61,13 @@ namespace xs
         //  Check whether the message matches at least one subscription.
         bool match (xs::msg_t *msg_);
 
+    //  TODO: Should this be really public?
+    public:
         //  Function to be applied to the trie to send all the subsciptions
         //  upstream.
         static void send_subscription (unsigned char *data_, size_t size_,
             void *arg_);
+    private:
 
         //  Fair queueing object for inbound pipes.
         fq_t fq;

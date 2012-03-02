@@ -111,15 +111,9 @@ void xs::xpub_t::xwrite_activated (pipe_t *pipe_)
 void xs::xpub_t::xterminated (pipe_t *pipe_)
 {
     //  Remove the filter associated with the pipe.
-    filter->destroy (fset, pipe_); // TODO: send_unsubscriptions!
+    filter->destroy (fset, pipe_, (void*) this);
 
     dist.terminated (pipe_);
-}
-
-void xs::xpub_t::mark_as_matching (pipe_t *pipe_, void *arg_)
-{
-    xpub_t *self = (xpub_t*) arg_;
-    self->dist.match (pipe_);
 }
 
 int xs::xpub_t::xsend (msg_t *msg_, int flags_)
@@ -128,8 +122,8 @@ int xs::xpub_t::xsend (msg_t *msg_, int flags_)
 
     //  For the first part of multi-part message, find the matching pipes.
     if (!more)
-        filter->match_all (fset, (unsigned char*) msg_->data (), msg_->size ());
-    //  TODO: mark_as_matching, this!
+        filter->match_all (fset, (unsigned char*) msg_->data (), msg_->size (),
+            (void*) this);
 
     //  Send the message to all the pipes that were marked as matching
     //  in the previous step.

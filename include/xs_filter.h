@@ -79,7 +79,7 @@ typedef struct {
     void (*create) (void *fset, void *fid);
 
     /*  Destroy the specified filter.                                         */
-    void (*destroy) (void *fset, void *fid);
+    void (*destroy) (void *fset, void *fid, void *arg);
 
     /*  Add subscription to the filter. Filter should be able to handle       */
     /*  multiple identical subscriptions (e.g. by reference counting the      */
@@ -100,7 +100,7 @@ typedef struct {
     /*  the subscriptions by calling xs_filter_subscription function.         */
     /*  If there are multiple identical subscriptions, xs_filter_subscription */
     /*  should be called once only.                                           */
-    void (*enumerate) (void *fset);
+    void (*enumerate) (void *fset, void *arg);
 
     /*  Checks whether particular message matches at least one subscription   */
     /*  in the filter. Returns 0 if it does not and 1 if it does.             */
@@ -110,16 +110,21 @@ typedef struct {
     /*  The function should announce that the message matches the filter by   */
     /*  calling xs_filter_matching function. It is all right to invoke        */
     /*  xs_filter_matching several times for the same filter.                 */
-    void (*match_all) (void *fset, unsigned char *data, size_t size);
+    void (*match_all) (void *fset, unsigned char *data, size_t size, void *arg);
 
 } xs_filter_t;
 
 /*  To be used from xs_filter_t::enumerate function.                          */
-XS_EXPORT void xs_filter_subscription (void *fset, unsigned char *data,
-    size_t size);
+XS_EXPORT void xs_filter_subscribed (unsigned char *data, size_t size,
+    void *arg);
 
-/*  To be used from xs_fitler_t::matchall function.                           */
-XS_EXPORT void xs_filter_matching (void *fset, void *fid);
+/*  To do used from xs_filter_t::destroy function.                            */
+XS_EXPORT void xs_filter_unsubscribed (unsigned char *data, size_t size,
+    void *arg);
+
+/*  To be used from xs_fitler_t::match_all function.                          */
+XS_EXPORT void xs_filter_matching (void *fid, void *arg);
+
 
 #undef XS_EXPORT
 
