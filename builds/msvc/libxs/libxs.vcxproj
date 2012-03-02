@@ -152,7 +152,6 @@
     <ClCompile Include="..\..\..\src\tcp_connecter.cpp" />
     <ClCompile Include="..\..\..\src\tcp_listener.cpp" />
     <ClCompile Include="..\..\..\src\thread.cpp" />
-    <ClCompile Include="..\..\..\src\trie.cpp" />
     <ClCompile Include="..\..\..\src\upoll.cpp" />
     <ClCompile Include="..\..\..\src\xpub.cpp" />
     <ClCompile Include="..\..\..\src\xrep.cpp" />
@@ -225,7 +224,6 @@
     <ClInclude Include="..\..\..\src\tcp_connecter.hpp" />
     <ClInclude Include="..\..\..\src\tcp_listener.hpp" />
     <ClInclude Include="..\..\..\src\thread.hpp" />
-    <ClInclude Include="..\..\..\src\trie.hpp" />
     <ClInclude Include="..\..\..\src\upoll.hpp" />
     <ClInclude Include="..\..\..\src\windows.hpp" />
     <ClInclude Include="..\..\..\src\wire.hpp" />
