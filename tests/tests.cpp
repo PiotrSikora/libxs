@@ -99,6 +99,10 @@
 #include "polltimeo.cpp"
 #undef XS_TEST_MAIN
 
+#define XS_TEST_MAIN resubscribe
+#include "resubscribe.cpp"
+#undef XS_TEST_MAIN
+
 int main ()
 {
     int rc;
@@ -136,6 +140,8 @@ int main ()
     rc = emptyctx ();
     assert (rc == 0);
     rc = polltimeo ();
+    assert (rc == 0);
+    rc = resubscribe ();
     assert (rc == 0);
 
     fprintf (stderr, "SUCCESS\n");

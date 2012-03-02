@@ -26,6 +26,9 @@
     <ClCompile Include="..\..\..\tests\reconnect.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\tests\resubscribe.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\tests\reqrep_device.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
