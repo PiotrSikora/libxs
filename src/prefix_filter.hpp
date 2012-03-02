@@ -76,8 +76,8 @@ namespace xs
                 void (*func_) (unsigned char *data_, size_t size_, void *arg_),
                 void *arg_);
 
-            //  Remove specific subscription from the trie. Return true is it was
-            //  actually removed rather than de-duplicated.
+            //  Remove specific subscription from the trie. Return true is it
+            //  was actually removed rather than de-duplicated.
             bool rm (unsigned char *prefix_, size_t size_, xs::pipe_t *pipe_);
 
             //  Signal all the matching pipes.
@@ -93,14 +93,10 @@ namespace xs
 
         private:
 
-            bool add_helper (unsigned char *prefix_, size_t size_,
-                xs::pipe_t *pipe_);
             void rm_helper (xs::pipe_t *pipe_, unsigned char **buff_,
                 size_t buffsize_, size_t maxbuffsize_,
                 void (*func_) (unsigned char *data_, size_t size_, void *arg_),
                 void *arg_);
-            bool rm_helper (unsigned char *prefix_, size_t size_,
-                xs::pipe_t *pipe_);
             void apply_helper (
                 unsigned char **buff_, size_t buffsize_, size_t maxbuffsize_,
                 void (*func_) (unsigned char *data_, size_t size_, void *arg_),

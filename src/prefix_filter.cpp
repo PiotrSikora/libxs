@@ -121,12 +121,6 @@ xs::prefix_filter_t::trie_t::~trie_t ()
 bool xs::prefix_filter_t::trie_t::add (unsigned char *prefix_, size_t size_,
     pipe_t *pipe_)
 {
-    return add_helper (prefix_, size_, pipe_);
-}
-
-bool xs::prefix_filter_t::trie_t::add_helper (unsigned char *prefix_,
-    size_t size_, pipe_t *pipe_)
-{
     //  We are at the node corresponding to the prefix. We are done.
     if (!size_) {
         bool result = !pipes;
@@ -194,7 +188,7 @@ bool xs::prefix_filter_t::trie_t::add_helper (unsigned char *prefix_,
             ++live_nodes;
             xs_assert (next.node);
         }
-        return next.node->add_helper (prefix_ + 1, size_ - 1, pipe_);
+        return next.node->add (prefix_ + 1, size_ - 1, pipe_);
     }
     else {
         if (!next.table [c - min]) {
@@ -202,7 +196,7 @@ bool xs::prefix_filter_t::trie_t::add_helper (unsigned char *prefix_,
             ++live_nodes;
             xs_assert (next.table [c - min]);
         }
-        return next.table [c - min]->add_helper (prefix_ + 1, size_ - 1, pipe_);
+        return next.table [c - min]->add (prefix_ + 1, size_ - 1, pipe_);
     }
 }
 
@@ -333,13 +327,7 @@ void xs::prefix_filter_t::trie_t::rm_helper (pipe_t *pipe_,
     }
 }
 
-bool xs::prefix_filter_t::trie_t::rm (unsigned char *prefix_, size_t size_,
-    pipe_t *pipe_)
-{
-    return rm_helper (prefix_, size_, pipe_);
-}
-
-bool xs::prefix_filter_t::trie_t::rm_helper (unsigned char *prefix_,
+bool xs::prefix_filter_t::trie_t::rm (unsigned char *prefix_,
     size_t size_, pipe_t *pipe_)
 {
     if (!size_) {
@@ -372,7 +360,7 @@ bool xs::prefix_filter_t::trie_t::rm_helper (unsigned char *prefix_,
     if (!next_node)
         return false;
 
-    bool ret = next_node->rm_helper (prefix_ + 1, size_ - 1, pipe_);
+    bool ret = next_node->rm (prefix_ + 1, size_ - 1, pipe_);
 
     if (next_node->is_redundant ()) {
         delete next_node;
@@ -585,6 +573,7 @@ bool xs::prefix_filter_t::trie_t::is_redundant () const
 }
 
 //  Implementation of the C interface of the filter.
+//  Following functions convert raw C calls into calls to C++ object methods.
 
 static void *fset_create ()
 {
