@@ -109,12 +109,12 @@ typedef struct {
 } xs_filter_t;
 
 /*  To be used from xs_filter_t::enumerate function.                          */
-XS_EXPORT void xs_filter_subscribed (unsigned char *data, size_t size,
-    void *arg);
+XS_EXPORT void xs_filter_subscribed (int filter_id, unsigned char *data,
+    size_t size, void *arg);
 
 /*  To do used from xs_filter_t::destroy function.                            */
-XS_EXPORT void xs_filter_unsubscribed (unsigned char *data, size_t size,
-    void *arg);
+XS_EXPORT void xs_filter_unsubscribed (int filter_id, unsigned char *data,
+    size_t size, void *arg);
 
 /*  To be used from xs_fitler_t::match_all function.                          */
 XS_EXPORT void xs_filter_matching (void *fid, void *arg);

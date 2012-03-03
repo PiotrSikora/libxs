@@ -232,8 +232,8 @@ bool xs::xsub_t::match (msg_t *msg_)
     return false;
 }
 
-void xs::xsub_t::send_subscription (unsigned char *data_, size_t size_,
-    void *arg_)
+void xs::xsub_t::send_subscription (int filter_id_, unsigned char *data_,
+    size_t size_, void *arg_)
 {
     pipe_t *pipe = (pipe_t*) arg_;
 

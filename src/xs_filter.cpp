@@ -23,14 +23,16 @@
 #include "xpub.hpp"
 #include "xsub.hpp"
 
-void xs_filter_subscribed (unsigned char *data_, size_t size_, void *arg_)
+void xs_filter_subscribed (int filter_id_, unsigned char *data_,
+    size_t size_, void *arg_)
 {
-    xs::xsub_t::send_subscription (data_, size_, arg_);
+    xs::xsub_t::send_subscription (filter_id_, data_, size_, arg_);
 }
 
-void xs_filter_unsubscribed (unsigned char *data_, size_t size_, void *arg_)
+void xs_filter_unsubscribed (int filter_id_, unsigned char *data_,
+    size_t size_, void *arg_)
 {
-    xs::xpub_t::send_unsubscription (data_, size_, arg_);
+    xs::xpub_t::send_unsubscription (filter_id_, data_, size_, arg_);
 }
 
 void xs_filter_matching (void *fid_, void *arg_)

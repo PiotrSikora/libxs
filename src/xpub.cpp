@@ -206,8 +206,8 @@ bool xs::xpub_t::xhas_in ()
     return !pending.empty ();
 }
 
-void xs::xpub_t::send_unsubscription (unsigned char *data_, size_t size_,
-    void *arg_)
+void xs::xpub_t::send_unsubscription (int filter_id_, unsigned char *data_,
+    size_t size_, void *arg_)
 {
     xpub_t *self = (xpub_t*) arg_;
 
