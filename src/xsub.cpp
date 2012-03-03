@@ -115,7 +115,6 @@ int xs::xsub_t::xsend (msg_t *msg_, int flags_)
             xs_assert (f.filter);
             f.fset = f.filter->fset_create ();
             xs_assert (f.fset);
-            f.filter->create (f.fset, NULL);
             filters.push_back (f);
             it = filters.end () - 1;
         }

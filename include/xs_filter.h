@@ -71,20 +71,14 @@ typedef struct {
     /*  destroy all the filters within the filter set.                        */
     void (*fset_destroy) (void *fset);
 
-    /*  Create a filter within a filter set. Filter is a collection of        */
-    /*  subscriptions capable of checking whether particular message matches  */
-    /*  one of the subscriptions or not. Filter must live within a specific   */
-    /*  filte set. 'fid' is a Crossroads-generated handle that identifies     */
-    /*  the filter instance.                                                  */
-    void (*create) (void *fset, void *fid);
-
     /*  Destroy the specified filter.                                         */
     void (*destroy) (void *fset, void *fid, void *arg);
 
     /*  Add subscription to the filter. Filter should be able to handle       */
     /*  multiple identical subscriptions (e.g. by reference counting the      */
     /*  subscriptions.) The format of the subscription is not interpreted     */
-    /*  by Crossroads core, just by the filter extension. The function        */
+    /*  by Crossroads core, just by the filter extension. If the filter with  */
+    /*  specified fid doesn't exist yet it will be created. The function      */
     /*  returns 0 if the subscription was a duplicate of an existing          */
     /*  subscription or 1 in the case of fresh subscription.                  */
     int (*subscribe) (void *fset, void *fid, unsigned char *data, size_t size);

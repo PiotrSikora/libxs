@@ -49,9 +49,6 @@ void xs::xpub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
     xs_assert (pipe_);
     dist.attach (pipe_);
 
-    //  Create a filter for the pipe.
-    filter->create (fset, pipe_);
-
     // If icanhasall_ is specified, the caller would like to subscribe
     // to all data on this pipe, implicitly.
     if (icanhasall_)

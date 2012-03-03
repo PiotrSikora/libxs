@@ -42,7 +42,6 @@ namespace xs
         prefix_filter_t ();
         ~prefix_filter_t ();
 
-        void create (void *fid_);
         void destroy (void *fid_, void *arg_);
         int subscribe (void *fid_, unsigned char *data_, size_t size_);
         int unsubscribe (void *fid_, unsigned char *data_, size_t size_);

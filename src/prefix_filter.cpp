@@ -36,11 +36,6 @@ xs::prefix_filter_t::~prefix_filter_t ()
     close (&root);
 }
 
-void xs::prefix_filter_t::create (void *fid_)
-{
-    //  Do nothing. There's no need to register filters explicitly.
-}
-
 void xs::prefix_filter_t::destroy (void *fid_, void *arg_)
 {
     rm (&root, (pipe_t*) fid_, arg_);
@@ -573,11 +568,6 @@ static void fset_destroy (void *fset_)
     delete (xs::prefix_filter_t*) fset_;
 }
 
-static void create (void *fset_, void *fid_)
-{
-    ((xs::prefix_filter_t*) fset_)->create (fid_);
-}
-
 static void destroy (void *fset_, void *fid_, void *arg_)
 {
     ((xs::prefix_filter_t*) fset_)->destroy (fid_, arg_);
@@ -618,7 +608,6 @@ static xs_filter_t filter = {
     XS_PREFIX_FILTER,
     fset_create,
     fset_destroy,
-    create,
     destroy,
     subscribe,
     unsubscribe,
