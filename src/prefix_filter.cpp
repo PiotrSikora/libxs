@@ -43,7 +43,7 @@ void xs::prefix_filter_t::create (void *fid_)
 
 void xs::prefix_filter_t::destroy (void *fid_, void *arg_)
 {
-    rm (&root, (pipe_t*) fid_, unsubscribed, arg_);
+    rm (&root, (pipe_t*) fid_, arg_);
 }
 
 int xs::prefix_filter_t::subscribe (void *fid_, unsigned char *data_,
@@ -74,24 +74,7 @@ int xs::prefix_filter_t::match (void *fid_, unsigned char *data_, size_t size_)
 void xs::prefix_filter_t::match_all (unsigned char *data_, size_t size_,
     void *arg_)
 {
-    match (&root, data_, size_, matched, arg_);
-}
-
-void xs::prefix_filter_t::subscribed (unsigned char *data_, size_t size_,
-    void *arg_)
-{
-    xs_filter_subscribed (data_, size_, arg_);
-}
-
-void xs::prefix_filter_t::unsubscribed (unsigned char *data_, size_t size_,
-    void *arg_)
-{
-    xs_filter_unsubscribed (data_, size_, arg_);
-}
-
-void xs::prefix_filter_t::matched (pipe_t *pipe_, void *arg_)
-{
-    xs_filter_matching (pipe_, arg_);
+    match (&root, data_, size_, arg_);
 }
 
 void xs::prefix_filter_t::init (node_t *node_)
@@ -214,19 +197,15 @@ bool xs::prefix_filter_t::add (node_t *node_, unsigned char *prefix_,
 }
 
 
-void xs::prefix_filter_t::rm (node_t *node_, pipe_t *pipe_,
-    void (*func_) (unsigned char *data_, size_t size_, void *arg_),
-    void *arg_)
+void xs::prefix_filter_t::rm (node_t *node_, pipe_t *pipe_, void *arg_)
 {
     unsigned char *buff = NULL;
-    rm_helper (node_, pipe_, &buff, 0, 0, func_, arg_);
+    rm_helper (node_, pipe_, &buff, 0, 0, arg_);
     free (buff);
 }
 
 void xs::prefix_filter_t::rm_helper (node_t *node_, pipe_t *pipe_,
-    unsigned char **buff_, size_t buffsize_, size_t maxbuffsize_,
-    void (*func_) (unsigned char *data_, size_t size_, void *arg_),
-    void *arg_)
+    unsigned char **buff_, size_t buffsize_, size_t maxbuffsize_, void *arg_)
 {
     //  Remove the subscription from this node.
     if (node_->pipes) {
@@ -237,7 +216,7 @@ void xs::prefix_filter_t::rm_helper (node_t *node_, pipe_t *pipe_,
             if (!it->second) {
                 node_->pipes->erase (it);
                 if (node_->pipes->empty ()) {
-                    func_ (*buff_, buffsize_, arg_);
+                    xs_filter_unsubscribed (*buff_, buffsize_, arg_);
                     delete node_->pipes;
                     node_->pipes = 0;
                 }
@@ -261,7 +240,7 @@ void xs::prefix_filter_t::rm_helper (node_t *node_, pipe_t *pipe_,
         (*buff_) [buffsize_] = node_->min;
         buffsize_++;
         rm_helper (node_->next.node, pipe_, buff_, buffsize_, maxbuffsize_,
-            func_, arg_);
+            arg_);
 
         //  Prune the node if it was made redundant by the removal
         if (is_redundant (node_->next.node)) {
@@ -285,7 +264,7 @@ void xs::prefix_filter_t::rm_helper (node_t *node_, pipe_t *pipe_,
         (*buff_) [buffsize_] = node_->min + c;
         if (node_->next.table [c]) {
             rm_helper (node_->next.table [c], pipe_, buff_, buffsize_ + 1,
-                maxbuffsize_, func_, arg_);
+                maxbuffsize_, arg_);
 
             //  Prune redudant nodes from the the trie.
             if (is_redundant (node_->next.table [c])) {
@@ -471,9 +450,8 @@ bool xs::prefix_filter_t::rm (node_t *node_, unsigned char *prefix_,
     return ret;
 }
 
-void xs::prefix_filter_t::match (node_t *node_,
-    unsigned char *data_, size_t size_,
-    void (*func_) (pipe_t *pipe_, void *arg_), void *arg_)
+void xs::prefix_filter_t::match (node_t *node_, unsigned char *data_,
+    size_t size_, void *arg_)
 {
     node_t *current = node_;
     while (true) {
@@ -482,7 +460,7 @@ void xs::prefix_filter_t::match (node_t *node_,
         if (current->pipes) {
             for (node_t::pipes_t::iterator it = current->pipes->begin ();
                   it != current->pipes->end (); ++it)
-                func_ (it->first, arg_);
+                xs_filter_matching (it->first, arg_);
         }
 
         //  If we are at the end of the message, there's nothing more to match.
@@ -520,7 +498,7 @@ void xs::prefix_filter_t::list (node_t *node_, unsigned char **buff_,
 {
     //  If this node is a subscription, apply the function.
     if (node_->pipes)
-        subscribed (*buff_, buffsize_, arg_);
+        xs_filter_subscribed (*buff_, buffsize_, arg_);
 
     //  Adjust the buffer.
     if (buffsize_ >= maxbuffsize_) {

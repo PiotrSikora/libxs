@@ -52,12 +52,6 @@ namespace xs
 
     private:
 
-        static void subscribed (unsigned char *data_, size_t size_,
-            void *arg_);
-        static void unsubscribed (unsigned char *data_, size_t size_,
-            void *arg_);
-        static void matched (pipe_t *pipe_, void *arg_);
-
         struct node_t
         {
             //  Pointer to particular pipe associated with the reference count.
@@ -90,13 +84,10 @@ namespace xs
         //  Remove all subscriptions for a specific peer from the trie.
         //  If there are no subscriptions left on some topics, invoke the
         //  supplied callback function.
-        static void rm (node_t *node_, xs::pipe_t *pipe_,
-            void (*func_) (unsigned char *data_, size_t size_, void *arg_),
-            void *arg_);
+        static void rm (node_t *node_, xs::pipe_t *pipe_, void *arg_);
 
         static void rm_helper (node_t *node_, xs::pipe_t *pipe_,
             unsigned char **buff_, size_t buffsize_, size_t maxbuffsize_,
-            void (*func_) (unsigned char *data_, size_t size_, void *arg_),
             void *arg_);
 
         //  Lists all the subscriptions in the trie.
@@ -108,7 +99,7 @@ namespace xs
 
         //  Signal all the matching pipes.
         static void match (node_t *node_, unsigned char *data_, size_t size_,
-            void (*func_) (xs::pipe_t *pipe_, void *arg_), void *arg_);
+            void *arg_);
 
 
         //  Checks whether node can be safely removed.
