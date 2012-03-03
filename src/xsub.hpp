@@ -21,6 +21,8 @@
 #ifndef __XS_XSUB_HPP_INCLUDED__
 #define __XS_XSUB_HPP_INCLUDED__
 
+#include <vector>
+
 #include "../include/xs_filter.h"
 
 #include "socket_base.hpp"
@@ -76,8 +78,14 @@ namespace xs
         dist_t dist;
 
         //  The repository of subscriptions.
-        xs_filter_t *filter;
-        void *fset;
+        struct filter_t
+        {
+            xs_filter_t *filter;
+            void *fset;
+        };
+        typedef std::vector <filter_t> filters_t;
+        filters_t filters;
+        
 
         //  If true, 'message' contains a matching message to return on the
         //  next recv call.

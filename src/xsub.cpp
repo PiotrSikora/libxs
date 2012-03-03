@@ -23,7 +23,6 @@
 
 #include "xsub.hpp"
 #include "err.hpp"
-#include "prefix_filter.hpp"
 
 xs::xsub_t::xsub_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     socket_base_t (parent_, tid_, sid_),
@@ -41,20 +40,13 @@ xs::xsub_t::xsub_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
 
     int rc = message.init ();
     errno_assert (rc == 0);
-
-    //  Set up the filters.
-    filter = (xs_filter_t*) prefix_filter;
-    fset = filter->fset_create ();
-    xs_assert (fset);
-
-    //  Create a filter for the pipe. We have only a single pipe, so we can
-    //  use NULL as a filter ID.
-    filter->create (fset, NULL);
 }
 
 xs::xsub_t::~xsub_t ()
 {
-    filter->fset_destroy (fset);
+    //  Deallocate all the filters.
+    for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
+        it->filter->fset_destroy (it->fset);
 
     int rc = message.close ();
     errno_assert (rc == 0);
@@ -67,7 +59,8 @@ void xs::xsub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
     dist.attach (pipe_);
 
     //  Send all the cached subscriptions to the new upstream peer.
-    filter->enumerate (fset, (void*) pipe_);
+    for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
+        it->filter->enumerate (it->fset, (void*) pipe_);
     pipe_->flush ();
 }
 
@@ -90,7 +83,8 @@ void xs::xsub_t::xterminated (pipe_t *pipe_)
 void xs::xsub_t::xhiccuped (pipe_t *pipe_)
 {
     //  Send all the cached subscriptions to the hiccuped pipe.
-    filter->enumerate (fset, (void*) pipe_);
+    for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
+        it->filter->enumerate (it->fset, (void*) pipe_);
     pipe_->flush ();
 }
 
@@ -99,21 +93,41 @@ int xs::xsub_t::xsend (msg_t *msg_, int flags_)
     size_t size = msg_->size ();
     unsigned char *data = (unsigned char*) msg_->data ();
 
-    // Malformed subscriptions.
+    //  Malformed subscriptions.
     if (size < 1 || (*data != 0 && *data != 1)) {
         errno = EINVAL;
         return -1;
     }
 
-    // Process the subscription.
+    //  Find the relevant filter.
+    filters_t::iterator it;
+    for (it = filters.begin (); it != filters.end (); ++it)
+        if (it->filter->filter_id == 1)
+            break;
+
+    //  Process the subscription.
     if (*data == 1) {
-        if (filter->subscribe (fset, NULL, data + 1, size - 1) == 1)
+
+        //  If the filter of the specified type does not exist yet, create it.
+        if (it == filters.end ()) {
+            filter_t f;
+            f.filter = get_filter (1);
+            xs_assert (f.filter);
+            f.fset = f.filter->fset_create ();
+            xs_assert (f.fset);
+            f.filter->create (f.fset, NULL);
+            filters.push_back (f);
+            it = filters.end () - 1;
+        }
+
+        if (it->filter->subscribe (it->fset, NULL, data + 1, size - 1) == 1)
             return dist.send_to_all (msg_, flags_);
         else
             return 0;
     }
     else if (*data == 0) {
-        if (filter->unsubscribe (fset, NULL, data + 1, size - 1) == 1)
+        xs_assert (it != filters.end ());
+        if (it->filter->unsubscribe (it->fset, NULL, data + 1, size - 1) == 1)
             return dist.send_to_all (msg_, flags_);
         else
             return 0;
@@ -212,8 +226,11 @@ bool xs::xsub_t::xhas_in ()
 
 bool xs::xsub_t::match (msg_t *msg_)
 {
-    return filter->match (fset, NULL, (unsigned char*) msg_->data (),
-        msg_->size ()) ? true : false;
+    for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
+        if (it->filter->match (it->fset, NULL, (unsigned char*) msg_->data (),
+              msg_->size ()))
+            return true;
+    return false;
 }
 
 void xs::xsub_t::send_subscription (unsigned char *data_, size_t size_,

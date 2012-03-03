@@ -22,6 +22,8 @@
 #ifndef __XS_OBJECT_HPP_INCLUDED__
 #define __XS_OBJECT_HPP_INCLUDED__
 
+#include "../include/xs_filter.h"
+
 #include "stdint.hpp"
 
 namespace xs
@@ -67,6 +69,9 @@ namespace xs
         //  Logging related functions.
         void log (int sid_, const char *text_);
         void publish_logs (const char *textr_);
+
+        //  Functions related to extensions.
+        xs_filter_t *get_filter (int filter_id_);
 
         //  Derived object can use these functions to send commands
         //  to other objects.

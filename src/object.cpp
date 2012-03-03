@@ -164,6 +164,11 @@ void xs::object_t::publish_logs (const char *text_)
     ctx->publish_logs (text_);
 }
 
+xs_filter_t *xs::object_t::get_filter (int filter_id_)
+{
+    return ctx->get_filter (filter_id_);
+}
+
 void xs::object_t::send_stop ()
 {
     //  'stop' command goes always from administrative thread to
