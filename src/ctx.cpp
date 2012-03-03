@@ -29,8 +29,6 @@
 #include <new>
 #include <string.h>
 
-#include "../include/xs_filter.h"
-
 #include "ctx.hpp"
 #include "socket_base.hpp"
 #include "monitor.hpp"
@@ -149,7 +147,27 @@ int xs::ctx_t::terminate ()
 
 int xs::ctx_t::plug (void *ext_)
 {
-    return 0;
+    if (!ext_) {
+        errno = EFAULT;
+        return -1;
+    }
+
+    //  Get the extension type.
+    int type = *(int*) ext_;
+
+    //  The extension is a message filter plug-in.
+    if (type == XS_EXTENSION_FILTER) {
+       xs_filter_t *filter = (xs_filter_t*) ext_;
+       opt_sync.lock ();
+       filters [filter->filter_id] = filter;
+       opt_sync.unlock ();
+       return 0;
+    }
+
+    //  Specified extension type is not supported by this version of
+    //  the library.
+    errno = ENOTSUP;
+    return -1;
 }
 
 int xs::ctx_t::setctxopt (int option_, const void *optval_, size_t optvallen_)
@@ -290,6 +308,17 @@ void xs::ctx_t::destroy_socket (class socket_base_t *socket_)
 xs::object_t *xs::ctx_t::get_reaper ()
 {
     return reaper;
+}
+
+xs_filter_t *xs::ctx_t::get_filter (int filter_id_)
+{
+    xs_filter_t *result = NULL;
+    opt_sync.lock ();
+    filters_t::iterator it = filters.find (filter_id_);
+    if (it != filters.end ())
+        result = it->second;
+    opt_sync.unlock ();
+    return result;
 }
 
 void xs::ctx_t::send_command (uint32_t tid_, const command_t &command_)

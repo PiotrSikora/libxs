@@ -27,6 +27,8 @@
 #include <string>
 #include <stdarg.h>
 
+#include "../include/xs_filter.h"
+
 #include "mailbox.hpp"
 #include "array.hpp"
 #include "config.hpp"
@@ -93,6 +95,10 @@ namespace xs
 
         //  Returns reaper thread object.
         xs::object_t *get_reaper ();
+
+        //  Get the filter associated with the specified filter ID or NULL
+        //  If such filter is not registered.
+        xs_filter_t *get_filter (int filter_id_);
 
         //  Management of inproc endpoints.
         int register_endpoint (const char *addr_, endpoint_t &endpoint_);
@@ -176,8 +182,12 @@ namespace xs
         //  Number of I/O threads to launch.
         uint32_t io_thread_count;
 
-        //  Synchronisation of access to context options.
+        //  Synchronisation of access to context options & extensions.
         mutex_t opt_sync;
+
+        //  List of all filters plugged into the context.
+        typedef std::map <int, xs_filter_t*> filters_t;
+        filters_t filters;
 
         ctx_t (const ctx_t&);
         const ctx_t &operator = (const ctx_t&);
