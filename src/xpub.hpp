@@ -68,9 +68,14 @@ namespace xs
             void *arg_);
     private:
 
-        //  Subscriptions.
-        xs_filter_t *filter;
-        void *fset;
+        //  The repository of subscriptions.
+        struct filter_t
+        {
+            xs_filter_t *filter;
+            void *fset;
+        };
+        typedef std::vector <filter_t> filters_t;
+        filters_t filters;
 
     //  TODO: Should this really be public?
     public:

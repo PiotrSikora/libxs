@@ -33,15 +33,19 @@ xs::xpub_t::xpub_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
 {
     options.type = XS_XPUB;
 
+/*
     //  Set up the filters.
     filter = (xs_filter_t*) prefix_filter;
     fset = filter->fset_create ();
     xs_assert (fset);
+*/
 }
 
 xs::xpub_t::~xpub_t ()
 {
-    filter->fset_destroy (fset);
+    //  Deallocate all the filters.
+    for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
+        it->filter->fset_destroy (it->fset);
 }
 
 void xs::xpub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
@@ -51,8 +55,25 @@ void xs::xpub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
 
     // If icanhasall_ is specified, the caller would like to subscribe
     // to all data on this pipe, implicitly.
-    if (icanhasall_)
-        filter->subscribe (fset, pipe_, NULL, 0);
+    if (icanhasall_) {
+
+        //  Find the prefix filter.
+        filters_t::iterator it;
+        for (it = filters.begin (); it != filters.end (); ++it)
+            if (it->filter->filter_id == 1)
+                break;
+        if (it == filters.end ()) {
+            filter_t f;
+            f.filter = get_filter (1);
+            xs_assert (f.filter);
+            f.fset = f.filter->fset_create ();
+            xs_assert (f.fset);
+            filters.push_back (f);
+            it = filters.end () - 1;
+        }
+
+        it->filter->subscribe (it->fset, pipe_, NULL, 0);
+    }
 
     //  The pipe is active when attached. Let's read the subscriptions from
     //  it, if any.
@@ -83,13 +104,34 @@ void xs::xpub_t::xread_activated (pipe_t *pipe_)
             return;
         }
 
+        //  Find the relevant filter.
+        filters_t::iterator it;
+        for (it = filters.begin (); it != filters.end (); ++it)
+            if (it->filter->filter_id == 1)
+                break;
+
         bool unique;
-		if (*data == 0)
-            unique = filter->unsubscribe (fset, pipe_, data + 1, size - 1) ?
-                true : false;
-		else
-            unique = filter->subscribe (fset, pipe_, data + 1, size - 1) ?
-                true : false;
+		if (*data == 0) {
+            xs_assert (it != filters.end ());
+            unique = it->filter->unsubscribe (it->fset, pipe_, data + 1,
+                size - 1) ? true : false;
+        }
+		else {
+
+            //  If the filter of the specified type does not exist yet, create it.
+            if (it == filters.end ()) {
+                filter_t f;
+                f.filter = get_filter (1);
+                xs_assert (f.filter);
+                f.fset = f.filter->fset_create ();
+                xs_assert (f.fset);
+                filters.push_back (f);
+                it = filters.end () - 1;
+            }
+
+            unique = it->filter->subscribe (it->fset, pipe_, data + 1,
+                size - 1) ? true : false;
+        }
 
         //  If the subscription is not a duplicate store it so that it can be
         //  passed to used on next recv call.
@@ -107,8 +149,9 @@ void xs::xpub_t::xwrite_activated (pipe_t *pipe_)
 
 void xs::xpub_t::xterminated (pipe_t *pipe_)
 {
-    //  Remove the filter associated with the pipe.
-    filter->destroy (fset, pipe_, (void*) this);
+    //  Remove the pipe from all the filters.
+    for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
+        it->filter->destroy (it->fset, pipe_, (void*) this);
 
     dist.terminated (pipe_);
 }
@@ -118,9 +161,12 @@ int xs::xpub_t::xsend (msg_t *msg_, int flags_)
     bool msg_more = msg_->flags () & msg_t::more ? true : false;
 
     //  For the first part of multi-part message, find the matching pipes.
-    if (!more)
-        filter->match_all (fset, (unsigned char*) msg_->data (), msg_->size (),
-            (void*) this);
+    if (!more) {
+        for (filters_t::iterator it = filters.begin (); it != filters.end ();
+              ++it)
+            it->filter->match_all (it->fset, (unsigned char*) msg_->data (),
+                msg_->size (), (void*) this);
+    }
 
     //  Send the message to all the pipes that were marked as matching
     //  in the previous step.

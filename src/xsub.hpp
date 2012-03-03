@@ -85,7 +85,6 @@ namespace xs
         };
         typedef std::vector <filter_t> filters_t;
         filters_t filters;
-        
 
         //  If true, 'message' contains a matching message to return on the
         //  next recv call.
