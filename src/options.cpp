@@ -22,6 +22,8 @@
 
 #include <string.h>
 
+#include "../include/xs.h"
+
 #include "options.hpp"
 #include "err.hpp"
 
@@ -44,6 +46,7 @@ xs::options_t::options_t () :
     rcvtimeo (-1),
     sndtimeo (-1),
     ipv4only (1),
+    filter_id (XS_FILTER_PREFIX),
     delay_on_close (true),
     delay_on_disconnect (true),
     filter (false),
@@ -215,6 +218,14 @@ int xs::options_t::setsockopt (int option_, const void *optval_,
             return 0;
         }
 
+    case XS_FILTER:
+        if (optvallen_ != sizeof (int)) {
+            errno = EINVAL;
+            return -1;
+        }
+        filter_id = *((int*) optval_);
+        return 0;
+
     }
 
     errno = EINVAL;
@@ -384,6 +395,15 @@ int xs::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
             return -1;
         }
         *((int*) optval_) = ipv4only;
+        *optvallen_ = sizeof (int);
+        return 0;
+
+    case XS_FILTER:
+        if (*optvallen_ < sizeof (int)) {
+            errno = EINVAL;
+            return -1;
+        }
+        *((int*) optval_) = filter_id;
         *optvallen_ = sizeof (int);
         return 0;
 

@@ -21,24 +21,18 @@
 
 #include <string.h>
 
+#include "../include/xs.h"
+
 #include "xpub.hpp"
 #include "pipe.hpp"
 #include "err.hpp"
 #include "msg.hpp"
-#include "prefix_filter.hpp"
 
 xs::xpub_t::xpub_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     socket_base_t (parent_, tid_, sid_),
     more (false)
 {
     options.type = XS_XPUB;
-
-/*
-    //  Set up the filters.
-    filter = (xs_filter_t*) prefix_filter;
-    fset = filter->fset_create ();
-    xs_assert (fset);
-*/
 }
 
 xs::xpub_t::~xpub_t ()
@@ -60,11 +54,11 @@ void xs::xpub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
         //  Find the prefix filter.
         filters_t::iterator it;
         for (it = filters.begin (); it != filters.end (); ++it)
-            if (it->filter->filter_id == 1)
+            if (it->filter->filter_id == XS_FILTER_PREFIX)
                 break;
         if (it == filters.end ()) {
             filter_t f;
-            f.filter = get_filter (1);
+            f.filter = get_filter (XS_FILTER_PREFIX);
             xs_assert (f.filter);
             f.fset = f.filter->fset_create ();
             xs_assert (f.fset);

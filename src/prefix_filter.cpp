@@ -21,6 +21,7 @@
 
 #include <new>
 
+#include "../include/xs.h"
 #include "../include/xs_filter.h"
 
 #include "prefix_filter.hpp"
@@ -601,11 +602,9 @@ static void match_all (void *fset_, unsigned char *data_, size_t size_,
     ((xs::prefix_filter_t*) fset_)->match_all (data_, size_, arg_);
 }
 
-#define XS_PREFIX_FILTER 1
-
 static xs_filter_t filter = {
     XS_EXTENSION_FILTER,
-    XS_PREFIX_FILTER,
+    XS_FILTER_PREFIX,
     fset_create,
     fset_destroy,
     destroy,

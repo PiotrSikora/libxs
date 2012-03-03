@@ -89,6 +89,9 @@ namespace xs
         //  connect to and accept connections from both IPv4 and IPv6 hosts.
         int ipv4only;
 
+        //  Filter ID to be used with subscriptions and unsubscriptions.
+        int filter_id;
+
         //  If true, session reads all the pending messages from the pipe and
         //  sends them to the network when socket is closed.
         bool delay_on_close;

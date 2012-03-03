@@ -102,7 +102,7 @@ int xs::xsub_t::xsend (msg_t *msg_, int flags_)
     //  Find the relevant filter.
     filters_t::iterator it;
     for (it = filters.begin (); it != filters.end (); ++it)
-        if (it->filter->filter_id == 1)
+        if (it->filter->filter_id == options.filter_id)
             break;
 
     //  Process the subscription.
@@ -111,7 +111,7 @@ int xs::xsub_t::xsend (msg_t *msg_, int flags_)
         //  If the filter of the specified type does not exist yet, create it.
         if (it == filters.end ()) {
             filter_t f;
-            f.filter = get_filter (1);
+            f.filter = get_filter (options.filter_id);
             xs_assert (f.filter);
             f.fset = f.filter->fset_create ();
             xs_assert (f.fset);

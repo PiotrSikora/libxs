@@ -198,6 +198,7 @@ XS_EXPORT int xs_setctxopt (void *context, int option, const void *optval,
 #define XS_RCVTIMEO 27
 #define XS_SNDTIMEO 28
 #define XS_IPV4ONLY 31
+#define XS_FILTER 32
 
 /*  Message options                                                           */
 #define XS_MORE 1
@@ -205,6 +206,10 @@ XS_EXPORT int xs_setctxopt (void *context, int option, const void *optval,
 /*  Send/recv options.                                                        */
 #define XS_DONTWAIT 1
 #define XS_SNDMORE 2
+
+/*  Built-in message filters.                                                 */
+#define XS_FILTER_ALL 0
+#define XS_FILTER_PREFIX 1
 
 XS_EXPORT void *xs_socket (void *context, int type);
 XS_EXPORT int xs_close (void *s);
