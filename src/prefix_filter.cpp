@@ -68,13 +68,81 @@ void xs::prefix_filter_t::enumerate (void *arg_)
 int xs::prefix_filter_t::match (void *fid_, unsigned char *data_, size_t size_)
 {
     //  TODO: What should we do with fid_?
-    return check (&root, data_, size_) ? 1 : 0;
+
+    //  This function is on critical path. It deliberately doesn't use
+    //  recursion to get a bit better performance.
+    node_t *current = &root;
+    while (true) {
+
+        //  We've found a corresponding subscription!
+        if (current->pipes)
+            return 1;
+
+        //  We've checked all the data and haven't found matching subscription.
+        if (!size_)
+            return 0;
+
+        //  If there's no corresponding slot for the first character
+        //  of the prefix, the message does not match.
+        unsigned char c = *data_;
+        if (c < current->min || c >= current->min + current->count)
+            return 0;
+
+        //  Move to the next character.
+        if (current->count == 1)
+            current = current->next.node;
+        else {
+            current = current->next.table [c - current->min];
+            if (!current)
+                return 0;
+        }
+        data_++;
+        size_--;
+    }
+
 }
 
 void xs::prefix_filter_t::match_all (unsigned char *data_, size_t size_,
     void *arg_)
 {
-    match (&root, data_, size_, arg_);
+    node_t *current = &root;
+    while (true) {
+
+        //  Signal the pipes attached to this node.
+        if (current->pipes) {
+            for (node_t::pipes_t::iterator it = current->pipes->begin ();
+                  it != current->pipes->end (); ++it)
+                xs_filter_matching (it->first, arg_);
+        }
+
+        //  If we are at the end of the message, there's nothing more to match.
+        if (!size_)
+            break;
+
+        //  If there are no subnodes in the trie, return.
+        if (current->count == 0)
+            break;
+
+        //  If there's one subnode (optimisation).
+		if (current->count == 1) {
+            if (data_ [0] != current->min)
+                break;
+            current = current->next.node;
+            data_++;
+            size_--;
+		    continue;
+		}
+
+		//  If there are multiple subnodes.
+        if (data_ [0] < current->min || data_ [0] >=
+              current->min + current->count)
+            break;
+        if (!current->next.table [data_ [0] - current->min])
+            break;
+        current = current->next.table [data_ [0] - current->min];
+        data_++;
+        size_--;
+    }
 }
 
 void xs::prefix_filter_t::init (node_t *node_)
@@ -450,49 +518,6 @@ bool xs::prefix_filter_t::rm (node_t *node_, unsigned char *prefix_,
     return ret;
 }
 
-void xs::prefix_filter_t::match (node_t *node_, unsigned char *data_,
-    size_t size_, void *arg_)
-{
-    node_t *current = node_;
-    while (true) {
-
-        //  Signal the pipes attached to this node.
-        if (current->pipes) {
-            for (node_t::pipes_t::iterator it = current->pipes->begin ();
-                  it != current->pipes->end (); ++it)
-                xs_filter_matching (it->first, arg_);
-        }
-
-        //  If we are at the end of the message, there's nothing more to match.
-        if (!size_)
-            break;
-
-        //  If there are no subnodes in the trie, return.
-        if (current->count == 0)
-            break;
-
-        //  If there's one subnode (optimisation).
-		if (current->count == 1) {
-            if (data_ [0] != current->min)
-                break;
-            current = current->next.node;
-            data_++;
-            size_--;
-		    continue;
-		}
-
-		//  If there are multiple subnodes.
-        if (data_ [0] < current->min || data_ [0] >=
-              current->min + current->count)
-            break;
-        if (!current->next.table [data_ [0] - current->min])
-            break;
-        current = current->next.table [data_ [0] - current->min];
-        data_++;
-        size_--;
-    }
-}
-
 void xs::prefix_filter_t::list (node_t *node_, unsigned char **buff_,
     size_t buffsize_, size_t maxbuffsize_, void *arg_)
 {
@@ -525,41 +550,6 @@ void xs::prefix_filter_t::list (node_t *node_, unsigned char **buff_,
         if (node_->next.table [c])
             list (node_->next.table [c], buff_, buffsize_ + 1, maxbuffsize_,
                 arg_);
-    }
-}
-
-bool xs::prefix_filter_t::check (node_t *node_,
-    unsigned char *data_, size_t size_)
-{
-    //  This function is on critical path. It deliberately doesn't use
-    //  recursion to get a bit better performance.
-    node_t *current = node_;
-    while (true) {
-
-        //  We've found a corresponding subscription!
-        if (current->pipes)
-            return true;
-
-        //  We've checked all the data and haven't found matching subscription.
-        if (!size_)
-            return false;
-
-        //  If there's no corresponding slot for the first character
-        //  of the prefix, the message does not match.
-        unsigned char c = *data_;
-        if (c < current->min || c >= current->min + current->count)
-            return false;
-
-        //  Move to the next character.
-        if (current->count == 1)
-            current = current->next.node;
-        else {
-            current = current->next.table [c - current->min];
-            if (!current)
-                return false;
-        }
-        data_++;
-        size_--;
     }
 }
 

@@ -94,14 +94,6 @@ namespace xs
         static void list (node_t *node_, unsigned char **buff_,
             size_t buffsize_, size_t maxbuffsize_, void *arg_);
 
-        //  Check whether particular key is in the trie.
-        static bool check (node_t *node_, unsigned char *data_, size_t size_);
-
-        //  Signal all the matching pipes.
-        static void match (node_t *node_, unsigned char *data_, size_t size_,
-            void *arg_);
-
-
         //  Checks whether node can be safely removed.
         static bool is_redundant (node_t *node_);
 
