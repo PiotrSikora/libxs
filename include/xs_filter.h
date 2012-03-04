@@ -81,13 +81,14 @@ typedef struct {
     /*  specified fid doesn't exist yet it will be created. The function      */
     /*  returns 0 if the subscription was a duplicate of an existing          */
     /*  subscription or 1 in the case of fresh subscription.                  */
-    int (*subscribe) (void *fset, void *fid, unsigned char *data, size_t size);
+    int (*subscribe) (void *fset, void *fid, const unsigned char *data,
+        size_t size);
 
     /*  Remove existing subscription. If there are several identical          */
     /*  subscriptions this function should remove one of them, leaving the    */
     /*  others in place. In such case the function returns 0. If the removed  */
     /*  subscription was an unique one, it returns 1.                         */
-    int (*unsubscribe) (void *fset, void *fid, unsigned char *data,
+    int (*unsubscribe) (void *fset, void *fid, const unsigned char *data,
         size_t size);
 
     /*  List all the subscriptions in the set. The function should announce   */
@@ -98,22 +99,24 @@ typedef struct {
 
     /*  Checks whether particular message matches at least one subscription   */
     /*  in the filter. Returns 0 if it does not and 1 if it does.             */
-    int (*match) (void *fset, void *fid, unsigned char *data, size_t size);
+    int (*match) (void *fset, void *fid, const unsigned char *data,
+        size_t size);
 
     /*  Finds all the filters in the filter set the message is matched by.    */
     /*  The function should announce that the message matches the filter by   */
     /*  calling xs_filter_matching function. It is all right to invoke        */
     /*  xs_filter_matching several times for the same filter.                 */
-    void (*match_all) (void *fset, unsigned char *data, size_t size, void *arg);
+    void (*match_all) (void *fset, const unsigned char *data, size_t size,
+        void *arg);
 
 } xs_filter_t;
 
 /*  To be used from xs_filter_t::enumerate function.                          */
-XS_EXPORT void xs_filter_subscribed (int filter_id, unsigned char *data,
+XS_EXPORT void xs_filter_subscribed (int filter_id, const unsigned char *data,
     size_t size, void *arg);
 
 /*  To do used from xs_filter_t::destroy function.                            */
-XS_EXPORT void xs_filter_unsubscribed (int filter_id, unsigned char *data,
+XS_EXPORT void xs_filter_unsubscribed (int filter_id, const unsigned char *data,
     size_t size, void *arg);
 
 /*  To be used from xs_fitler_t::match_all function.                          */

@@ -43,11 +43,11 @@ namespace xs
         ~prefix_filter_t ();
 
         void destroy (void *fid_, void *arg_);
-        int subscribe (void *fid_, unsigned char *data_, size_t size_);
-        int unsubscribe (void *fid_, unsigned char *data_, size_t size_);
+        int subscribe (void *fid_, const unsigned char *data_, size_t size_);
+        int unsubscribe (void *fid_, const unsigned char *data_, size_t size_);
         void enumerate (void *arg_);
-        int match (void *fid_, unsigned char *data_, size_t size_);
-        void match_all (unsigned char *data_, size_t size_, void *arg_);
+        int match (void *fid_, const unsigned char *data_, size_t size_);
+        void match_all (const unsigned char *data_, size_t size_, void *arg_);
 
     private:
 
@@ -72,13 +72,13 @@ namespace xs
 
         //  Add key to the trie. Returns true if it's a new subscription
         //  rather than a duplicate.
-        static bool add (node_t *node_, unsigned char *prefix_, size_t size_,
-            xs::pipe_t *pipe_);
+        static bool add (node_t *node_, const unsigned char *prefix_,
+            size_t size_, xs::pipe_t *pipe_);
 
         //  Remove specific subscription from the trie. Return true is it
         //  was actually removed rather than de-duplicated.
-        static bool rm (node_t *node_, unsigned char *prefix_, size_t size_,
-            xs::pipe_t *pipe_);
+        static bool rm (node_t *node_, const unsigned char *prefix_,
+            size_t size_, xs::pipe_t *pipe_);
 
         //  Remove all subscriptions for a specific peer from the trie.
         //  If there are no subscriptions left on some topics, invoke the

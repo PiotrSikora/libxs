@@ -64,8 +64,8 @@ namespace xs
     public:
         //  Function to be applied to the trie to send all the subsciptions
         //  upstream.
-        static void send_unsubscription (int filter_id_, unsigned char *data_,
-            size_t size_, void *arg_);
+        static void send_unsubscription (int filter_id_,
+            const unsigned char *data_, size_t size_, void *arg_);
     private:
 
         //  The repository of subscriptions.

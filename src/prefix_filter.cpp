@@ -42,13 +42,13 @@ void xs::prefix_filter_t::destroy (void *fid_, void *arg_)
     rm (&root, (pipe_t*) fid_, arg_);
 }
 
-int xs::prefix_filter_t::subscribe (void *fid_, unsigned char *data_,
+int xs::prefix_filter_t::subscribe (void *fid_, const unsigned char *data_,
     size_t size_)
 {
     return add (&root, data_, size_, (pipe_t*) fid_) ? 1 : 0;
 }
 
-int xs::prefix_filter_t::unsubscribe (void *fid_, unsigned char *data_,
+int xs::prefix_filter_t::unsubscribe (void *fid_, const unsigned char *data_,
     size_t size_)
 {
     return rm (&root, data_, size_, (pipe_t*) fid_) ? 1 : 0;
@@ -61,7 +61,8 @@ void xs::prefix_filter_t::enumerate (void *arg_)
     free (buff);
 }
 
-int xs::prefix_filter_t::match (void *fid_, unsigned char *data_, size_t size_)
+int xs::prefix_filter_t::match (void *fid_, const unsigned char *data_,
+    size_t size_)
 {
     //  TODO: What should we do with fid_?
 
@@ -98,7 +99,7 @@ int xs::prefix_filter_t::match (void *fid_, unsigned char *data_, size_t size_)
 
 }
 
-void xs::prefix_filter_t::match_all (unsigned char *data_, size_t size_,
+void xs::prefix_filter_t::match_all (const unsigned char *data_, size_t size_,
     void *arg_)
 {
     node_t *current = &root;
@@ -172,7 +173,7 @@ void xs::prefix_filter_t::close (node_t *node_)
     }
 }
 
-bool xs::prefix_filter_t::add (node_t *node_, unsigned char *prefix_,
+bool xs::prefix_filter_t::add (node_t *node_, const unsigned char *prefix_,
     size_t size_, pipe_t *pipe_)
 {
     //  We are at the node corresponding to the prefix. We are done.
@@ -390,7 +391,7 @@ void xs::prefix_filter_t::rm_helper (node_t *node_, pipe_t *pipe_,
     }
 }
 
-bool xs::prefix_filter_t::rm (node_t *node_, unsigned char *prefix_,
+bool xs::prefix_filter_t::rm (node_t *node_, const unsigned char *prefix_,
     size_t size_, pipe_t *pipe_)
 {
     if (!size_) {
@@ -575,13 +576,13 @@ static void destroy (void *fset_, void *fid_, void *arg_)
     ((xs::prefix_filter_t*) fset_)->destroy (fid_, arg_);
 }
 
-static int subscribe (void *fset_, void *fid_, unsigned char *data_,
+static int subscribe (void *fset_, void *fid_, const unsigned char *data_,
     size_t size_)
 {
     return ((xs::prefix_filter_t*) fset_)->subscribe (fid_, data_, size_);
 }
 
-static int unsubscribe (void *fset_, void *fid_, unsigned char *data_,
+static int unsubscribe (void *fset_, void *fid_, const unsigned char *data_,
     size_t size_)
 {
     return ((xs::prefix_filter_t*) fset_)->unsubscribe (fid_, data_, size_);
@@ -592,12 +593,13 @@ static void enumerate (void *fset_, void *arg_)
     ((xs::prefix_filter_t*) fset_)->enumerate (arg_);
 }
 
-static int match (void *fset_, void *fid_, unsigned char *data_, size_t size_)
+static int match (void *fset_, void *fid_, const unsigned char *data_,
+    size_t size_)
 {
     return ((xs::prefix_filter_t*) fset_)->match (fid_, data_, size_);
 }
 
-static void match_all (void *fset_, unsigned char *data_, size_t size_,
+static void match_all (void *fset_, const unsigned char *data_, size_t size_,
     void *arg_)
 {
     ((xs::prefix_filter_t*) fset_)->match_all (data_, size_, arg_);
