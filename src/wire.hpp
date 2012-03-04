@@ -23,6 +23,10 @@
 
 #include "stdint.hpp"
 
+//  Protocol-related constants.
+#define XS_CMD_SUBSCRIBE 1
+#define XS_CMD_UNSUBSCRIBE 2
+
 namespace xs
 {
 

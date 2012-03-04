@@ -25,6 +25,7 @@
 
 #include "xpub.hpp"
 #include "pipe.hpp"
+#include "wire.hpp"
 #include "err.hpp"
 #include "msg.hpp"
 
@@ -52,6 +53,7 @@ void xs::xpub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
     if (icanhasall_) {
 
         //  Find the prefix filter.
+        //  TODO: Change this to ALL filter.
         filters_t::iterator it;
         for (it = filters.begin (); it != filters.end (); ++it)
             if (it->filter->filter_id == XS_FILTER_PREFIX)
@@ -93,7 +95,13 @@ void xs::xpub_t::xread_activated (pipe_t *pipe_)
 
         //  TODO: In the case of malformed subscription we will simply ignore
         //  it for now. However, we should close the connection instead.
-        if (size <= 0 || (*data == 0 && *data == 1)) {
+        if (size <= 4) {
+            sub.close ();
+            return;
+        }
+        int cmd = get_uint16 (data);
+        int filter_id = get_uint16 (data + 2);
+        if (cmd != XS_CMD_SUBSCRIBE && cmd != XS_CMD_UNSUBSCRIBE) {
             sub.close ();
             return;
         }
@@ -101,21 +109,22 @@ void xs::xpub_t::xread_activated (pipe_t *pipe_)
         //  Find the relevant filter.
         filters_t::iterator it;
         for (it = filters.begin (); it != filters.end (); ++it)
-            if (it->filter->filter_id == 1)
+            if (it->filter->filter_id == filter_id)
                 break;
 
         bool unique;
-		if (*data == 0) {
+		if (cmd == XS_CMD_UNSUBSCRIBE) {
             xs_assert (it != filters.end ());
-            unique = it->filter->unsubscribe (it->fset, pipe_, data + 1,
-                size - 1) ? true : false;
+            unique = it->filter->unsubscribe (it->fset, pipe_, data + 4,
+                size - 4) ? true : false;
         }
 		else {
 
-            //  If the filter of the specified type does not exist yet, create it.
+            //  If the filter of the specified type does not exist yet,
+            //  create it.
             if (it == filters.end ()) {
                 filter_t f;
-                f.filter = get_filter (1);
+                f.filter = get_filter (filter_id);
                 xs_assert (f.filter);
                 f.fset = f.filter->fset_create ();
                 xs_assert (f.fset);
@@ -123,8 +132,8 @@ void xs::xpub_t::xread_activated (pipe_t *pipe_)
                 it = filters.end () - 1;
             }
 
-            unique = it->filter->subscribe (it->fset, pipe_, data + 1,
-                size - 1) ? true : false;
+            unique = it->filter->subscribe (it->fset, pipe_, data + 4,
+                size - 4) ? true : false;
         }
 
         //  If the subscription is not a duplicate store it so that it can be
@@ -211,14 +220,15 @@ void xs::xpub_t::send_unsubscription (int filter_id_, unsigned char *data_,
 {
     xpub_t *self = (xpub_t*) arg_;
 
+    //  In XS_PUB socket, the subscriptions are not passed upstream.
     if (self->options.type != XS_PUB) {
 
 		//  Place the unsubscription to the queue of pending (un)sunscriptions
 		//  to be retrived by the user later on.
-		xpub_t *self = (xpub_t*) arg_;
-		blob_t unsub (size_ + 1, 0);
-		unsub [0] = 0;
-		memcpy ((void*) (unsub.data () + 1), data_, size_);
+		blob_t unsub (size_ + 4, 0);
+        put_uint16 ((unsigned char*) unsub.data (), XS_CMD_UNSUBSCRIBE);
+        put_uint16 ((unsigned char*) unsub.data () + 2, filter_id_);
+		memcpy ((void*) (unsub.data () + 4), data_, size_);
 		self->pending.push_back (unsub);
     }
 }

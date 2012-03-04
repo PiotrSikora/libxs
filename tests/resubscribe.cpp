@@ -43,13 +43,21 @@ int XS_TEST_MAIN ()
     assert (rc == 0);
 
     //  Check whether subscriptions are correctly received.
-    char buf [2];
+    char buf [5];
     rc = xs_recv (xpub, buf, sizeof (buf), 0);
-    assert (rc == 2);
-    assert (buf [0] == 1 && buf [1] == 'a');
+    assert (rc == 5);
+    assert (buf [0] == 0);
+    assert (buf [1] == 1);
+    assert (buf [2] == 0);
+    assert (buf [3] == 1);
+    assert (buf [4] == 'a');
     rc = xs_recv (xpub, buf, sizeof (buf), 0);
-    assert (rc == 2);
-    assert (buf [0] == 1 && buf [1] == 'b');
+    assert (rc == 5);
+    assert (buf [0] == 0);
+    assert (buf [1] == 1);
+    assert (buf [2] == 0);
+    assert (buf [3] == 1);
+    assert (buf [4] == 'b');
 
     //  Tear down the connection.
     rc = xs_close (xpub);
@@ -69,11 +77,19 @@ int XS_TEST_MAIN ()
 
     //  Check whether subscriptions are correctly generated.
     rc = xs_recv (xpub, buf, sizeof (buf), 0);
-    assert (rc == 2);
-    assert (buf [0] == 1 && buf [1] == 'a');
+    assert (rc == 5);
+    assert (buf [0] == 0);
+    assert (buf [1] == 1);
+    assert (buf [2] == 0);
+    assert (buf [3] == 1);
+    assert (buf [4] == 'a');
     rc = xs_recv (xpub, buf, sizeof (buf), 0);
-    assert (rc == 2);
-    assert (buf [0] == 1 && buf [1] == 'b');
+    assert (rc == 5);
+    assert (buf [0] == 0);
+    assert (buf [1] == 1);
+    assert (buf [2] == 0);
+    assert (buf [3] == 1);
+    assert (buf [4] == 'b');
 
     //  Clean up.
     rc = xs_close (sub);

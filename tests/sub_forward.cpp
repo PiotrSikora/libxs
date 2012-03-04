@@ -51,7 +51,7 @@ int XS_TEST_MAIN ()
     assert (rc == 0);
 
     //  Subscribe for all messages.
-    rc = xs_setsockopt (sub, XS_SUBSCRIBE, "", 0);
+    rc = xs_setsockopt (sub, XS_SUBSCRIBE, "ABC", 3);
     assert (rc == 0);
 
     //  Pass the subscription upstream through the device.
@@ -64,9 +64,9 @@ int XS_TEST_MAIN ()
     //  Wait a bit till the subscription gets to the publisher.
     xs_sleep (1);
 
-    //  Send an empty message.
-    rc = xs_send (pub, NULL, 0, 0);
-    assert (rc == 0);
+    //  Send a matching message.
+    rc = xs_send (pub, "ABCD", 4, 0);
+    assert (rc == 4);
 
     //  Pass the message downstream through the device.
     rc = xs_recv (xsub, buff, sizeof (buff), 0);
@@ -76,7 +76,7 @@ int XS_TEST_MAIN ()
 
     //  Receive the message in the subscriber.
     rc = xs_recv (sub, buff, sizeof (buff), 0);
-    assert (rc == 0);
+    assert (rc == 4);
 
     //  Clean up.
     rc = xs_close (xpub);

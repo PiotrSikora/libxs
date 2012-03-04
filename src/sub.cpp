@@ -21,6 +21,7 @@
 
 #include "sub.hpp"
 #include "msg.hpp"
+#include "wire.hpp"
 
 xs::sub_t::sub_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     xsub_t (parent_, tid_, sid_)
@@ -51,14 +52,15 @@ int xs::sub_t::xsetsockopt (int option_, const void *optval_,
 
     //  Create the subscription message.
     msg_t msg;
-    int rc = msg.init_size (optvallen_ + 1);
+    int rc = msg.init_size (optvallen_ + 4);
     errno_assert (rc == 0);
     unsigned char *data = (unsigned char*) msg.data ();
-    if (option_ == XS_SUBSCRIBE)
-        *data = 1;
+    if (option_ == XS_SUBSCRIBE) 
+        put_uint16 (data, XS_CMD_SUBSCRIBE);
     else if (option_ == XS_UNSUBSCRIBE)
-        *data = 0;
-    memcpy (data + 1, optval_, optvallen_);
+        put_uint16 (data, XS_CMD_UNSUBSCRIBE);
+    put_uint16 (data + 2, options.filter_id);
+    memcpy (data + 4, optval_, optvallen_);
 
     //  Pass it further on in the stack.
     int err = 0;

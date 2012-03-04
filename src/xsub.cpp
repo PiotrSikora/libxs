@@ -23,6 +23,7 @@
 
 #include "xsub.hpp"
 #include "err.hpp"
+#include "wire.hpp"
 
 xs::xsub_t::xsub_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     socket_base_t (parent_, tid_, sid_),
@@ -94,24 +95,30 @@ int xs::xsub_t::xsend (msg_t *msg_, int flags_)
     unsigned char *data = (unsigned char*) msg_->data ();
 
     //  Malformed subscriptions.
-    if (size < 1 || (*data != 0 && *data != 1)) {
+    if (size < 4) {
         errno = EINVAL;
         return -1;
     }
-
+    int cmd = get_uint16 (data);
+    int filter_id = get_uint16 (data + 2);
+    if (cmd != XS_CMD_SUBSCRIBE && cmd != XS_CMD_UNSUBSCRIBE) {
+        errno = EINVAL;
+        return -1;
+    }
+    
     //  Find the relevant filter.
     filters_t::iterator it;
     for (it = filters.begin (); it != filters.end (); ++it)
-        if (it->filter->filter_id == options.filter_id)
+        if (it->filter->filter_id == filter_id)
             break;
 
     //  Process the subscription.
-    if (*data == 1) {
+    if (cmd == XS_CMD_SUBSCRIBE) {
 
         //  If the filter of the specified type does not exist yet, create it.
         if (it == filters.end ()) {
             filter_t f;
-            f.filter = get_filter (options.filter_id);
+            f.filter = get_filter (filter_id);
             xs_assert (f.filter);
             f.fset = f.filter->fset_create ();
             xs_assert (f.fset);
@@ -119,14 +126,14 @@ int xs::xsub_t::xsend (msg_t *msg_, int flags_)
             it = filters.end () - 1;
         }
 
-        if (it->filter->subscribe (it->fset, NULL, data + 1, size - 1) == 1)
+        if (it->filter->subscribe (it->fset, NULL, data + 4, size - 4) == 1)
             return dist.send_to_all (msg_, flags_);
         else
             return 0;
     }
-    else if (*data == 0) {
+    else if (cmd == XS_CMD_UNSUBSCRIBE) {
         xs_assert (it != filters.end ());
-        if (it->filter->unsubscribe (it->fset, NULL, data + 1, size - 1) == 1)
+        if (it->filter->unsubscribe (it->fset, NULL, data + 4, size - 4) == 1)
             return dist.send_to_all (msg_, flags_);
         else
             return 0;
@@ -239,11 +246,12 @@ void xs::xsub_t::send_subscription (int filter_id_, unsigned char *data_,
 
     //  Create the subsctription message.
     msg_t msg;
-    int rc = msg.init_size (size_ + 1);
+    int rc = msg.init_size (size_ + 4);
     xs_assert (rc == 0);
     unsigned char *data = (unsigned char*) msg.data ();
-    data [0] = 1;
-    memcpy (data + 1, data_, size_);
+    put_uint16 (data, XS_CMD_SUBSCRIBE);
+    put_uint16 (data + 2, filter_id_);
+    memcpy (data + 4, data_, size_);
 
     //  Send it to the pipe.
     bool sent = pipe->write (&msg);
