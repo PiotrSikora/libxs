@@ -23,7 +23,7 @@ lib_LTLIBRARIES = libxs.la libxszmq.la
 
 pkgconfig_DATA = libxs.pc libxszmq.pc
 
-include_HEADERS = ../include/xs.h ../include/xs_utils.h \
+include_HEADERS = ../include/xs.h ../include/xs_utils.h ../include/xs_filter.h \
     ../include/xszmq.h ../include/xszmq_utils.h
 endif
 
