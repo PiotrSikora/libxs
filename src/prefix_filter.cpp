@@ -37,21 +37,21 @@ xs::prefix_filter_t::~prefix_filter_t ()
     close (&root);
 }
 
-void xs::prefix_filter_t::destroy (void *fid_, void *arg_)
+int xs::prefix_filter_t::subscribe (void *subscriber_,
+    const unsigned char *data_, size_t size_)
 {
-    rm (&root, (pipe_t*) fid_, arg_);
+    return add (&root, data_, size_, (pipe_t*) subscriber_) ? 1 : 0;
 }
 
-int xs::prefix_filter_t::subscribe (void *fid_, const unsigned char *data_,
-    size_t size_)
+int xs::prefix_filter_t::unsubscribe (void *subscriber_,
+    const unsigned char *data_, size_t size_)
 {
-    return add (&root, data_, size_, (pipe_t*) fid_) ? 1 : 0;
+    return rm (&root, data_, size_, (pipe_t*) subscriber_) ? 1 : 0;
 }
 
-int xs::prefix_filter_t::unsubscribe (void *fid_, const unsigned char *data_,
-    size_t size_)
+void xs::prefix_filter_t::unsubscribe_all (void *subscriber_, void *arg_)
 {
-    return rm (&root, data_, size_, (pipe_t*) fid_) ? 1 : 0;
+    rm (&root, (pipe_t*) subscriber_, arg_);
 }
 
 void xs::prefix_filter_t::enumerate (void *arg_)
@@ -61,8 +61,8 @@ void xs::prefix_filter_t::enumerate (void *arg_)
     free (buff);
 }
 
-int xs::prefix_filter_t::match (void *fid_, const unsigned char *data_,
-    size_t size_)
+int xs::prefix_filter_t::match (void *subscriber_,
+    const unsigned char *data_, size_t size_)
 {
     //  TODO: What should we do with fid_?
 
@@ -559,60 +559,63 @@ bool xs::prefix_filter_t::is_redundant (node_t *node_)
 //  Implementation of the C interface of the filter.
 //  Following functions convert raw C calls into calls to C++ object methods.
 
-static void *fset_create ()
+static void *create ()
 {
     void *fset = (void*) new (std::nothrow) xs::prefix_filter_t;
     alloc_assert (fset);
     return fset;
 }
 
-static void fset_destroy (void *fset_)
+static void destroy (void *filter_)
 {
-    delete (xs::prefix_filter_t*) fset_;
+    delete (xs::prefix_filter_t*) filter_;
 }
 
-static void destroy (void *fset_, void *fid_, void *arg_)
+static int subscribe (void *filter_, void *subscriber_,
+    const unsigned char *data_, size_t size_)
 {
-    ((xs::prefix_filter_t*) fset_)->destroy (fid_, arg_);
+    return ((xs::prefix_filter_t*) filter_)->subscribe (subscriber_,
+        data_, size_);
 }
 
-static int subscribe (void *fset_, void *fid_, const unsigned char *data_,
-    size_t size_)
+static int unsubscribe (void *filter_, void *subscriber_,
+    const unsigned char *data_, size_t size_)
 {
-    return ((xs::prefix_filter_t*) fset_)->subscribe (fid_, data_, size_);
+    return ((xs::prefix_filter_t*) filter_)->unsubscribe (subscriber_,
+        data_, size_);
 }
 
-static int unsubscribe (void *fset_, void *fid_, const unsigned char *data_,
-    size_t size_)
+static void unsubscribe_all (void *filter_, void *subscriber_, void *arg_)
 {
-    return ((xs::prefix_filter_t*) fset_)->unsubscribe (fid_, data_, size_);
+    ((xs::prefix_filter_t*) filter_)->unsubscribe_all (subscriber_, arg_);
 }
 
-static void enumerate (void *fset_, void *arg_)
+
+static void enumerate (void *filter_, void *arg_)
 {
-    ((xs::prefix_filter_t*) fset_)->enumerate (arg_);
+    ((xs::prefix_filter_t*) filter_)->enumerate (arg_);
 }
 
-static int match (void *fset_, void *fid_, const unsigned char *data_,
-    size_t size_)
+static int match (void *filter_, void *subscriber_,
+    const unsigned char *data_, size_t size_)
 {
-    return ((xs::prefix_filter_t*) fset_)->match (fid_, data_, size_);
+    return ((xs::prefix_filter_t*) filter_)->match (subscriber_, data_, size_);
 }
 
-static void match_all (void *fset_, const unsigned char *data_, size_t size_,
+static void match_all (void *filter_, const unsigned char *data_, size_t size_,
     void *arg_)
 {
-    ((xs::prefix_filter_t*) fset_)->match_all (data_, size_, arg_);
+    ((xs::prefix_filter_t*) filter_)->match_all (data_, size_, arg_);
 }
 
 static xs_filter_t filter = {
     XS_EXTENSION_FILTER,
     XS_FILTER_PREFIX,
-    fset_create,
-    fset_destroy,
+    create,
     destroy,
     subscribe,
     unsubscribe,
+    unsubscribe_all,
     enumerate,
     match,
     match_all

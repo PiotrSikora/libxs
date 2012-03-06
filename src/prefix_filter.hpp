@@ -42,11 +42,13 @@ namespace xs
         prefix_filter_t ();
         ~prefix_filter_t ();
 
-        void destroy (void *fid_, void *arg_);
-        int subscribe (void *fid_, const unsigned char *data_, size_t size_);
-        int unsubscribe (void *fid_, const unsigned char *data_, size_t size_);
+        int subscribe (void *subscriber_,
+            const unsigned char *data_, size_t size_);
+        int unsubscribe (void *subscriber_,
+            const unsigned char *data_, size_t size_);
+        void unsubscribe_all (void *subscriber_, void *arg_);
         void enumerate (void *arg_);
-        int match (void *fid_, const unsigned char *data_, size_t size_);
+        int match (void *subscriber_, const unsigned char *data_, size_t size_);
         void match_all (const unsigned char *data_, size_t size_, void *arg_);
 
     private:

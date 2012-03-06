@@ -40,7 +40,7 @@ xs::xpub_t::~xpub_t ()
 {
     //  Deallocate all the filters.
     for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
-        it->filter->fset_destroy (it->fset);
+        it->type->destroy (it->instance);
 }
 
 void xs::xpub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
@@ -56,19 +56,19 @@ void xs::xpub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
         //  TODO: Change this to ALL filter.
         filters_t::iterator it;
         for (it = filters.begin (); it != filters.end (); ++it)
-            if (it->filter->filter_id == XS_FILTER_PREFIX)
+            if (it->type->filter_id == XS_FILTER_PREFIX)
                 break;
         if (it == filters.end ()) {
             filter_t f;
-            f.filter = get_filter (XS_FILTER_PREFIX);
-            xs_assert (f.filter);
-            f.fset = f.filter->fset_create ();
-            xs_assert (f.fset);
+            f.type = get_filter (XS_FILTER_PREFIX);
+            xs_assert (f.type);
+            f.instance = f.type->create ();
+            xs_assert (f.instance);
             filters.push_back (f);
             it = filters.end () - 1;
         }
 
-        it->filter->subscribe (it->fset, pipe_, NULL, 0);
+        it->type->subscribe (it->instance, pipe_, NULL, 0);
     }
 
     //  The pipe is active when attached. Let's read the subscriptions from
@@ -109,13 +109,13 @@ void xs::xpub_t::xread_activated (pipe_t *pipe_)
         //  Find the relevant filter.
         filters_t::iterator it;
         for (it = filters.begin (); it != filters.end (); ++it)
-            if (it->filter->filter_id == filter_id)
+            if (it->type->filter_id == filter_id)
                 break;
 
         bool unique;
 		if (cmd == XS_CMD_UNSUBSCRIBE) {
             xs_assert (it != filters.end ());
-            unique = it->filter->unsubscribe (it->fset, pipe_, data + 4,
+            unique = it->type->unsubscribe (it->instance, pipe_, data + 4,
                 size - 4) ? true : false;
         }
 		else {
@@ -124,15 +124,15 @@ void xs::xpub_t::xread_activated (pipe_t *pipe_)
             //  create it.
             if (it == filters.end ()) {
                 filter_t f;
-                f.filter = get_filter (filter_id);
-                xs_assert (f.filter);
-                f.fset = f.filter->fset_create ();
-                xs_assert (f.fset);
+                f.type = get_filter (filter_id);
+                xs_assert (f.type);
+                f.instance = f.type->create ();
+                xs_assert (f.instance);
                 filters.push_back (f);
                 it = filters.end () - 1;
             }
 
-            unique = it->filter->subscribe (it->fset, pipe_, data + 4,
+            unique = it->type->subscribe (it->instance, pipe_, data + 4,
                 size - 4) ? true : false;
         }
 
@@ -154,7 +154,7 @@ void xs::xpub_t::xterminated (pipe_t *pipe_)
 {
     //  Remove the pipe from all the filters.
     for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
-        it->filter->destroy (it->fset, pipe_, (void*) this);
+        it->type->unsubscribe_all (it->instance, (void*) pipe_, (void*) this);
 
     dist.terminated (pipe_);
 }
@@ -167,7 +167,7 @@ int xs::xpub_t::xsend (msg_t *msg_, int flags_)
     if (!more) {
         for (filters_t::iterator it = filters.begin (); it != filters.end ();
               ++it)
-            it->filter->match_all (it->fset, (unsigned char*) msg_->data (),
+            it->type->match_all (it->instance, (unsigned char*) msg_->data (),
                 msg_->size (), (void*) this);
     }
 

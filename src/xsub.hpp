@@ -80,8 +80,8 @@ namespace xs
         //  The repository of subscriptions.
         struct filter_t
         {
-            xs_filter_t *filter;
-            void *fset;
+            xs_filter_t *type;
+            void *instance;
         };
         typedef std::vector <filter_t> filters_t;
         filters_t filters;
