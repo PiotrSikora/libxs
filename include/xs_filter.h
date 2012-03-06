@@ -58,7 +58,7 @@ typedef struct
         const unsigned char *data, size_t size);
     void (*unsubscribe_all) (void *filter, void *subscriber, void *arg);
     void (*enumerate) (void *filter, void *arg);
-    int (*match) (void *filter, void *subscriber,
+    int (*match) (void *filter,
         const unsigned char *data, size_t size);
     void (*match_all) (void *filter,
         const unsigned char *data, size_t size, void *arg);

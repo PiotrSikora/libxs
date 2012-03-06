@@ -61,11 +61,8 @@ void xs::prefix_filter_t::enumerate (void *arg_)
     free (buff);
 }
 
-int xs::prefix_filter_t::match (void *subscriber_,
-    const unsigned char *data_, size_t size_)
+int xs::prefix_filter_t::match (const unsigned char *data_, size_t size_)
 {
-    //  TODO: What should we do with fid_?
-
     //  This function is on critical path. It deliberately doesn't use
     //  recursion to get a bit better performance.
     node_t *current = &root;
@@ -596,10 +593,9 @@ static void enumerate (void *filter_, void *arg_)
     ((xs::prefix_filter_t*) filter_)->enumerate (arg_);
 }
 
-static int match (void *filter_, void *subscriber_,
-    const unsigned char *data_, size_t size_)
+static int match (void *filter_, const unsigned char *data_, size_t size_)
 {
-    return ((xs::prefix_filter_t*) filter_)->match (subscriber_, data_, size_);
+    return ((xs::prefix_filter_t*) filter_)->match (data_, size_);
 }
 
 static void match_all (void *filter_, const unsigned char *data_, size_t size_,

@@ -233,7 +233,7 @@ bool xs::xsub_t::xhas_in ()
 bool xs::xsub_t::match (msg_t *msg_)
 {
     for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
-        if (it->type->match (it->instance, NULL, (unsigned char*) msg_->data (),
+        if (it->type->match (it->instance, (unsigned char*) msg_->data (),
               msg_->size ()))
             return true;
     return false;
