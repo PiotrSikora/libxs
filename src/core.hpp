@@ -21,6 +21,8 @@
 #ifndef __XS_CORE_HPP_INCLUDED__
 #define __XS_CORE_HPP_INCLUDED__
 
+#include <stddef.h>
+
 namespace xs
 {
 
@@ -31,10 +33,10 @@ namespace xs
     {
         inline virtual ~core_t () {}
 
-        inline virtual void filter_subscribed (int filter_id_,
-            const unsigned char *data_, size_t size_) {}
-        inline virtual void filter_unsubscribed (int filter_id_,
-            const unsigned char *data_, size_t size_) {};
+        inline virtual void filter_subscribed (const unsigned char *data_,
+            size_t size_) {}
+        inline virtual void filter_unsubscribed (const unsigned char *data_,
+            size_t size_) {};
         inline virtual void filter_matching (void *subscriber_) {};
 
     };

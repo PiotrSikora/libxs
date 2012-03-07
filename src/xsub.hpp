@@ -61,8 +61,7 @@ namespace xs
     private:
 
         //  Overloads from core_t class.
-        void filter_subscribed (int filter_id_,
-            const unsigned char *data_, size_t size_);
+        void filter_subscribed (const unsigned char *data_, size_t size_);
 
         //  Check whether the message matches at least one subscription.
         bool match (xs::msg_t *msg_);
@@ -93,6 +92,7 @@ namespace xs
 
         //  Different values stored while filter extensions are being executed.
         pipe_t *tmp_pipe;
+        int tmp_filter_id;
 
         xsub_t (const xsub_t&);
         const xsub_t &operator = (const xsub_t&);

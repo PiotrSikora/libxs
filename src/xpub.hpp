@@ -61,8 +61,7 @@ namespace xs
     private:
 
         //  Overloaded functions from core_t.
-        void filter_unsubscribed (int filter_id_,
-            const unsigned char *data_, size_t size_);
+        void filter_unsubscribed (const unsigned char *data_, size_t size_);
         void filter_matching (void *subscriber_);
 
         //  The repository of subscriptions.
@@ -84,6 +83,9 @@ namespace xs
         //  applied to the trie, but not yet received by the user.
         typedef std::deque <blob_t> pending_t;
         pending_t pending;
+
+        //  Different values stored while filter extensions are being executed.
+        int tmp_filter_id;
 
         xpub_t (const xpub_t&);
         const xpub_t &operator = (const xpub_t&);

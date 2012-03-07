@@ -279,8 +279,7 @@ void xs::prefix_filter_t::rm_helper (node_t *node_, pipe_t *pipe_,
             if (!it->second) {
                 node_->pipes->erase (it);
                 if (node_->pipes->empty ()) {
-                    xs_filter_unsubscribed (arg_, XS_FILTER_PREFIX,
-                        *buff_, buffsize_);
+                    xs_filter_unsubscribed (arg_, *buff_, buffsize_);
                     delete node_->pipes;
                     node_->pipes = 0;
                 }
@@ -519,7 +518,7 @@ void xs::prefix_filter_t::list (node_t *node_, unsigned char **buff_,
 {
     //  If this node is a subscription, apply the function.
     if (node_->pipes)
-        xs_filter_subscribed (arg_, XS_FILTER_PREFIX, *buff_, buffsize_);
+        xs_filter_subscribed (arg_, *buff_, buffsize_);
 
     //  Adjust the buffer.
     if (buffsize_ >= maxbuffsize_) {

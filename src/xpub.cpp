@@ -31,7 +31,8 @@
 
 xs::xpub_t::xpub_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     socket_base_t (parent_, tid_, sid_),
-    more (false)
+    more (false),
+    tmp_filter_id (-1)
 {
     options.type = XS_XPUB;
 }
@@ -154,9 +155,13 @@ void xs::xpub_t::xwrite_activated (pipe_t *pipe_)
 void xs::xpub_t::xterminated (pipe_t *pipe_)
 {
     //  Remove the pipe from all the filters.
-    for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
+    for (filters_t::iterator it = filters.begin (); it != filters.end ();
+          ++it) {
+        tmp_filter_id = it->type->filter_id;
         it->type->unsubscribe_all ((void*) (core_t*) this, it->instance,
             (void*) pipe_);
+        tmp_filter_id = -1;
+    }
 
     dist.terminated (pipe_);
 }
@@ -217,8 +222,7 @@ bool xs::xpub_t::xhas_in ()
     return !pending.empty ();
 }
 
-void xs::xpub_t::filter_unsubscribed (int filter_id_,
-    const unsigned char *data_, size_t size_)
+void xs::xpub_t::filter_unsubscribed (const unsigned char *data_, size_t size_)
 {
     //  In XS_PUB socket, the subscriptions are not passed upstream.
     if (options.type != XS_PUB) {
@@ -227,7 +231,7 @@ void xs::xpub_t::filter_unsubscribed (int filter_id_,
 		//  to be retrived by the user later on.
 		blob_t unsub (size_ + 4, 0);
         put_uint16 ((unsigned char*) unsub.data (), XS_CMD_UNSUBSCRIBE);
-        put_uint16 ((unsigned char*) unsub.data () + 2, filter_id_);
+        put_uint16 ((unsigned char*) unsub.data () + 2, tmp_filter_id);
 		memcpy ((void*) (unsub.data () + 4), data_, size_);
 		pending.push_back (unsub);
     }

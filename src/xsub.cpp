@@ -29,7 +29,8 @@ xs::xsub_t::xsub_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     socket_base_t (parent_, tid_, sid_),
     has_message (false),
     more (false),
-    tmp_pipe (NULL)
+    tmp_pipe (NULL),
+    tmp_filter_id (-1)
 {
     options.type = XS_XSUB;
 
@@ -62,8 +63,12 @@ void xs::xsub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
 
     //  Send all the cached subscriptions to the new upstream peer.
     tmp_pipe = pipe_;
-    for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
+    for (filters_t::iterator it = filters.begin (); it != filters.end ();
+          ++it) {
+        tmp_filter_id = it->type->filter_id;
         it->type->enumerate ((void*) (core_t*) this, it->instance);
+        tmp_filter_id = -1;
+    }
     pipe_->flush ();
     tmp_pipe = NULL;
 }
@@ -88,8 +93,12 @@ void xs::xsub_t::xhiccuped (pipe_t *pipe_)
 {
     //  Send all the cached subscriptions to the hiccuped pipe.
     tmp_pipe = pipe_;
-    for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
+    for (filters_t::iterator it = filters.begin (); it != filters.end ();
+          ++it) {
+        tmp_filter_id = it->type->filter_id;
         it->type->enumerate ((void*) (core_t*) this, it->instance);
+        tmp_filter_id = -1;
+    }
     pipe_->flush ();
     tmp_pipe = NULL;
 }
@@ -246,8 +255,7 @@ bool xs::xsub_t::match (msg_t *msg_)
     return false;
 }
 
-void xs::xsub_t::filter_subscribed (int filter_id_, const unsigned char *data_,
-    size_t size_)
+void xs::xsub_t::filter_subscribed (const unsigned char *data_, size_t size_)
 {
     //  Create the subsctription message.
     msg_t msg;
@@ -255,7 +263,7 @@ void xs::xsub_t::filter_subscribed (int filter_id_, const unsigned char *data_,
     xs_assert (rc == 0);
     unsigned char *data = (unsigned char*) msg.data ();
     put_uint16 (data, XS_CMD_SUBSCRIBE);
-    put_uint16 (data + 2, filter_id_);
+    put_uint16 (data + 2, tmp_filter_id);
     memcpy (data + 4, data_, size_);
 
     //  Send it to the pipe.
