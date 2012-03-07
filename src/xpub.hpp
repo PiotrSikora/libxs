@@ -61,8 +61,8 @@ namespace xs
     private:
 
         //  Overloaded functions from core_t.
-        void filter_unsubscribed (const unsigned char *data_, size_t size_);
-        void filter_matching (void *subscriber_);
+        int filter_unsubscribed (const unsigned char *data_, size_t size_);
+        int filter_matching (void *subscriber_);
 
         //  The repository of subscriptions.
         struct filter_t

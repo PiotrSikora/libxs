@@ -255,7 +255,7 @@ bool xs::xsub_t::match (msg_t *msg_)
     return false;
 }
 
-void xs::xsub_t::filter_subscribed (const unsigned char *data_, size_t size_)
+int xs::xsub_t::filter_subscribed (const unsigned char *data_, size_t size_)
 {
     //  Create the subsctription message.
     msg_t msg;
@@ -275,6 +275,8 @@ void xs::xsub_t::filter_subscribed (const unsigned char *data_, size_t size_)
     //  when the SNDHWM is reached.
     if (!sent)
         msg.close ();
+
+    return 0;
 }
 
 xs::xsub_session_t::xsub_session_t (io_thread_t *io_thread_, bool connect_,

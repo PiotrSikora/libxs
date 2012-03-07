@@ -106,8 +106,10 @@ void xs::prefix_filter_t::match_all (void *core_,
         //  Signal the pipes attached to this node.
         if (current->pipes) {
             for (node_t::pipes_t::iterator it = current->pipes->begin ();
-                  it != current->pipes->end (); ++it)
-                xs_filter_matching (core_, it->first);
+                  it != current->pipes->end (); ++it) {
+                int rc = xs_filter_matching (core_, it->first);
+                errno_assert (rc == 0);
+            }
         }
 
         //  If we are at the end of the message, there's nothing more to match.
@@ -279,7 +281,8 @@ void xs::prefix_filter_t::rm_helper (node_t *node_, pipe_t *pipe_,
             if (!it->second) {
                 node_->pipes->erase (it);
                 if (node_->pipes->empty ()) {
-                    xs_filter_unsubscribed (arg_, *buff_, buffsize_);
+                    int rc = xs_filter_unsubscribed (arg_, *buff_, buffsize_);
+                    errno_assert (rc == 0);
                     delete node_->pipes;
                     node_->pipes = 0;
                 }
@@ -517,8 +520,10 @@ void xs::prefix_filter_t::list (node_t *node_, unsigned char **buff_,
     size_t buffsize_, size_t maxbuffsize_, void *arg_)
 {
     //  If this node is a subscription, apply the function.
-    if (node_->pipes)
-        xs_filter_subscribed (arg_, *buff_, buffsize_);
+    if (node_->pipes) {
+        int rc = xs_filter_subscribed (arg_, *buff_, buffsize_);
+        errno_assert (rc == 0);
+    }
 
     //  Adjust the buffer.
     if (buffsize_ >= maxbuffsize_) {

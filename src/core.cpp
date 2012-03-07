@@ -21,21 +21,48 @@
 #include "../include/xs_filter.h"
 
 #include "core.hpp"
+#include "err.hpp"
 
-void xs_filter_subscribed (void *core_,
-    const unsigned char *data_, size_t size_)
+xs::core_t::core_t ()
 {
-    ((xs::core_t*) core_)->filter_subscribed (data_, size_);
 }
 
-void xs_filter_unsubscribed (void *core_,
-    const unsigned char *data_, size_t size_)
+xs::core_t::~core_t ()
 {
-    ((xs::core_t*) core_)->filter_unsubscribed (data_, size_);
 }
 
-void xs_filter_matching (void *core_, void *subscriber_)
+int xs::core_t::filter_subscribed (const unsigned char *data_, size_t size_)
 {
-    ((xs::core_t*) core_)->filter_matching (subscriber_);
+    errno = ENOTSUP;
+    return -1;
+}
+
+int xs::core_t::filter_unsubscribed (const unsigned char *data_, size_t size_)
+{
+    errno = ENOTSUP;
+    return -1;
+}
+
+int xs::core_t::filter_matching (void *subscriber_)
+{
+    errno = ENOTSUP;
+    return -1;
+}
+
+int xs_filter_subscribed (void *core_,
+    const unsigned char *data_, size_t size_)
+{
+    return ((xs::core_t*) core_)->filter_subscribed (data_, size_);
+}
+
+int xs_filter_unsubscribed (void *core_,
+    const unsigned char *data_, size_t size_)
+{
+    return ((xs::core_t*) core_)->filter_unsubscribed (data_, size_);
+}
+
+int xs_filter_matching (void *core_, void *subscriber_)
+{
+    return ((xs::core_t*) core_)->filter_matching (subscriber_);
 }
 

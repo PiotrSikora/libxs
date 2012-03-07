@@ -222,7 +222,7 @@ bool xs::xpub_t::xhas_in ()
     return !pending.empty ();
 }
 
-void xs::xpub_t::filter_unsubscribed (const unsigned char *data_, size_t size_)
+int xs::xpub_t::filter_unsubscribed (const unsigned char *data_, size_t size_)
 {
     //  In XS_PUB socket, the subscriptions are not passed upstream.
     if (options.type != XS_PUB) {
@@ -235,11 +235,14 @@ void xs::xpub_t::filter_unsubscribed (const unsigned char *data_, size_t size_)
 		memcpy ((void*) (unsub.data () + 4), data_, size_);
 		pending.push_back (unsub);
     }
+
+    return 0;
 }
 
-void xs::xpub_t::filter_matching (void *subscriber_)
+int xs::xpub_t::filter_matching (void *subscriber_)
 {
     dist.match ((xs::pipe_t*) subscriber_);
+    return 0;
 }
 
 xs::xpub_session_t::xpub_session_t (io_thread_t *io_thread_, bool connect_,

@@ -61,7 +61,7 @@ namespace xs
     private:
 
         //  Overloads from core_t class.
-        void filter_subscribed (const unsigned char *data_, size_t size_);
+        int filter_subscribed (const unsigned char *data_, size_t size_);
 
         //  Check whether the message matches at least one subscription.
         bool match (xs::msg_t *msg_);

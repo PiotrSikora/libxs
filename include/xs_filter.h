@@ -64,13 +64,13 @@ typedef struct
         const unsigned char *data, size_t size);
 } xs_filter_t;
 
-XS_EXPORT void xs_filter_subscribed (void *core,
+XS_EXPORT int xs_filter_subscribed (void *core,
     const unsigned char *data, size_t size);
 
-XS_EXPORT void xs_filter_unsubscribed (void *core,
+XS_EXPORT int xs_filter_unsubscribed (void *core,
     const unsigned char *data, size_t size);
 
-XS_EXPORT void xs_filter_matching (void *core, void *subscriber);
+XS_EXPORT int xs_filter_matching (void *core, void *subscriber);
 
 #undef XS_EXPORT
 

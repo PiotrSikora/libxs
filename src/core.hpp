@@ -29,16 +29,23 @@ namespace xs
     //  This class is not a core of Crossroads. It's rather a callback interface
     //  for extensions, ie. what's extensions see as Crossroads core.
 
-    struct core_t
+    class core_t
     {
-        inline virtual ~core_t () {}
+    public:
 
-        inline virtual void filter_subscribed (const unsigned char *data_,
-            size_t size_) {}
-        inline virtual void filter_unsubscribed (const unsigned char *data_,
-            size_t size_) {};
-        inline virtual void filter_matching (void *subscriber_) {};
+        core_t ();
+        virtual ~core_t ();
 
+        virtual int filter_subscribed (const unsigned char *data_,
+            size_t size_);
+        virtual int filter_unsubscribed (const unsigned char *data_,
+            size_t size_);
+        virtual int filter_matching (void *subscriber_);
+
+    private:
+
+        core_t (const core_t&);
+        const core_t &operator = (const core_t&);
     };
 
 }
