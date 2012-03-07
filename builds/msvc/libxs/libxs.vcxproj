@@ -104,6 +104,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\clock.cpp" />
+    <ClCompile Include="..\..\..\src\core.cpp" />
     <ClCompile Include="..\..\..\src\ctx.cpp" />
     <ClCompile Include="..\..\..\src\decoder.cpp" />
     <ClCompile Include="..\..\..\src\devpoll.cpp" />
@@ -135,6 +136,7 @@
     <ClCompile Include="..\..\..\src\precompiled.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\prefix_filter.cpp" />
     <ClCompile Include="..\..\..\src\pub.cpp" />
     <ClCompile Include="..\..\..\src\pull.cpp" />
     <ClCompile Include="..\..\..\src\push.cpp" />
@@ -165,6 +167,7 @@
     <ClInclude Include="..\..\..\include\xs.h" />
     <ClInclude Include="..\..\..\include\xszmq.h" />
     <ClInclude Include="..\..\..\include\xszmq_utils.h" />
+    <ClInclude Include="..\..\..\include\xs_filter.h" />
     <ClInclude Include="..\..\..\include\xs_utils.h" />
     <ClInclude Include="..\..\..\include\zmq.h" />
     <ClInclude Include="..\..\..\src\array.hpp" />
@@ -173,6 +176,7 @@
     <ClInclude Include="..\..\..\src\clock.hpp" />
     <ClInclude Include="..\..\..\src\command.hpp" />
     <ClInclude Include="..\..\..\src\config.hpp" />
+    <ClInclude Include="..\..\..\src\core.hpp" />
     <ClInclude Include="..\..\..\src\ctx.hpp" />
     <ClInclude Include="..\..\..\src\decoder.hpp" />
     <ClInclude Include="..\..\..\src\devpoll.hpp" />
@@ -206,6 +210,7 @@
     <ClInclude Include="..\..\..\src\pipe.hpp" />
     <ClInclude Include="..\..\..\src\poll.hpp" />
     <ClInclude Include="..\..\..\src\precompiled.hpp" />
+    <ClInclude Include="..\..\..\src\prefix_filter.hpp" />
     <ClInclude Include="..\..\..\src\pub.hpp" />
     <ClInclude Include="..\..\..\src\pull.hpp" />
     <ClInclude Include="..\..\..\src\push.hpp" />

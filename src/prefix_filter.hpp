@@ -63,8 +63,8 @@ namespace xs
             unsigned short count;
             unsigned short live_nodes;
             union {
-                class node_t *node;
-                class node_t **table;
+                struct node_t *node;
+                struct node_t **table;
             } next;
 
         };
