@@ -48,7 +48,7 @@ xs::xsub_t::~xsub_t ()
 {
     //  Deallocate all the filters.
     for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
-        it->type->destroy (it->instance);
+        it->type->destroy ((void*) (core_t*) this, it->instance);
 
     int rc = message.close ();
     errno_assert (rc == 0);
@@ -63,7 +63,7 @@ void xs::xsub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
     //  Send all the cached subscriptions to the new upstream peer.
     tmp_pipe = pipe_;
     for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
-        it->type->enumerate (it->instance, (void*) (core_t*) this);
+        it->type->enumerate ((void*) (core_t*) this, it->instance);
     pipe_->flush ();
     tmp_pipe = NULL;
 }
@@ -89,7 +89,7 @@ void xs::xsub_t::xhiccuped (pipe_t *pipe_)
     //  Send all the cached subscriptions to the hiccuped pipe.
     tmp_pipe = pipe_;
     for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
-        it->type->enumerate (it->instance, (void*) (core_t*) this);
+        it->type->enumerate ((void*) (core_t*) this, it->instance);
     pipe_->flush ();
     tmp_pipe = NULL;
 }
@@ -125,20 +125,22 @@ int xs::xsub_t::xsend (msg_t *msg_, int flags_)
             filter_t f;
             f.type = get_filter (filter_id);
             xs_assert (f.type);
-            f.instance = f.type->create ();
+            f.instance = f.type->create ((void*) (core_t*) this);
             xs_assert (f.instance);
             filters.push_back (f);
             it = filters.end () - 1;
         }
 
-        if (it->type->subscribe (it->instance, NULL, data + 4, size - 4) == 1)
+        if (it->type->subscribe ((void*) (core_t*) this, it->instance,
+              NULL, data + 4, size - 4) == 1)
             return dist.send_to_all (msg_, flags_);
         else
             return 0;
     }
     else if (cmd == XS_CMD_UNSUBSCRIBE) {
         xs_assert (it != filters.end ());
-        if (it->type->unsubscribe (it->instance, NULL, data + 4, size - 4) == 1)
+        if (it->type->unsubscribe ((void*) (core_t*) this, it->instance,
+              NULL, data + 4, size - 4) == 1)
             return dist.send_to_all (msg_, flags_);
         else
             return 0;
@@ -238,8 +240,8 @@ bool xs::xsub_t::xhas_in ()
 bool xs::xsub_t::match (msg_t *msg_)
 {
     for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
-        if (it->type->match (it->instance, (unsigned char*) msg_->data (),
-              msg_->size ()))
+        if (it->type->match ((void*) (core_t*) this, it->instance,
+              (unsigned char*) msg_->data (), msg_->size ()))
             return true;
     return false;
 }

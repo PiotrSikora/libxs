@@ -40,7 +40,7 @@ xs::xpub_t::~xpub_t ()
 {
     //  Deallocate all the filters.
     for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
-        it->type->destroy (it->instance);
+        it->type->destroy ((void*) (core_t*) this, it->instance);
 }
 
 void xs::xpub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
@@ -62,13 +62,14 @@ void xs::xpub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
             filter_t f;
             f.type = get_filter (XS_FILTER_PREFIX);
             xs_assert (f.type);
-            f.instance = f.type->create ();
+            f.instance = f.type->create ((void*) (core_t*) this);
             xs_assert (f.instance);
             filters.push_back (f);
             it = filters.end () - 1;
         }
 
-        it->type->subscribe (it->instance, pipe_, NULL, 0);
+        it->type->subscribe ((void*) (core_t*) this, it->instance, pipe_,
+            NULL, 0);
     }
 
     //  The pipe is active when attached. Let's read the subscriptions from
@@ -115,8 +116,8 @@ void xs::xpub_t::xread_activated (pipe_t *pipe_)
         bool unique;
 		if (cmd == XS_CMD_UNSUBSCRIBE) {
             xs_assert (it != filters.end ());
-            unique = it->type->unsubscribe (it->instance, pipe_, data + 4,
-                size - 4) ? true : false;
+            unique = it->type->unsubscribe ((void*) (core_t*) this,
+                it->instance, pipe_, data + 4, size - 4) ? true : false;
         }
 		else {
 
@@ -126,14 +127,14 @@ void xs::xpub_t::xread_activated (pipe_t *pipe_)
                 filter_t f;
                 f.type = get_filter (filter_id);
                 xs_assert (f.type);
-                f.instance = f.type->create ();
+                f.instance = f.type->create ((void*) (core_t*) this);
                 xs_assert (f.instance);
                 filters.push_back (f);
                 it = filters.end () - 1;
             }
 
-            unique = it->type->subscribe (it->instance, pipe_, data + 4,
-                size - 4) ? true : false;
+            unique = it->type->subscribe ((void*) (core_t*) this, it->instance,
+                pipe_, data + 4, size - 4) ? true : false;
         }
 
         //  If the subscription is not a duplicate store it so that it can be
@@ -154,8 +155,8 @@ void xs::xpub_t::xterminated (pipe_t *pipe_)
 {
     //  Remove the pipe from all the filters.
     for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
-        it->type->unsubscribe_all (it->instance, (void*) pipe_,
-            (void*) (core_t*) this);
+        it->type->unsubscribe_all ((void*) (core_t*) this, it->instance,
+            (void*) pipe_);
 
     dist.terminated (pipe_);
 }
@@ -168,8 +169,8 @@ int xs::xpub_t::xsend (msg_t *msg_, int flags_)
     if (!more) {
         for (filters_t::iterator it = filters.begin (); it != filters.end ();
               ++it)
-            it->type->match_all (it->instance, (unsigned char*) msg_->data (),
-                msg_->size (), (void*) (core_t*) this);
+            it->type->match_all ((void*) (core_t*) this, it->instance,
+                (unsigned char*) msg_->data (), msg_->size ());
     }
 
     //  Send the message to all the pipes that were marked as matching

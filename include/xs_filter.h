@@ -50,27 +50,27 @@ typedef struct
 {
     int extension_type;
     int filter_id;
-    void *(*create) ();
-    void (*destroy) (void *filter);
-    int (*subscribe) (void *filter, void *subscriber,
+    void *(*create) (void *core);
+    void (*destroy) (void *core, void *filter);
+    int (*subscribe) (void *core, void *filter, void *subscriber,
         const unsigned char *data, size_t size);
-    int (*unsubscribe) (void *filter, void *subscriber,
+    int (*unsubscribe) (void *core, void *filter, void *subscriber,
         const unsigned char *data, size_t size);
-    void (*unsubscribe_all) (void *filter, void *subscriber, void *arg);
-    void (*enumerate) (void *filter, void *arg);
-    int (*match) (void *filter,
+    void (*unsubscribe_all) (void *core, void *filter, void *subscriber);
+    void (*enumerate) (void *core, void *filter);
+    int (*match) (void *core, void *filter,
         const unsigned char *data, size_t size);
-    void (*match_all) (void *filter,
-        const unsigned char *data, size_t size, void *arg);
+    void (*match_all) (void *core, void *filter,
+        const unsigned char *data, size_t size);
 } xs_filter_t;
 
-XS_EXPORT void xs_filter_subscribed (int filter_id,
-    const unsigned char *data, size_t size, void *arg);
+XS_EXPORT void xs_filter_subscribed (void *core, int filter_id,
+    const unsigned char *data, size_t size);
 
-XS_EXPORT void xs_filter_unsubscribed (int filter_id,
-    const unsigned char *data, size_t size, void *arg);
+XS_EXPORT void xs_filter_unsubscribed (void *core, int filter_id,
+    const unsigned char *data, size_t size);
 
-XS_EXPORT void xs_filter_matching (void *subscriber, void *arg);
+XS_EXPORT void xs_filter_matching (void *core, void *subscriber);
 
 #undef XS_EXPORT
 

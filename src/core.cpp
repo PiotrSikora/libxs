@@ -22,20 +22,20 @@
 
 #include "core.hpp"
 
-void xs_filter_subscribed (int filter_id_, const unsigned char *data_,
-    size_t size_, void *arg_)
+void xs_filter_subscribed (void *core_, int filter_id_,
+    const unsigned char *data_, size_t size_)
 {
-    ((xs::core_t*) arg_)->filter_subscribed (filter_id_, data_, size_);
+    ((xs::core_t*) core_)->filter_subscribed (filter_id_, data_, size_);
 }
 
-void xs_filter_unsubscribed (int filter_id_, const unsigned char *data_,
-    size_t size_, void *arg_)
+void xs_filter_unsubscribed (void *core_, int filter_id_,
+    const unsigned char *data_, size_t size_)
 {
-    ((xs::core_t*) arg_)->filter_unsubscribed (filter_id_, data_, size_);
+    ((xs::core_t*) core_)->filter_unsubscribed (filter_id_, data_, size_);
 }
 
-void xs_filter_matching (void *subscriber_, void *arg_)
+void xs_filter_matching (void *core_, void *subscriber_)
 {
-    ((xs::core_t*) arg_)->filter_matching (subscriber_);
+    ((xs::core_t*) core_)->filter_matching (subscriber_);
 }
 

@@ -37,31 +37,32 @@ xs::prefix_filter_t::~prefix_filter_t ()
     close (&root);
 }
 
-int xs::prefix_filter_t::subscribe (void *subscriber_,
+int xs::prefix_filter_t::subscribe (void *core_, void *subscriber_,
     const unsigned char *data_, size_t size_)
 {
     return add (&root, data_, size_, (pipe_t*) subscriber_) ? 1 : 0;
 }
 
-int xs::prefix_filter_t::unsubscribe (void *subscriber_,
+int xs::prefix_filter_t::unsubscribe (void *core_, void *subscriber_,
     const unsigned char *data_, size_t size_)
 {
     return rm (&root, data_, size_, (pipe_t*) subscriber_) ? 1 : 0;
 }
 
-void xs::prefix_filter_t::unsubscribe_all (void *subscriber_, void *arg_)
+void xs::prefix_filter_t::unsubscribe_all (void *core_, void *subscriber_)
 {
-    rm (&root, (pipe_t*) subscriber_, arg_);
+    rm (&root, (pipe_t*) subscriber_, core_);
 }
 
-void xs::prefix_filter_t::enumerate (void *arg_)
+void xs::prefix_filter_t::enumerate (void *core_)
 {
     unsigned char *buff = NULL;
-    list (&root, &buff, 0, 0, arg_);
+    list (&root, &buff, 0, 0, core_);
     free (buff);
 }
 
-int xs::prefix_filter_t::match (const unsigned char *data_, size_t size_)
+int xs::prefix_filter_t::match (void *core_,
+    const unsigned char *data_, size_t size_)
 {
     //  This function is on critical path. It deliberately doesn't use
     //  recursion to get a bit better performance.
@@ -96,8 +97,8 @@ int xs::prefix_filter_t::match (const unsigned char *data_, size_t size_)
 
 }
 
-void xs::prefix_filter_t::match_all (const unsigned char *data_, size_t size_,
-    void *arg_)
+void xs::prefix_filter_t::match_all (void *core_,
+    const unsigned char *data_, size_t size_)
 {
     node_t *current = &root;
     while (true) {
@@ -106,7 +107,7 @@ void xs::prefix_filter_t::match_all (const unsigned char *data_, size_t size_,
         if (current->pipes) {
             for (node_t::pipes_t::iterator it = current->pipes->begin ();
                   it != current->pipes->end (); ++it)
-                xs_filter_matching (it->first, arg_);
+                xs_filter_matching (core_, it->first);
         }
 
         //  If we are at the end of the message, there's nothing more to match.
@@ -278,8 +279,8 @@ void xs::prefix_filter_t::rm_helper (node_t *node_, pipe_t *pipe_,
             if (!it->second) {
                 node_->pipes->erase (it);
                 if (node_->pipes->empty ()) {
-                    xs_filter_unsubscribed (XS_FILTER_PREFIX,
-                        *buff_, buffsize_, arg_);
+                    xs_filter_unsubscribed (arg_, XS_FILTER_PREFIX,
+                        *buff_, buffsize_);
                     delete node_->pipes;
                     node_->pipes = 0;
                 }
@@ -518,7 +519,7 @@ void xs::prefix_filter_t::list (node_t *node_, unsigned char **buff_,
 {
     //  If this node is a subscription, apply the function.
     if (node_->pipes)
-        xs_filter_subscribed (XS_FILTER_PREFIX, *buff_, buffsize_, arg_);
+        xs_filter_subscribed (arg_, XS_FILTER_PREFIX, *buff_, buffsize_);
 
     //  Adjust the buffer.
     if (buffsize_ >= maxbuffsize_) {
@@ -556,52 +557,53 @@ bool xs::prefix_filter_t::is_redundant (node_t *node_)
 //  Implementation of the C interface of the filter.
 //  Following functions convert raw C calls into calls to C++ object methods.
 
-static void *create ()
+static void *create (void *core_)
 {
     void *fset = (void*) new (std::nothrow) xs::prefix_filter_t;
     alloc_assert (fset);
     return fset;
 }
 
-static void destroy (void *filter_)
+static void destroy (void *core_, void *filter_)
 {
     delete (xs::prefix_filter_t*) filter_;
 }
 
-static int subscribe (void *filter_, void *subscriber_,
+static int subscribe (void *core_, void *filter_, void *subscriber_,
     const unsigned char *data_, size_t size_)
 {
-    return ((xs::prefix_filter_t*) filter_)->subscribe (subscriber_,
+    return ((xs::prefix_filter_t*) filter_)->subscribe (core_, subscriber_,
         data_, size_);
 }
 
-static int unsubscribe (void *filter_, void *subscriber_,
+static int unsubscribe (void *core_, void *filter_, void *subscriber_,
     const unsigned char *data_, size_t size_)
 {
-    return ((xs::prefix_filter_t*) filter_)->unsubscribe (subscriber_,
+    return ((xs::prefix_filter_t*) filter_)->unsubscribe (core_, subscriber_,
         data_, size_);
 }
 
-static void unsubscribe_all (void *filter_, void *subscriber_, void *arg_)
+static void unsubscribe_all (void *core_, void *filter_, void *subscriber_)
 {
-    ((xs::prefix_filter_t*) filter_)->unsubscribe_all (subscriber_, arg_);
+    ((xs::prefix_filter_t*) filter_)->unsubscribe_all (core_, subscriber_);
 }
 
 
-static void enumerate (void *filter_, void *arg_)
+static void enumerate (void *core_, void *filter_)
 {
-    ((xs::prefix_filter_t*) filter_)->enumerate (arg_);
+    ((xs::prefix_filter_t*) filter_)->enumerate (core_);
 }
 
-static int match (void *filter_, const unsigned char *data_, size_t size_)
+static int match (void *core_, void *filter_,
+    const unsigned char *data_, size_t size_)
 {
-    return ((xs::prefix_filter_t*) filter_)->match (data_, size_);
+    return ((xs::prefix_filter_t*) filter_)->match (core_, data_, size_);
 }
 
-static void match_all (void *filter_, const unsigned char *data_, size_t size_,
-    void *arg_)
+static void match_all (void *core_, void *filter_,
+    const unsigned char *data_, size_t size_)
 {
-    ((xs::prefix_filter_t*) filter_)->match_all (data_, size_, arg_);
+    ((xs::prefix_filter_t*) filter_)->match_all (core_, data_, size_);
 }
 
 static xs_filter_t filter = {
