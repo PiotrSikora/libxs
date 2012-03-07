@@ -154,7 +154,8 @@ void xs::xpub_t::xterminated (pipe_t *pipe_)
 {
     //  Remove the pipe from all the filters.
     for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
-        it->type->unsubscribe_all (it->instance, (void*) pipe_, (void*) this);
+        it->type->unsubscribe_all (it->instance, (void*) pipe_,
+            (void*) (core_t*) this);
 
     dist.terminated (pipe_);
 }
@@ -168,7 +169,7 @@ int xs::xpub_t::xsend (msg_t *msg_, int flags_)
         for (filters_t::iterator it = filters.begin (); it != filters.end ();
               ++it)
             it->type->match_all (it->instance, (unsigned char*) msg_->data (),
-                msg_->size (), (void*) this);
+                msg_->size (), (void*) (core_t*) this);
     }
 
     //  Send the message to all the pipes that were marked as matching
@@ -215,13 +216,11 @@ bool xs::xpub_t::xhas_in ()
     return !pending.empty ();
 }
 
-void xs::xpub_t::send_unsubscription (int filter_id_,
-    const unsigned char *data_, size_t size_, void *arg_)
+void xs::xpub_t::filter_unsubscribed (int filter_id_,
+    const unsigned char *data_, size_t size_)
 {
-    xpub_t *self = (xpub_t*) arg_;
-
     //  In XS_PUB socket, the subscriptions are not passed upstream.
-    if (self->options.type != XS_PUB) {
+    if (options.type != XS_PUB) {
 
 		//  Place the unsubscription to the queue of pending (un)sunscriptions
 		//  to be retrived by the user later on.
@@ -229,8 +228,13 @@ void xs::xpub_t::send_unsubscription (int filter_id_,
         put_uint16 ((unsigned char*) unsub.data (), XS_CMD_UNSUBSCRIBE);
         put_uint16 ((unsigned char*) unsub.data () + 2, filter_id_);
 		memcpy ((void*) (unsub.data () + 4), data_, size_);
-		self->pending.push_back (unsub);
+		pending.push_back (unsub);
     }
+}
+
+void xs::xpub_t::filter_matching (void *subscriber_)
+{
+    dist.match ((xs::pipe_t*) subscriber_);
 }
 
 xs::xpub_session_t::xpub_session_t (io_thread_t *io_thread_, bool connect_,

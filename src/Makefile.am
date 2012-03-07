@@ -35,6 +35,7 @@ libxs_la_SOURCES = \
     clock.hpp \
     command.hpp \
     config.hpp \
+    core.hpp \
     ctx.hpp \
     decoder.hpp \
     devpoll.hpp \
@@ -97,6 +98,7 @@ libxs_la_SOURCES = \
     ypipe.hpp \
     yqueue.hpp \
     clock.cpp \
+    core.cpp \
     ctx.cpp \
     decoder.cpp \
     devpoll.cpp \
@@ -149,7 +151,6 @@ libxs_la_SOURCES = \
     xreq.cpp \
     xsub.cpp \
     xs.cpp \
-    xs_filter.cpp \
     xs_utils.cpp
 
 if ON_MINGW

@@ -18,26 +18,27 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/xs_filter.h"
+#ifndef __XS_CORE_HPP_INCLUDED__
+#define __XS_CORE_HPP_INCLUDED__
 
-#include "xpub.hpp"
-#include "xsub.hpp"
-
-void xs_filter_subscribed (int filter_id_, const unsigned char *data_,
-    size_t size_, void *arg_)
+namespace xs
 {
-    xs::xsub_t::send_subscription (filter_id_, data_, size_, arg_);
+
+    //  This class is not a core of Crossroads. It's rather a callback interface
+    //  for extensions, ie. what's extensions see as Crossroads core.
+
+    struct core_t
+    {
+        inline virtual ~core_t () {}
+
+        inline virtual void filter_subscribed (int filter_id_,
+            const unsigned char *data_, size_t size_) {}
+        inline virtual void filter_unsubscribed (int filter_id_,
+            const unsigned char *data_, size_t size_) {};
+        inline virtual void filter_matching (void *subscriber_) {};
+
+    };
+
 }
 
-void xs_filter_unsubscribed (int filter_id_, const unsigned char *data_,
-    size_t size_, void *arg_)
-{
-    xs::xpub_t::send_unsubscription (filter_id_, data_, size_, arg_);
-}
-
-void xs_filter_matching (void *fid_, void *arg_)
-{
-    xs::xpub_t *self = (xs::xpub_t*) arg_;
-    self->dist.match ((xs::pipe_t*) fid_);
-}
-
+#endif

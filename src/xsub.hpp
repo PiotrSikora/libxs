@@ -28,6 +28,7 @@
 #include "socket_base.hpp"
 #include "session_base.hpp"
 #include "dist.hpp"
+#include "core.hpp"
 #include "fq.hpp"
 
 namespace xs
@@ -37,8 +38,7 @@ namespace xs
     class pipe_t;
     class io_thread_t;
 
-    class xsub_t :
-        public socket_base_t
+    class xsub_t : public socket_base_t, public core_t
     {
     public:
 
@@ -60,16 +60,12 @@ namespace xs
 
     private:
 
+        //  Overloads from core_t class.
+        void filter_subscribed (int filter_id_,
+            const unsigned char *data_, size_t size_);
+
         //  Check whether the message matches at least one subscription.
         bool match (xs::msg_t *msg_);
-
-    //  TODO: Should this be really public?
-    public:
-        //  Function to be applied to the trie to send all the subsciptions
-        //  upstream.
-        static void send_subscription (int filter_id_,
-            const unsigned char *data_, size_t size_, void *arg_);
-    private:
 
         //  Fair queueing object for inbound pipes.
         fq_t fq;
@@ -94,6 +90,9 @@ namespace xs
         //  If true, part of a multipart message was already received, but
         //  there are following parts still waiting.
         bool more;
+
+        //  Different values stored while filter extensions are being executed.
+        pipe_t *tmp_pipe;
 
         xsub_t (const xsub_t&);
         const xsub_t &operator = (const xsub_t&);

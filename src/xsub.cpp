@@ -28,7 +28,8 @@
 xs::xsub_t::xsub_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     socket_base_t (parent_, tid_, sid_),
     has_message (false),
-    more (false)
+    more (false),
+    tmp_pipe (NULL)
 {
     options.type = XS_XSUB;
 
@@ -60,9 +61,11 @@ void xs::xsub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
     dist.attach (pipe_);
 
     //  Send all the cached subscriptions to the new upstream peer.
+    tmp_pipe = pipe_;
     for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
-        it->type->enumerate (it->instance, (void*) pipe_);
+        it->type->enumerate (it->instance, (void*) (core_t*) this);
     pipe_->flush ();
+    tmp_pipe = NULL;
 }
 
 void xs::xsub_t::xread_activated (pipe_t *pipe_)
@@ -84,9 +87,11 @@ void xs::xsub_t::xterminated (pipe_t *pipe_)
 void xs::xsub_t::xhiccuped (pipe_t *pipe_)
 {
     //  Send all the cached subscriptions to the hiccuped pipe.
+    tmp_pipe = pipe_;
     for (filters_t::iterator it = filters.begin (); it != filters.end (); ++it)
-        it->type->enumerate (it->instance, (void*) pipe_);
+        it->type->enumerate (it->instance, (void*) (core_t*) this);
     pipe_->flush ();
+    tmp_pipe = NULL;
 }
 
 int xs::xsub_t::xsend (msg_t *msg_, int flags_)
@@ -239,11 +244,9 @@ bool xs::xsub_t::match (msg_t *msg_)
     return false;
 }
 
-void xs::xsub_t::send_subscription (int filter_id_, const unsigned char *data_,
-    size_t size_, void *arg_)
+void xs::xsub_t::filter_subscribed (int filter_id_, const unsigned char *data_,
+    size_t size_)
 {
-    pipe_t *pipe = (pipe_t*) arg_;
-
     //  Create the subsctription message.
     msg_t msg;
     int rc = msg.init_size (size_ + 4);
@@ -254,7 +257,7 @@ void xs::xsub_t::send_subscription (int filter_id_, const unsigned char *data_,
     memcpy (data + 4, data_, size_);
 
     //  Send it to the pipe.
-    bool sent = pipe->write (&msg);
+    bool sent = tmp_pipe->write (&msg);
 
     //  If we reached the SNDHWM, and thus cannot send the subscription, drop
     //  the subscription message instead. This matches the behaviour of

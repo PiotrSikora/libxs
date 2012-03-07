@@ -31,6 +31,7 @@
 #include "array.hpp"
 #include "dist.hpp"
 #include "blob.hpp"
+#include "core.hpp"
 
 namespace xs
 {
@@ -40,8 +41,7 @@ namespace xs
     class pipe_t;
     class io_thread_t;
 
-    class xpub_t :
-        public socket_base_t
+    class xpub_t : public socket_base_t, public core_t
     {
     public:
 
@@ -60,13 +60,10 @@ namespace xs
 
     private:
 
-    //  TODO: Should this really be public?
-    public:
-        //  Function to be applied to the trie to send all the subsciptions
-        //  upstream.
-        static void send_unsubscription (int filter_id_,
-            const unsigned char *data_, size_t size_, void *arg_);
-    private:
+        //  Overloaded functions from core_t.
+        void filter_unsubscribed (int filter_id_,
+            const unsigned char *data_, size_t size_);
+        void filter_matching (void *subscriber_);
 
         //  The repository of subscriptions.
         struct filter_t
@@ -77,11 +74,8 @@ namespace xs
         typedef std::vector <filter_t> filters_t;
         filters_t filters;
 
-    //  TODO: Should this really be public?
-    public:
         //  Distributor of messages holding the list of outbound pipes.
         dist_t dist;
-    private:
 
         //  True if we are in the middle of sending a multi-part message.
         bool more;
