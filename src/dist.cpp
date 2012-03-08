@@ -80,13 +80,33 @@ void xs::dist_t::terminated (pipe_t *pipe_)
 {
     //  Remove the pipe from the list; adjust number of matching, active and/or
     //  eligible pipes accordingly.
-    if (pipes.index (pipe_) < matching)
-        matching--;
-    if (pipes.index (pipe_) < active)
-        active--;
-    if (pipes.index (pipe_) < eligible)
-        eligible--;
-    pipes.erase (pipe_);
+
+    int i = pipes.index (pipe_);
+    if (i < (int) matching) {
+        pipes [i] = pipes [matching - 1];
+        pipes [matching - 1] = NULL;
+        if (pipes [i])
+            ((pipes_t::item_t*) pipes [i])->set_array_index (i);
+        --matching;
+        i = matching;
+    }
+    if (i < (int) active) {
+        pipes [i] = pipes [active - 1];
+        pipes [active - 1] = NULL;
+        if (pipes [i])
+            ((pipes_t::item_t*) pipes [i])->set_array_index (i);
+        --active;
+        i = active;
+    }
+    if (i < (int) eligible) {
+        pipes [i] = pipes [eligible - 1];
+        pipes [eligible - 1] = NULL;
+        if (pipes [i])
+            ((pipes_t::item_t*) pipes [i])->set_array_index (i);
+        --eligible;
+        i = eligible;
+    }
+    pipes.erase (i);
 }
 
 void xs::dist_t::activated (pipe_t *pipe_)

@@ -72,11 +72,9 @@ namespace xs
 
     template <typename T, int ID = 0> class array_t
     {
-    private:
+    public:
 
         typedef array_item_t <ID> item_t;
-
-    public:
 
         typedef typename std::vector <T*>::size_type size_type;
 
