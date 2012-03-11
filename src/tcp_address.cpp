@@ -274,7 +274,8 @@ int xs::tcp_address_t::resolve_interface (char const *interface_,
     //  service-name irregularity due to indeterminate socktype.
     req.ai_flags = AI_PASSIVE | AI_NUMERICHOST;
 
-#ifndef XS_HAVE_WINDOWS
+#if defined AI_V4MAPPED && !defined XS_HAVE_WINDOWS && !defined XS_HAVE_FREEBSD
+    //  On FreeBSD, AI_V4MAPPED  isn't supported.
     //  Windows by default maps IPv4 addresses into IPv6. In this API we only
     //  require IPv4-mapped addresses when no native IPv6 interfaces are
     //  available (~AI_ALL).  This saves an additional DNS roundtrip for IPv4
@@ -319,8 +320,9 @@ int xs::tcp_address_t::resolve_hostname (const char *hostname_, bool ipv4only_)
     //  Need to choose one to avoid duplicate results from getaddrinfo() - this
     //  doesn't really matter, since it's not included in the addr-output.
     req.ai_socktype = SOCK_STREAM;
-    
-#ifndef XS_HAVE_WINDOWS
+
+#if defined AI_V4MAPPED && !defined XS_HAVE_WINDOWS && !defined XS_HAVE_FREEBSD
+    //  On FreeBSD, AI_V4MAPPED  isn't supported.
     //  Windows by default maps IPv4 addresses into IPv6. In this API we only
     //  require IPv4-mapped addresses when no native IPv6 interfaces are
     //  available.  This saves an additional DNS roundtrip for IPv4 addresses.
