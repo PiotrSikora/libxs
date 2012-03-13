@@ -165,8 +165,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\xs.h" />
-    <ClInclude Include="..\..\..\include\xszmq.h" />
-    <ClInclude Include="..\..\..\include\xszmq_utils.h" />
     <ClInclude Include="..\..\..\include\xs_utils.h" />
     <ClInclude Include="..\..\..\include\zmq.h" />
     <ClInclude Include="..\..\..\src\array.hpp" />
