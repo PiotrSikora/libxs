@@ -377,7 +377,7 @@ int zmq_recv (void *s, zmq_msg_t *msg, int flags)
 
 int zmq_poll (zmq_pollitem_t *items, int nitems, long timeout)
 {
-    return xs_poll ((xs_pollitem_t*) items, nitems, timeout / 1000);
+    return xs_poll ((xs_pollitem_t*) items, nitems, (int) (timeout / 1000));
 }
 
 int zmq_device (int device, void *frontend, void *backend)

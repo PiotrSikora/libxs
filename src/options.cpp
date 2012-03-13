@@ -21,6 +21,7 @@
 */
 
 #include <string.h>
+#include <limits>
 
 #include "options.hpp"
 #include "err.hpp"
@@ -40,7 +41,7 @@ xs::options_t::options_t () :
     reconnect_ivl (100),
     reconnect_ivl_max (0),
     backlog (100),
-    maxmsgsize (-1),
+    maxmsgsize (std::numeric_limits <uint64_t>::max ()),
     rcvtimeo (-1),
     sndtimeo (-1),
     ipv4only (1),
@@ -169,11 +170,11 @@ int xs::options_t::setsockopt (int option_, const void *optval_,
         return 0;
 
     case XS_MAXMSGSIZE:
-        if (optvallen_ != sizeof (int64_t)) {
+        if (optvallen_ != sizeof (uint64_t)) {
             errno = EINVAL;
             return -1;
         }
-        maxmsgsize = *((int64_t*) optval_);
+        maxmsgsize = *((uint64_t*) optval_);
         return 0;
 
     case XS_MULTICAST_HOPS:
@@ -343,12 +344,12 @@ int xs::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         return 0;
 
     case XS_MAXMSGSIZE:
-        if (*optvallen_ < sizeof (int64_t)) {
+        if (*optvallen_ < sizeof (uint64_t)) {
             errno = EINVAL;
             return -1;
         }
-        *((int64_t*) optval_) = maxmsgsize;
-        *optvallen_ = sizeof (int64_t);
+        *((uint64_t*) optval_) = maxmsgsize;
+        *optvallen_ = sizeof (uint64_t);
         return 0;
 
     case XS_MULTICAST_HOPS:

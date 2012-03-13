@@ -28,7 +28,7 @@
 #include "wire.hpp"
 #include "err.hpp"
 
-xs::decoder_t::decoder_t (size_t bufsize_, int64_t maxmsgsize_) :
+xs::decoder_t::decoder_t (size_t bufsize_, uint64_t maxmsgsize_) :
     decoder_base_t <decoder_t> (bufsize_),
     session (NULL),
     maxmsgsize (maxmsgsize_)
@@ -70,7 +70,7 @@ bool xs::decoder_t::one_byte_size_ready ()
         //  close it before calling xs_msg_init_size, however, it's a 0-byte
         //  message and thus we can treat it as uninitialised...
         int rc;
-        if (maxmsgsize >= 0 && (int64_t) (*tmpbuf - 1) > maxmsgsize) {
+        if (maxmsgsize >= 0 && (uint64_t) (*tmpbuf - 1) > maxmsgsize) {
             rc = -1;
             errno = ENOMEM;
         }
@@ -105,7 +105,7 @@ bool xs::decoder_t::eight_byte_size_ready ()
     //  close it before calling xs_msg_init_size, however, it's a 0-byte
     //  message and thus we can treat it as uninitialised...
     int rc;
-    if (maxmsgsize >= 0 && (int64_t) (size - 1) > maxmsgsize) {
+    if (maxmsgsize >= 0 && (uint64_t) (size - 1) > maxmsgsize) {
         rc = -1;
         errno = ENOMEM;
     }

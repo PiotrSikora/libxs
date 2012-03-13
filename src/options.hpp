@@ -78,7 +78,7 @@ namespace xs
         int backlog;
 
         //  Maximal size of message to handle.
-        int64_t maxmsgsize;
+        uint64_t maxmsgsize;
 
         // The timeout for send/recv operations for this socket.
         int rcvtimeo;

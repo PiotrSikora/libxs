@@ -193,7 +193,7 @@ namespace xs
     {
     public:
 
-        decoder_t (size_t bufsize_, int64_t maxmsgsize_);
+        decoder_t (size_t bufsize_, uint64_t maxmsgsize_);
         ~decoder_t ();
 
         void set_session (xs::session_base_t *session_);
@@ -209,7 +209,7 @@ namespace xs
         unsigned char tmpbuf [8];
         msg_t in_progress;
 
-        int64_t maxmsgsize;
+        uint64_t maxmsgsize;
 
         decoder_t (const decoder_t&);
         void operator = (const decoder_t&);

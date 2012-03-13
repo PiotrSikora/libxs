@@ -280,12 +280,12 @@ XS_MAXMSGSIZE: Maximum acceptable inbound message size
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Limits the size of the inbound message. If a peer sends a message larger than
-XS_MAXMSGSIZE it is disconnected. Value of -1 means 'no limit'.
+XS_MAXMSGSIZE it is disconnected.
 
 [horizontal]
-Option value type:: int64_t
+Option value type:: uint64_t
 Option value unit:: bytes
-Default value:: -1
+Default value:: 2^64-1
 Applicable socket types:: all
 
 
