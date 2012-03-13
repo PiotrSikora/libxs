@@ -5,14 +5,14 @@ lib_LTLIBRARIES = libxs.la libzmq.la
 
 pkgconfig_DATA = libxs.pc libzmq.pc
 
-include_HEADERS = ../include/xs.h ../include/xs_utils.h \
+include_HEADERS = ../include/xs.h \
     ../include/zmq.h ../include/zmq_utils.h
 else
 lib_LTLIBRARIES = libxs.la
 
 pkgconfig_DATA = libxs.pc
 
-include_HEADERS = ../include/xs.h ../include/xs_utils.h
+include_HEADERS = ../include/xs.h
 endif
 
 libxs_la_SOURCES = \
@@ -138,8 +138,7 @@ libxs_la_SOURCES = \
     xrep.cpp \
     xreq.cpp \
     xsub.cpp \
-    xs.cpp \
-    xs_utils.cpp
+    xs.cpp
 
 if ON_MINGW
 libxs_la_LDFLAGS = -no-undefined -avoid-version -version-info @LIBXS_ABI_VERSION@ @LIBXS_EXTRA_LDFLAGS@

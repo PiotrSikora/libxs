@@ -37,6 +37,7 @@
 #include "config.hpp"
 #include "likely.hpp"
 #include "upoll.hpp"
+#include "clock.hpp"
 #include "ctx.hpp"
 #include "err.hpp"
 #include "msg.hpp"
@@ -356,4 +357,24 @@ int xs_errno ()
     return errno;
 }
 
+//  The following utility functions are exported for use from language bindings
+//  in performance tests, for the purpose of consistent results in such tests.
+//  They are not considered part of the core XS API per se, use at your own
+//  risk!
+
+void *xs_stopwatch_start ()
+{
+    uint64_t *watch = (uint64_t*) malloc (sizeof (uint64_t));
+    alloc_assert (watch);
+    *watch = xs::clock_t::now_us ();
+    return (void*) watch;
+}
+
+unsigned long xs_stopwatch_stop (void *watch_)
+{
+    uint64_t end = xs::clock_t::now_us ();
+    uint64_t start = *(uint64_t*) watch_;
+    free (watch_);
+    return (unsigned long) (end - start);
+}
 

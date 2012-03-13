@@ -241,6 +241,20 @@ typedef struct
 
 XS_EXPORT int xs_poll (xs_pollitem_t *items, int nitems, long timeout);
 
+/******************************************************************************/
+/*  The following utility functions are exported for use from language        */
+/*  bindings in performance tests, for the purpose of consistent results in   */
+/*  such tests.  They are not considered part of the core XS API per se,      */
+/*  use at your own risk!                                                     */
+/******************************************************************************/
+
+/*  Starts the stopwatch. Returns the handle to the watch.                    */
+XS_EXPORT void *xs_stopwatch_start (void);
+
+/*  Stops the stopwatch. Returns the number of microseconds elapsed since     */
+/*  the stopwatch was started.                                                */
+XS_EXPORT unsigned long xs_stopwatch_stop (void *watch);
+
 #undef XS_EXPORT
 
 #ifdef __cplusplus
