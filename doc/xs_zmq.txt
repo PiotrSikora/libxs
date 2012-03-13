@@ -1,10 +1,10 @@
-zmq(7)
-======
+xs_zmq(7)
+=========
 
 
 NAME
 ----
-zmq - Crossroads I/O ZeroMQ compatibility library
+xs_zmq - Crossroads I/O ZeroMQ compatibility library
 
 
 SYNOPSIS
@@ -20,21 +20,23 @@ This 'libzmq' compatibility library is provided by the Crossroads I/O project
 as a transitional drop-in replacement for existing applications and language
 bindings written for the ZeroMQ library.
 
-The interfaces provided emulate those provided by ZeroMQ release 2.1.11, and
-binary compatibility is provided for ABI version 1.0.0.
+The intent is to ease transition of existing ZeroMQ applications and
+language bindings to Crossroads I/O, thus this feature will not be
+maintained indefinitely and developers are strongly encouraged to migrate
+their applications to native 'libxs' interfaces.
 
-Existing applications can use these interfaces as a drop-in replacement for the
-ZeroMQ-provided 'libzmq' by installing the Crossroads version of this library
-in its place.
+'libzmq' interfaces provided emulate those provided by ZeroMQ release
+2.1.11, and binary compatibility is provided for ABI version 1.0.0.
 
-Applications can also be recompiled against this library with no code or build
-system changes.
+Existing applications can use these interfaces as a drop-in replacement for
+the ZeroMQ-provided 'libzmq' by installing the Crossroads version of this
+library in its place.  Applications can also be recompiled against this
+library with no code or build system changes.
 
 IMPORTANT: The 'libzmq' compatibility library is an optional component of
-the Crossroads project, intended as a way to ease transition of existing
-applications and language bindings to the native 'libxs' interfaces, this
-feature will not be maintained indefinitely, hence developers are strongly
-encouraged to migrate their applications to 'libxs'.
+Crossroads I/O, and is only built and installed if your copy of the
+Crossroads library was configured with `--enable-libzmq` at build time.
+
 
 CONSTANTS
 ---------
