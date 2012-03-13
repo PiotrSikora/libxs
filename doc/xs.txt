@@ -179,9 +179,8 @@ provided by the vendor of their language binding.
 ZEROMQ COMPATIBILITY
 --------------------
 The Crossroads library provides an optional drop-in 'libzmq' compatibility
-library for ZeroMQ applications.  If your version of Crossroads was built with
-the `--enable-libzmq` option, you can find the compatibility library
-documentation in linkxs:zmq[7].
+library for ZeroMQ applications.  See linkxs:xs_zmq[7] for documentation on
+this option.
 
 
 AUTHORS
