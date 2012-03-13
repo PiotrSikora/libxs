@@ -26,13 +26,106 @@
 #include <string.h>
 #include <stdio.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 #include "../include/xs.h"
 #include "../include/xs_utils.h"
 #include "../src/platform.hpp"
 
+#if !defined XS_HAVE_WINDOWS
+#include <unistd.h>
+#include <pthread.h>
+#else
+#include "../src/windows.hpp"
+#endif
+
 #if !defined XS_TEST_MAIN
 #define XS_TEST_MAIN main
+#endif
+
+#if defined XS_HAVE_WINDOWS
+#define sleep(s) Sleep ((s) * 1000)
+#endif
+
+#if defined XS_HAVE_WINDOWS
+
+struct arg_t
+{
+    HANDLE handle;
+    void (*fn) (void *arg);
+    void *arg;
+};
+
+extern "C"
+{
+    static unsigned int __stdcall thread_routine (void *arg_)
+    {
+        arg_t *arg = (arg_t*) arg_;
+        arg->fn (arg->arg);
+        return 0;
+    }
+}
+
+void *thread_create (void (*fn_) (void *arg_), void *arg_)
+{
+    arg_t *arg = (arg_t*) malloc (sizeof (arg_t));
+    assert (arg);
+    arg->fn = fn_;
+    arg->arg = arg_;
+    arg->handle = (HANDLE) _beginthreadex (NULL, 0,
+        &::thread_routine, (void*) arg, 0 , NULL);
+    win_assert (arg->handle != NULL);
+    return (void*) arg;
+}
+
+void thread_join (void *thread_)
+{
+    arg_t *arg = (arg_t*) thread_;
+    DWORD rc = WaitForSingleObject (arg->handle, INFINITE);
+    win_assert (rc != WAIT_FAILED);
+    BOOL rc2 = CloseHandle (arg->handle);
+    win_assert (rc2 != 0);
+    free (arg);
+}
+
+#else
+
+struct arg_t
+{
+    pthread_t handle;
+    void (*fn) (void *arg);
+    void *arg;
+};
+
+extern "C"
+{
+    static void *thread_routine (void *arg_)
+    {
+        arg_t *arg = (arg_t*) arg_;
+        arg->fn (arg->arg);
+        return NULL;
+    }
+}
+
+void *thread_create (void (*fn_) (void *arg_), void *arg_)
+{
+    arg_t *arg = (arg_t*) malloc (sizeof (arg_t));
+    assert (arg);
+    arg->fn = fn_;
+    arg->arg = arg_;
+    int rc = pthread_create (&arg->handle, NULL, thread_routine, (void*) arg);
+    assert (rc == 0);
+    return (void*) arg;
+}
+
+void thread_join (void *thread_)
+{
+    arg_t *arg = (arg_t*) thread_;
+    int rc = pthread_join (arg->handle, NULL);
+    assert (rc == 0);
+    free (arg);
+}
+
 #endif
 
 inline void bounce (void *sb, void *sc)

@@ -62,7 +62,7 @@ int XS_TEST_MAIN ()
     assert (rc >= 0);
 
     //  Wait a bit till the subscription gets to the publisher.
-    xs_sleep (1);
+    sleep (1);
 
     //  Send an empty message.
     rc = xs_send (pub, NULL, 0, 0);

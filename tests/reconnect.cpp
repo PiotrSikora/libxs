@@ -39,7 +39,7 @@ int XS_TEST_MAIN ()
     assert (rc == 3);
 
     //  Wait a while for few attempts to reconnect to happen.
-    xs_sleep (1);
+    sleep (1);
 
     //  Bind the peer and get the message.
     rc = xs_bind (pull, "tcp://127.0.0.1:5560");
@@ -67,7 +67,7 @@ int XS_TEST_MAIN ()
     assert (rc == 3);
 
     //  Wait a while for few attempts to reconnect to happen.
-    xs_sleep (1);
+    sleep (1);
 
     //  Bind the peer and get the message.
     rc = xs_bind (pull, "tcp://127.0.0.1:5560");
