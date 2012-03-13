@@ -25,9 +25,17 @@
 #include "../include/xs.h"
 #include "../include/xs_utils.h"
 
+#include "platform.hpp"
+
 #include <assert.h>
 #include <stdlib.h>
 #include <stdint.h>
+
+#if !defined XS_HAVE_WINDOWS
+#include <unistd.h>
+#else
+#include <windows.hpp>
+#endif
 
 void zmq_version (int *major_, int *minor_, int *patch_)
 {
@@ -451,8 +459,12 @@ unsigned long zmq_stopwatch_stop (void *watch)
     return xs_stopwatch_stop (watch);
 }
 
-void zmq_sleep (int seconds)
+void zmq_sleep (int seconds_)
 {
-    xs_sleep (seconds);
+#if defined XS_HAVE_WINDOWS
+    Sleep (seconds_ * 1000);
+#else
+    sleep (seconds_);
+#endif
 }
 

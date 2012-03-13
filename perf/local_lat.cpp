@@ -91,8 +91,6 @@ int main (int argc, char *argv [])
         return -1;
     }
 
-    xs_sleep (1);
-
     rc = xs_close (s);
     if (rc != 0) {
         printf ("error in xs_close: %s\n", xs_strerror (errno));

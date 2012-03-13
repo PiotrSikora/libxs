@@ -70,12 +70,12 @@ int XS_TEST_MAIN ()
         for (i = 0; i != THREAD_COUNT; i++) {
             s2 = xs_socket (ctx, XS_SUB);
             assert (s2);
-            threads [i] = xs_thread_create (shutdown_stress_worker, s2);
+            threads [i] = thread_create (shutdown_stress_worker, s2);
             assert (threads [i]);
         }
 
         for (i = 0; i != THREAD_COUNT; i++)
-            xs_thread_join (threads [i]);
+            thread_join (threads [i]);
 
         rc = xs_close (s1);
         assert (rc == 0);

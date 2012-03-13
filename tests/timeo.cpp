@@ -26,12 +26,12 @@ extern "C"
     {
         //  Worker thread connects after delay of 1 second. Then it waits
         //  for 1 more second, so that async connect has time to succeed.
-        xs_sleep (1);
+        sleep (1);
         void *sc = xs_socket (ctx_, XS_PUSH);
         assert (sc);
         int rc = xs_connect (sc, "inproc://timeout_test");
         assert (rc == 0);
-        xs_sleep (1);
+        sleep (1);
         rc = xs_close (sc);
         assert (rc == 0);
     }
@@ -72,7 +72,7 @@ int XS_TEST_MAIN ()
     timeout = 2000;
     rc = xs_setsockopt(sb, XS_RCVTIMEO, &timeout, timeout_size);
     assert (rc == 0);
-    void *thread = xs_thread_create (timeo_worker, ctx);
+    void *thread = thread_create (timeo_worker, ctx);
     assert (thread);
     watch = xs_stopwatch_start ();
     rc = xs_recv (sb, buf, 32, 0);
@@ -80,7 +80,7 @@ int XS_TEST_MAIN ()
     assert (xs_errno () == EAGAIN);
     elapsed = xs_stopwatch_stop (watch);
     assert (elapsed > 1900000 && elapsed < 2100000);
-    xs_thread_join (thread);
+    thread_join (thread);
 
     //  Check that timeouts don't break normal message transfer.
     void *sc = xs_socket (ctx, XS_PUSH);
