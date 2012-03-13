@@ -28,14 +28,14 @@ AC_SUBST(PACKAGE_VERSION)
 LIBXS_ABI_VERSION="1:0:0"
 AC_SUBST(LIBXS_ABI_VERSION)
 
-# ABI version for libxszmq
+# ABI version for XS libzmq compatibility library
 #
 # This must be set to the ABI version of libzmq we are emulating.
 # This is currently libzmq 2.1 which is ABI 1.0.0.
 #
-# libxszmq -version-info current:revision:age
-LIBXSZMQ_ABI_VERSION="1:0:0"
-AC_SUBST(LIBXSZMQ_ABI_VERSION)
+# libzmq -version-info current:revision:age
+LIBZMQ_ABI_VERSION="1:0:0"
+AC_SUBST(LIBZMQ_ABI_VERSION)
 
 # Take a copy of original flags
 XS_ORIG_CFLAGS="${CFLAGS:-none}"
@@ -279,14 +279,14 @@ AC_TYPE_UINT32_T
 AC_C_VOLATILE
 
 #  libzmq compatibility mode
-libxs_libzmq_compat="no"
-AC_ARG_ENABLE([libzmq-compat], [AS_HELP_STRING([--enable-libzmq-compat],
+libxs_libzmq="no"
+AC_ARG_ENABLE([libzmq], [AS_HELP_STRING([--enable-libzmq],
     [install libzmq compatibility library and headers [default=no]])],
-    [enable_libzmq_compat=$enableval], [enable_libzmq_compat=no])
+    [enable_libzmq=$enableval], [enable_libzmq=no])
 
-if test "x$enable_libzmq_compat" != "xno"; then
+if test "x$enable_libzmq" != "xno"; then
     AC_MSG_NOTICE([enabling libzmq compatibility library and headers])
-    libxs_libzmq_compat="yes"
+    libxs_libzmq="yes"
 fi
 
 #  PGM extension
@@ -381,7 +381,7 @@ if test "x$libxs_pedantic" = "xyes"; then
 fi
 AC_LANG_POP([C++])
 
-AM_CONDITIONAL(BUILD_LIBZMQ, test "x$libxs_libzmq_compat" = "xyes")
+AM_CONDITIONAL(BUILD_LIBZMQ, test "x$libxs_libzmq" = "xyes")
 AM_CONDITIONAL(BUILD_PGM, test "x$libxs_pgm_ext" = "xyes")
 AM_CONDITIONAL(ON_MINGW, test "x$libxs_on_mingw32" = "xyes")
 
@@ -401,10 +401,10 @@ AC_SUBST(LIBXS_EXTRA_CXXFLAGS)
 AC_SUBST(LIBXS_EXTRA_LDFLAGS)
 
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile
-    perf/Makefile src/libxs.pc src/libxszmq.pc \
+    perf/Makefile src/libxs.pc \
     builds/msvc/Makefile tests/Makefile \
     foreign/openpgm/Makefile])
-if test "x$libxs_libzmq_compat" == "xyes"; then
+if test "x$libxs_libzmq" == "xyes"; then
     AC_CONFIG_FILES([src/libzmq.pc])
 fi
 AC_OUTPUT
@@ -422,7 +422,7 @@ Configuration for $PACKAGE_STRING
     GCC code coverage reporting: ${XS_GCOV-no}
     Polling system: $libxs_cv_poller
     Disable eventfd: $xs_disable_eventfd
-    Build libzmq compatibility library and headers: $libxs_libzmq_compat
+    Build libzmq compatibility library and headers: $libxs_libzmq
     PGM extension: $with_pgm_ext
     Use system-provided PGM library: $with_system_pgm_ext
     Build documentation: $libxs_build_doc
@@ -439,8 +439,8 @@ Installation:
 
 EOF
 
-if test "x$libxs_libzmq_compat" == "xyes"; then
-    AC_MSG_WARN([The --enable-libzmq-compat option was specified:])
+if test "x$libxs_libzmq" == "xyes"; then
+    AC_MSG_WARN([The --enable-libzmq option was specified:])
     AC_MSG_WARN([libzmq compatibility library and headers are enabled.])
     AC_MSG_WARN([This will overwrite any existing installation of libzmq.])
 fi
