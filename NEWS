@@ -1,0 +1,57 @@
+Crossroads I/O Release Notes
+----------------------------
+
+This file documents the major changes in between releases of Crossroads
+I/O. For a detailed list of changes please refer to Git history, or the
+ChangeLog file included with your distribution of Crossroads.
+
+
+Release 1.0.0 (15 March 2012)
+-----------------------------
+
+Initial release.  Changes listed here are as compared to libzmq release
+3.1.
+
+New features:
+
+* The io_threads argument has been removed from xs_init(), and the default
+  number of I/O threads per context is now 1.
+* Context options added - see xs_setctxopt(3):
+  * The XS_IO_THREADS context option allows the user to specify the size of
+    the worker thread pool.
+  * The XS_MAX_SOCKETS context option allows the user to specify the
+    maximum number of sockets that can exist in parallel within a context.
+* Allow setting the source address for TCP connections - see xs_tcp(7).
+* ZeroMQ drop-in compatibility mode, enabled by the --enable-libzmq option
+  to configure. This is a binary compatible emulation of the ZeroMQ 2.1.11
+  API, for details see zmq(7).
+
+Bugfixes:
+
+* Fix pgm_receiver.cpp: zmq_assert (pending_bytes == 0). (LIBZMQ-205)
+* Fix assertion in pgm_sender_t::plug(). (LIBZMQ-303)
+* Race condition in zmq_term() fixed.
+* Message loss when a SUB socket disconnects fixed.
+* Fix data loss for PUB/SUB and unidirectional transports. (LIBZMQ-268)
+* Bug in linger implementation fixed.
+* Fix IPC transport domain socket stream file not being removed when
+  connection is closed.
+* Removal of pipe from dist_t fixed.
+* Only use AI_V4MAPPED if defined, and don't use it on FreeBSD.
+
+Optimisation:
+
+* Several optimisations to reduce the memory size of PUB/SUB subscription
+  map.
+* Avoid one extra call to poll() when there are no more data to send.
+
+Build:
+
+* MSVC build updated to use MSVC2010 instead of MSVC2008.
+* configure prints out a summary of XS configuration.
+
+Self tests:
+
+* Many more tests have been added, see the tests/ subdirectory.
+* The self tests can now be run from a MSVC build, see the "tests" project.
+
