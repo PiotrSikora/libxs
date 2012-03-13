@@ -167,9 +167,6 @@
     <ClCompile Include="..\..\..\src\xs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\xs_utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\monitor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -185,9 +182,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\xs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\xs_utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\array.hpp">

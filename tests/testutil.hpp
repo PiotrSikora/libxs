@@ -29,7 +29,6 @@
 #include <stdlib.h>
 
 #include "../include/xs.h"
-#include "../include/xs_utils.h"
 #include "../src/platform.hpp"
 
 #if !defined XS_HAVE_WINDOWS
@@ -74,7 +73,7 @@ void *thread_create (void (*fn_) (void *arg_), void *arg_)
     arg->arg = arg_;
     arg->handle = (HANDLE) _beginthreadex (NULL, 0,
         &::thread_routine, (void*) arg, 0 , NULL);
-    win_assert (arg->handle != NULL);
+    assert (arg->handle != NULL);
     return (void*) arg;
 }
 
@@ -82,9 +81,9 @@ void thread_join (void *thread_)
 {
     arg_t *arg = (arg_t*) thread_;
     DWORD rc = WaitForSingleObject (arg->handle, INFINITE);
-    win_assert (rc != WAIT_FAILED);
+    assert (rc != WAIT_FAILED);
     BOOL rc2 = CloseHandle (arg->handle);
-    win_assert (rc2 != 0);
+    assert (rc2 != 0);
     free (arg);
 }
 

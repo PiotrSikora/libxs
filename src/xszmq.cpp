@@ -23,7 +23,6 @@
 #include "../include/zmq_utils.h"
 
 #include "../include/xs.h"
-#include "../include/xs_utils.h"
 
 #include "platform.hpp"
 
@@ -34,7 +33,7 @@
 #if !defined XS_HAVE_WINDOWS
 #include <unistd.h>
 #else
-#include <windows.hpp>
+#include "windows.hpp"
 #endif
 
 void zmq_version (int *major_, int *minor_, int *patch_)

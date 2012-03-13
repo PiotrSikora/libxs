@@ -139,7 +139,7 @@ int main ()
     assert (rc == 0);
 
     fprintf (stderr, "SUCCESS\n");
-    xs_sleep (1);
+    sleep (1);
 
     return 0;
 }

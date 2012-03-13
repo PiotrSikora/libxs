@@ -20,7 +20,6 @@
 */
 
 #include "../include/xs.h"
-#include "../include/xs_utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

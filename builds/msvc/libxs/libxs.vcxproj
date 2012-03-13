@@ -161,11 +161,9 @@
     <ClCompile Include="..\..\..\src\xsub.cpp" />
     <ClCompile Include="..\..\..\src\xs.cpp" />
     <ClCompile Include="..\..\..\src\xszmq.cpp" />
-    <ClCompile Include="..\..\..\src\xs_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\xs.h" />
-    <ClInclude Include="..\..\..\include\xs_utils.h" />
     <ClInclude Include="..\..\..\include\zmq.h" />
     <ClInclude Include="..\..\..\src\array.hpp" />
     <ClInclude Include="..\..\..\src\atomic_counter.hpp" />
