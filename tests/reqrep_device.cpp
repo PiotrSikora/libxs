@@ -25,7 +25,7 @@ int XS_TEST_MAIN ()
 {
     fprintf (stderr, "reqrep_device test running...\n");
 
-    void *ctx = xs_init (1);
+    void *ctx = xs_init ();
     assert (ctx);
 
     //  Create a req/rep device.

@@ -31,7 +31,6 @@
 #include "array.hpp"
 #include "config.hpp"
 #include "mutex.hpp"
-#include "stdint.hpp"
 #include "options.hpp"
 #include "atomic_counter.hpp"
 
@@ -60,9 +59,8 @@ namespace xs
     {
     public:
 
-        //  Create the context object. The argument specifies the size
-        //  of I/O thread pool to create.
-        ctx_t (uint32_t io_threads_);
+        //  Create the context object.
+        ctx_t ();
 
         //  Returns false if object is not a context.
         bool check_tag ();
@@ -171,7 +169,7 @@ namespace xs
         int max_sockets;
 
         //  Number of I/O threads to launch.
-        uint32_t io_thread_count;
+        int io_thread_count;
 
         //  Synchronisation of access to context options.
         mutex_t opt_sync;

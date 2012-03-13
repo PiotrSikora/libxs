@@ -25,7 +25,7 @@ int XS_TEST_MAIN ()
     fprintf (stderr, "linger test running...\n");
 
     //  Create socket.
-    void *ctx = xs_init (1);
+    void *ctx = xs_init ();
     assert (ctx);
     void *s = xs_socket (ctx, XS_PUSH);
     assert (s);

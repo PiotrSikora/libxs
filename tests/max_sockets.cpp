@@ -25,7 +25,7 @@ int XS_TEST_MAIN ()
     fprintf (stderr, "max_sockets test running...\n");
 
     //  Create context and set MAX_SOCKETS to 1.
-    void *ctx = xs_init (1);
+    void *ctx = xs_init ();
     assert (ctx);
     int max_sockets = 1;
     int rc = xs_setctxopt (ctx, XS_MAX_SOCKETS, &max_sockets,

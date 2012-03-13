@@ -25,7 +25,7 @@ int XS_TEST_MAIN ()
     fprintf (stderr, "msg_flags test running...\n");
 
     //  Create the infrastructure
-    void *ctx = xs_init (1);
+    void *ctx = xs_init ();
     assert (ctx);
     void *sb = xs_socket (ctx, XS_XREP);
     assert (sb);

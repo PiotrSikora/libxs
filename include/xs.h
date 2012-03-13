@@ -147,8 +147,9 @@ XS_EXPORT int xs_getmsgopt (xs_msg_t *msg, int option, void *optval,
 /******************************************************************************/
 
 #define XS_MAX_SOCKETS 1
+#define XS_IO_THREADS 2
 
-XS_EXPORT void *xs_init (int io_threads);
+XS_EXPORT void *xs_init ();
 XS_EXPORT int xs_term (void *context);
 XS_EXPORT int xs_setctxopt (void *context, int option, const void *optval,
     size_t optvallen); 

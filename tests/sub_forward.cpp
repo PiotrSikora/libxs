@@ -25,7 +25,7 @@ int XS_TEST_MAIN ()
 {
     fprintf (stderr, "sub_forward test running...\n");
 
-    void *ctx = xs_init (1);
+    void *ctx = xs_init ();
     assert (ctx);
 
     //  First, create an intermediate device.

@@ -112,7 +112,22 @@ size_t zmq_msg_size (zmq_msg_t *msg)
 
 void *zmq_init (int io_threads)
 {
-    return xs_init (io_threads);
+    void *ctx = xs_init ();
+    if (!ctx)
+        return NULL;
+
+    //  Crossroads don't allow for zero I/O threads.
+    if (io_threads < 1)
+        io_threads = 1;
+
+    int rc = xs_setctxopt (ctx, XS_IO_THREADS, &io_threads,
+        sizeof (io_threads));
+    if (rc != 0) {
+        xs_term (ctx);
+        return NULL;
+    }
+
+    return ctx;
 }
 
 int zmq_term (void *context)

@@ -31,7 +31,7 @@ int XS_TEST_MAIN ()
 {
     fprintf (stderr, "pair_ipc test running...\n");
 
-    void *ctx = xs_init (1);
+    void *ctx = xs_init ();
     assert (ctx);
 
     void *sb = xs_socket (ctx, XS_PAIR);

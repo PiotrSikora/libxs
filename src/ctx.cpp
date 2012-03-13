@@ -37,7 +37,7 @@
 #include "err.hpp"
 #include "msg.hpp"
 
-xs::ctx_t::ctx_t (uint32_t io_threads_) :
+xs::ctx_t::ctx_t () :
     tag (0xbadcafe0),
     starting (true),
     terminating (false),
@@ -47,7 +47,7 @@ xs::ctx_t::ctx_t (uint32_t io_threads_) :
     monitor (NULL),
     log_socket (NULL),
     max_sockets (512),
-    io_thread_count (io_threads_)
+    io_thread_count (1)
 {
 }
 
@@ -153,6 +153,15 @@ int xs::ctx_t::setctxopt (int option_, const void *optval_, size_t optvallen_)
         max_sockets = *((int*) optval_);
         opt_sync.unlock ();
         break;
+    case XS_IO_THREADS:
+        if (optvallen_ != sizeof (int) || *((int*) optval_) < 1) {
+            errno = EINVAL;
+            return -1;
+        }
+        opt_sync.lock ();
+        io_thread_count = *((int*) optval_);
+        opt_sync.unlock ();
+        break;
     default:
         errno = EINVAL;
         return -1;
@@ -170,8 +179,9 @@ xs::socket_base_t *xs::ctx_t::create_socket (int type_)
         //  xs_term thread and reaper thread.
         opt_sync.lock ();
         int maxs = max_sockets;
+        int ios = io_thread_count;
         opt_sync.unlock ();
-        slot_count = maxs + io_thread_count + 3;
+        slot_count = maxs + ios + 3;
         slots = (mailbox_t**) malloc (sizeof (mailbox_t*) * slot_count);
         alloc_assert (slots);
 
@@ -185,7 +195,7 @@ xs::socket_base_t *xs::ctx_t::create_socket (int type_)
         reaper->start ();
 
         //  Create I/O thread objects and launch them.
-        for (uint32_t i = 2; i != io_thread_count + 2; i++) {
+        for (int i = 2; i != ios + 2; i++) {
             io_thread_t *io_thread = io_thread_t::create (this, i);
             errno_assert (io_thread);
             io_threads.push_back (io_thread);
@@ -195,7 +205,7 @@ xs::socket_base_t *xs::ctx_t::create_socket (int type_)
 
         //  In the unused part of the slot array, create a list of empty slots.
         for (int32_t i = (int32_t) slot_count - 1;
-              i >= (int32_t) io_thread_count + 2; i--) {
+              i >= (int32_t) ios + 2; i--) {
             empty_slots.push_back (i);
             slots [i] = NULL;
         }

@@ -25,7 +25,7 @@ int XS_TEST_MAIN ()
     fprintf (stderr, "reconnect test running...\n");
 
     //  Create the basic infrastructure.
-    void *ctx = xs_init (1);
+    void *ctx = xs_init ();
     assert (ctx);
     void *push = xs_socket (ctx, XS_PUSH);
     assert (push);

@@ -48,7 +48,7 @@ int main (int argc, char *argv [])
     message_size = atoi (argv [2]);
     roundtrip_count = atoi (argv [3]);
 
-    ctx = xs_init (1);
+    ctx = xs_init ();
     if (!ctx) {
         printf ("error in xs_init: %s\n", xs_strerror (errno));
         return -1;

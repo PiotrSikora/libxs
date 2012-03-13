@@ -24,7 +24,7 @@ int XS_TEST_MAIN ()
 {
     fprintf (stderr, "hwm test running...\n");
 
-    void *ctx = xs_init (1);
+    void *ctx = xs_init ();
     assert (ctx);
 
     //  Create pair of socket, each with high watermark of 2. Thus the total

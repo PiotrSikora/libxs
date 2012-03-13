@@ -26,7 +26,7 @@ int XS_TEST_MAIN ()
     fprintf (stderr, "invalid_rep test running...\n");
 
     //  Create REQ/XREP wiring.
-    void *ctx = xs_init (1);
+    void *ctx = xs_init ();
     assert (ctx);
     void *xrep_socket = xs_socket (ctx, XS_XREP);
     assert (xrep_socket);

@@ -9,16 +9,12 @@ xs_init - initialise Crossroads context
 
 SYNOPSIS
 --------
-*void *xs_init (int 'io_threads');*
+*void *xs_init ();*
 
 
 DESCRIPTION
 -----------
 The _xs_init()_ function initialises a Crossroads 'context'.
-
-The 'io_threads' argument specifies the size of the thread pool to handle
-I/O operations. If your application is using only the 'inproc' transport for
-messaging you may set this to zero, otherwise set it to at least one.
 
 .Thread safety
 A 'context' is thread safe and may be shared among as many application
@@ -35,8 +31,7 @@ of the values defined below.
 
 ERRORS
 ------
-*EINVAL*::
-An invalid number of 'io_threads' was requested.
+No error values are defined.
 
 
 SEE ALSO

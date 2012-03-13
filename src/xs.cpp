@@ -63,14 +63,8 @@ const char *xs_strerror (int errnum_)
     return xs::errno_to_string (errnum_);
 }
 
-void *xs_init (int io_threads_)
+void *xs_init ()
 {
-    //  We need at least one I/O thread to run the monitor object in.
-    if (io_threads_ < 1) {
-        errno = EINVAL;
-        return NULL;
-    }
-
 #if defined XS_HAVE_OPENPGM
 
     //  Init PGM transport. Ensure threading and timer are enabled. Find PGM
@@ -111,7 +105,7 @@ void *xs_init (int io_threads_)
 #endif
 
     //  Create the context.
-    xs::ctx_t *ctx = new (std::nothrow) xs::ctx_t ((uint32_t) io_threads_);
+    xs::ctx_t *ctx = new (std::nothrow) xs::ctx_t;
     alloc_assert (ctx);
     return (void*) ctx;
 }

@@ -34,6 +34,16 @@ Option value type:: int
 Option value unit:: sockets
 Default value:: 512
 
+XS_IO_THREADS: Set number of worker threads
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The 'XS_IO_THREADS' option shall set specify the size of the thread pool to
+handle I/O operations. The value should be at least 1.
+
+[horizontal]
+Option value type:: int
+Option value unit:: threads
+Default value:: 1
+
 RETURN VALUE
 ------------
 The _xs_setctxopt()_ function shall return zero if successful. Otherwise it

@@ -46,6 +46,7 @@ int XS_TEST_MAIN ()
     int i;
     int j;
     int rc;
+    int io_threads;
     void *threads [THREAD_COUNT];
 
     fprintf (stderr, "shutdown_stress test running...\n");
@@ -53,8 +54,12 @@ int XS_TEST_MAIN ()
     for (j = 0; j != 10; j++) {
 
         //  Check the shutdown with many parallel I/O threads.
-        ctx = xs_init (7);
+        ctx = xs_init ();
         assert (ctx);
+        io_threads = 7;
+        rc = xs_setctxopt (ctx, XS_IO_THREADS, &io_threads,
+            sizeof (io_threads));
+        assert (rc == 0);
 
         s1 = xs_socket (ctx, XS_PUB);
         assert (s1);
