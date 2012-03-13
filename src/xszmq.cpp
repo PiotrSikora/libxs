@@ -19,8 +19,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/xszmq.h"
-#include "../include/xszmq_utils.h"
+#include "../include/zmq.h"
+#include "../include/zmq_utils.h"
 
 #include "../include/xs.h"
 #include "../include/xs_utils.h"
