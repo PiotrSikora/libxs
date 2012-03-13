@@ -239,7 +239,7 @@ typedef struct
     short revents;
 } xs_pollitem_t;
 
-XS_EXPORT int xs_poll (xs_pollitem_t *items, int nitems, long timeout);
+XS_EXPORT int xs_poll (xs_pollitem_t *items, int nitems, int timeout);
 
 /******************************************************************************/
 /*  The following utility functions are exported for use from language        */

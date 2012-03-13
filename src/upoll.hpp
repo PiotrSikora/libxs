@@ -26,7 +26,7 @@
 namespace xs
 {
     //  Underlying function for xs_poll.
-    int upoll (xs_pollitem_t *items_, int nitems_, long timeout_);
+    int upoll (xs_pollitem_t *items_, int nitems_, int timeout_);
 }
 
 #endif

@@ -347,7 +347,7 @@ int xs_getmsgopt (xs_msg_t *msg_, int option_, void *optval_,
     }
 }
 
-int xs_poll (xs_pollitem_t *items_, int nitems_, long timeout_)
+int xs_poll (xs_pollitem_t *items_, int nitems_, int timeout_)
 {
     return xs::upoll (items_, nitems_, timeout_);
 }
