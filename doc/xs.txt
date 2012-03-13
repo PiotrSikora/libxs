@@ -175,10 +175,20 @@ used by C programmers. The intent is that programmers using Crossroads from
 other languages shall refer to this documentation alongside any documentation
 provided by the vendor of their language binding.
 
+
+ZEROMQ COMPATIBILITY
+--------------------
+The Crossroads library provides an optional drop-in 'libzmq' compatibility
+library for ZeroMQ applications.  If your version of Crossroads was built with
+the `--enable-libzmq` option, you can find the compatibility library
+documentation in linkxs:zmq[7].
+
+
 AUTHORS
 -------
 The Crossroads documentation was written by Martin Sustrik <sustrik@250bpm.com>
 and Martin Lucina <martin@lucina.net>.
+
 
 COPYING
 -------
