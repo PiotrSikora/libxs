@@ -6,6 +6,10 @@ MAN3 = xs_bind.3 xs_close.3 xs_connect.3 xs_init.3 \
     xs_sendmsg.3 xs_recvmsg.3 xs_getmsgopt.3 xs_setctxopt.3
 MAN7 = xs.7 xs_tcp.7 xs_pgm.7 xs_inproc.7 xs_ipc.7
 
+if BUILD_LIBZMQ
+MAN7 += zmq.7
+endif
+
 MAN_DOC = $(MAN1) $(MAN3) $(MAN7)
 
 MAN_TXT = $(MAN3:%.3=%.txt)
