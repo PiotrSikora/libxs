@@ -48,18 +48,25 @@ Initialise Crossroads context::
 Terminate Crossroads context::
     linkxs:xs_term[3]
 
+Set Crossroads context options::
+    linkxs:xs_setctxopt[3]
+
 
 Thread safety
 ^^^^^^^^^^^^^
 A 'context' is thread safe and may be shared among as many application
-threads as necessary, without any additional locking required on the part of
-the caller.
+threads as necessary, without any additional locking required on the part
+of the caller.
 
-Individual Crossroads 'sockets' are _not_ thread safe except in the case where
-full memory barriers are issued when migrating a socket from one thread to
-another. In practice this means applications can create a socket in one thread
-with _xs_socket()_ and then pass it to a _newly created_ thread as part of
-thread initialization, for example via a structure passed as an argument to
+The individual 'sockets' within a 'context' are _not_ thread safe --
+applications may _not_ use a single 'socket' concurrently from multiple
+threads.
+
+A 'socket' _may_ be _migrated_ from one thread to another, by issuing a
+full memory barrier between individual calls on the 'socket'.  For example,
+this means applications can create a socket in one thread with
+_xs_socket()_ and then pass it to a _newly created_ thread as part of
+thread initialization via a structure passed as an argument to
 _pthread_create()_.
 
 
@@ -68,18 +75,28 @@ Multiple contexts
 Multiple 'contexts' may coexist within a single application. Thus, an
 application can use Crossroads directly and at the same time make use of any
 number of additional libraries or components which themselves make use of
-Crossroads as long as the above guidelines regarding thread safety are adhered
-to.
+Crossroads.
 
 
 Messages
 ~~~~~~~~
-A Crossroads message is a discrete unit of data passed between applications or
-components of the same application. Crossroads messages have no internal
+A Crossroads message is a discrete unit of data passed between applications
+or components of the same application. Crossroads messages have no internal
 structure and from the point of view of Crossroads themselves they are
 considered to be opaque binary data.
 
-The following functions are provided to work with messages:
+Applications using the Crossroads library send and receive messages
+directly from/to buffers provided by the application, using the Crossroads
+functions _xs_send()_ and _xs_recv()_.
+
+Alternatively, applications desiring zero-copy messaging and/or reference
+counted allocation of messages can use the message handling functions
+described in this section, and send and receive messages using
+_xs_sendmsg()_ and _xs_recvmsg()_ respectively.  These two approaches are
+interchangeable.
+
+The following functions are provided to work with messages using zero-copy
+and/or reference-counted allocation of messages:
 
 Initialise a message::
     linkxs:xs_msg_init[3]
@@ -96,6 +113,9 @@ Access message content::
 Message manipulation::
     linkxs:xs_msg_copy[3]
     linkxs:xs_msg_move[3]
+
+Retrieve message option::
+    linkxs:xs_getmsgopt[3]
 
 
 Sockets
@@ -124,8 +144,12 @@ Sending and receiving messages::
     linkxs:xs_send[3]
     linkxs:xs_recv[3]
 
+Sending and receiving messages (zero-copy)::
+    linkxs:xs_sendmsg[3]
+    linkxs:xs_recvmsg[3]
+
 .Input/output multiplexing
-Crossroads provide a mechanism for applications to multiplex input/output events
+Crossroads provides a mechanism for applications to multiplex input/output events
 over a set containing both Crossroads sockets and standard sockets. This
 mechanism mirrors the standard _poll()_ system call, and is described in detail
 in linkxs:xs_poll[3].
@@ -150,6 +174,7 @@ Local inter-process communication transport::
 
 Local in-process (inter-thread) communication transport::
     linkxs:xs_inproc[7]
+
 
 ERROR HANDLING
 --------------
@@ -199,6 +224,10 @@ and Martin Lucina <martin@lucina.net>.
 
 COPYING
 -------
-Free use of Crossroads library is granted under the terms of the GNU Lesser
-General Public License (LGPL). For details see the files `COPYING` and
-`COPYING.LESSER` included with the Crossroads distribution.
+Free use of the Crossroads library software is granted under the terms of
+the GNU Lesser General Public License (LGPL). For details see the files
+`COPYING` and `COPYING.LESSER` included with the libxs distribution.
+
+As a special exception, the copyright holders of libxs grant you the right
+to link the library statically with your software. Refer to the end of
+the `COPYING.LESSER` file included with the libxs distribution for details.
