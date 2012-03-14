@@ -154,16 +154,6 @@ xs::io_thread_t *xs::object_t::choose_io_thread (uint64_t affinity_)
     return ctx->choose_io_thread (affinity_);
 }
 
-void xs::object_t::log (int sid_, const char *text_)
-{
-     ctx->log (sid_, text_);
-}
-
-void xs::object_t::publish_logs (const char *text_)
-{
-    ctx->publish_logs (text_);
-}
-
 void xs::object_t::send_stop ()
 {
     //  'stop' command goes always from administrative thread to

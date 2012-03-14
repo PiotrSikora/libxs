@@ -31,7 +31,6 @@
 
 #include "ctx.hpp"
 #include "socket_base.hpp"
-#include "monitor.hpp"
 #include "reaper.hpp"
 #include "pipe.hpp"
 #include "err.hpp"
@@ -44,8 +43,6 @@ xs::ctx_t::ctx_t () :
     reaper (NULL),
     slot_count (0),
     slots (NULL),
-    monitor (NULL),
-    log_socket (NULL),
     max_sockets (512),
     io_thread_count (1)
 {
@@ -97,20 +94,6 @@ int xs::ctx_t::terminate ()
 
         //  First attempt to terminate the context.
         if (!restarted) {
-
-            //  Close the monitor object. Wait for done command from the monitor.
-            monitor->stop ();
-            command_t cmd;
-            int rc = term_mailbox.recv (&cmd, -1);
-            xs_assert (rc == 0);
-            xs_assert (cmd.type == command_t::done);
-
-            //  Close the logging socket.
-            log_sync.lock ();
-            rc = log_socket->close ();
-            xs_assert (rc == 0);
-            log_socket = NULL;
-            log_sync.unlock ();
 
             //  First send stop command to sockets so that any blocking calls
             //  can be interrupted. If there are no sockets we can ask reaper
@@ -181,7 +164,7 @@ xs::socket_base_t *xs::ctx_t::create_socket (int type_)
         int maxs = max_sockets;
         int ios = io_thread_count;
         opt_sync.unlock ();
-        slot_count = maxs + ios + 3;
+        slot_count = maxs + ios + 2;
         slots = (mailbox_t**) malloc (sizeof (mailbox_t*) * slot_count);
         alloc_assert (slots);
 
@@ -209,23 +192,6 @@ xs::socket_base_t *xs::ctx_t::create_socket (int type_)
             empty_slots.push_back (i);
             slots [i] = NULL;
         }
-
-        //  Create the socket to send logs to.
-        log_socket = create_socket (XS_PUB);
-        xs_assert (log_socket);
-        int linger = 0;
-        int rc = log_socket->setsockopt (XS_LINGER, &linger, sizeof (linger));
-        errno_assert (rc == 0);
-        int hwm = 1;
-        rc = log_socket->setsockopt (XS_SNDHWM, &hwm, sizeof (hwm));
-        errno_assert (rc == 0);
-
-        //  Create the monitor object.
-        io_thread_t *io_thread = choose_io_thread (0);
-        xs_assert (io_thread);
-        monitor = new (std::nothrow) monitor_t (io_thread);
-        alloc_assert (monitor);
-        monitor->start ();
     }
 
     slot_sync.lock ();
@@ -372,23 +338,6 @@ xs::endpoint_t xs::ctx_t::find_endpoint (const char *addr_)
 
      endpoints_sync.unlock ();
      return *endpoint;
-}
-
-void xs::ctx_t::log (int sid_, const char *text_)
-{
-    monitor->log (sid_, text_);
-}
-
-void xs::ctx_t::publish_logs (const char *text_)
-{
-    log_sync.lock ();
-    msg_t msg;
-    msg.init_size (strlen (text_) + 1);
-    memcpy (msg.data (), text_, strlen (text_) + 1);
-    int rc = log_socket->send (&msg, XS_DONTWAIT);
-    errno_assert (rc == 0);
-    msg.close ();
-    log_sync.unlock ();
 }
 
 //  The last used socket ID, or 0 if no socket was used so far. Note that this

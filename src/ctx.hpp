@@ -38,7 +38,6 @@ namespace xs
 {
 
     class object_t;
-    class monitor_t;
     class io_thread_t;
     class socket_base_t;
     class reaper_t;
@@ -93,10 +92,6 @@ namespace xs
         int register_endpoint (const char *addr_, endpoint_t &endpoint_);
         void unregister_endpoints (xs::socket_base_t *socket_);
         endpoint_t find_endpoint (const char *addr_);
-
-        //  Logging related functions.
-        void log (int sid_, const char *text_);
-        void publish_logs (const char *text_);
 
         enum {
             term_tid = 0,
@@ -154,16 +149,8 @@ namespace xs
         //  Synchronisation of access to the list of inproc endpoints.
         mutex_t endpoints_sync;
 
-        //  Monitor object attached to the context.
-        xs::monitor_t *monitor;
-
         //  Maximum socket ID.
         static atomic_counter_t max_socket_id;
-
-        //  PUB socket for logging. The socket is shared among all the threads,
-        //  thus it is synchronised by a mutex.
-        xs::socket_base_t *log_socket;
-        mutex_t log_sync;
 
         //  Maximum number of sockets that can be opened at the same time.
         int max_sockets;

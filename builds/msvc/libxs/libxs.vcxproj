@@ -121,7 +121,6 @@
     <ClCompile Include="..\..\..\src\kqueue.cpp" />
     <ClCompile Include="..\..\..\src\lb.cpp" />
     <ClCompile Include="..\..\..\src\mailbox.cpp" />
-    <ClCompile Include="..\..\..\src\monitor.cpp" />
     <ClCompile Include="..\..\..\src\msg.cpp" />
     <ClCompile Include="..\..\..\src\mtrie.cpp" />
     <ClCompile Include="..\..\..\src\object.cpp" />
@@ -191,7 +190,6 @@
     <ClInclude Include="..\..\..\src\lb.hpp" />
     <ClInclude Include="..\..\..\src\likely.hpp" />
     <ClInclude Include="..\..\..\src\mailbox.hpp" />
-    <ClInclude Include="..\..\..\src\monitor.hpp" />
     <ClInclude Include="..\..\..\src\msg.hpp" />
     <ClInclude Include="..\..\..\src\mtrie.hpp" />
     <ClInclude Include="..\..\..\src\mutex.hpp" />
