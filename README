@@ -1,24 +1,91 @@
 Welcome
 -------
 
-libxs is a library which extends the standard socket interfaces with features
-traditionally provided by specialised messaging middleware products. libxs
-sockets provide an abstraction of asynchronous message queues, multiple
-messaging patterns, message filtering (subscriptions), seamless access to
-multiple transport protocols and more.
+Crossroads I/O ("libxs") is a library for building scalable and high
+performance distributed applications. It fits between classic BSD sockets,
+JMS/AMQP-style message queues, and enterprise message-oriented middleware.
+
+Crossroads I/O extends the standard socket interfaces with features
+traditionally provided by specialised messaging middleware products,
+providing an abstraction of asynchronous message queues, multiple messaging
+patterns, message filtering (subscriptions), seamless access to multiple
+transport protocols, and more.
+
+Crossroads I/O provides a native C API for applications. Support for many
+more languages is provided by the community through language bindings which
+can be found at the Crossroads website.
 
 
-Building and installation
+Building and Installation
 -------------------------
 
-See the INSTALL file included with the distribution.
+The following instructions apply to building libxs from an official release
+downloaded from the Crossroads I/O website. For building directly from Git,
+refer to the `INSTALL` file included with the libxs distribution.
+
+On POSIX platforms, libxs uses the standard autotools build system. To
+build and install the library, ensure your system has a C++ compiler
+installed, and proceed with the following steps:
+
+1. Run `./configure`, then `make` to build the library.
+2. Optionally, run `make test` to run the built in test suite.
+3. Run `make install` as root.
+4. On Linux or other platforms which use ld.so for dynamic linking, run
+   `ldconfig` or equivalent as root to update your systems shared library
+   cache.
+
+On Windows, solution files for Visual C++ 2010 are provided in the
+`builds/msvc/` subdirectory of the distribution.
+
+Refer to the `INSTALL` file included with the libxs distribution for more
+detailed installation instructions.
+
+
+ZeroMQ Compatibility
+--------------------
+
+Crossroads I/O provides a drop-in 'libzmq' compatibility library for ZeroMQ
+language bindings and applications. To enable 'libzmq' compatibility, you
+must build your copy of libxs with the `--enable-libzmq` option to
+configure, or on Windows by building the appropriate solution file.
+
+For further details refer to the `doc/xs_zmq.html` or the 'xs_zmq(7)'
+manual page included with this distribution.
+
+NOTE: Enabling this option will *overwrite* any existing installation of
+`libzmq` on your system. 
+
+
+Reporting Bugs
+--------------
+
+To report a bug, sign up to the Crossroads I/O development discussion group
+at <http://groups.crossroads.io> and post a topic or send an email
+describing your problem.
+
+Prefix the subject of your post with `[BUG]` to catch the developers
+attention.
+
+To ensure that your report is dealt with promptly, please attach a minimal
+test case reproducing the bug, ideally written in C.
 
 
 Resources
 ---------
 
+The libxs development Git tree can be found on Github at
+<http://github.com/crossroads-io/libxs>.
+
+Development is coordinated on the <crossroads-dev@groups.crossroads.io>
+mailing list. Vist <http://groups.crossroads.io/> to join or view archives
+of previous discussion.
+
 Extensive documentation is provided with the distribution. Refer to
 doc/xs.html, or "man xs" after you have installed libxs on your system.
+
+Further resources, language bindings, tutorials, and more can be found on
+the Crossroads website at <http://www.crossroads.io/>.
+
 
 Copying
 -------
@@ -26,3 +93,7 @@ Copying
 Free use of this software is granted under the terms of the GNU Lesser General
 Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER`
 included with the libxs distribution.
+
+As a special exception, the copyright holders of libxs grant you the right
+to link the library statically with your software. Refer to the end of
+the `COPYING.LESSER` file included with the libxs distribution for details.

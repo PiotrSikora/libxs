@@ -16,12 +16,20 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-Crossroads I/O is a library which extends the standard
-socket interfaces with features traditionally provided by specialised
-_messaging middleware_ products. Crossroads sockets provide an abstraction of
-asynchronous  _message queues_, multiple _messaging patterns_, message
-filtering (_subscriptions_), seamless access to multiple _transport protocols_
-and more.
+Crossroads I/O is a library for building scalable and high performance
+distributed applications. It fits between classic BSD sockets,
+JMS/AMQP-style message queues, and enterprise message-oriented middleware.
+
+Crossroads I/O extends the standard socket interfaces with features
+traditionally provided by specialised _messaging middleware_ products.
+Crossroads sockets provide an abstraction of asynchronous  _message
+queues_, multiple _messaging patterns_, message filtering
+(_subscriptions_), seamless access to multiple _transport protocols_ and
+more.
+
+Crossroads I/O provides a native C API for applications. Support for many
+more languages is provided by the community through language bindings which
+can be found at the Crossroads website.
 
 This documentation presents an overview of Crossroads concepts, describes how
 Crossroads abstract standard sockets and provides a reference manual for the
