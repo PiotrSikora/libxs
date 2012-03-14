@@ -10,7 +10,7 @@ xs_poll - input/output multiplexing
 SYNOPSIS
 --------
 
-*int xs_poll (xs_pollitem_t '*items', int 'nitems', long 'timeout');*
+*int xs_poll (xs_pollitem_t '*items', int 'nitems', int 'timeout');*
 
 
 DESCRIPTION

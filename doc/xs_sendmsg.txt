@@ -4,7 +4,7 @@ xs_sendmsg(3)
 
 NAME
 ----
-xs_sendmsg - send a message part on a socket
+xs_sendmsg - send a message part on a socket (zero-copy)
 
 
 SYNOPSIS
@@ -47,6 +47,7 @@ by available memory.
 
 An application that sends multipart messages must use the _XS_SNDMORE_ flag
 when sending each data part except the final one.
+
 
 RETURN VALUE
 ------------
@@ -104,8 +105,9 @@ rc = xs_sendmsg (socket, &part3, 0);
 
 SEE ALSO
 --------
-linkxs:xs_recv[3]
-linkxs:xs_recv[3]
+Applications that do not require zero-copy messaging can use the simpler
+linkxs:xs_send[3] instead of _xs_sendmsg()_.
+
 linkxs:xs_recvmsg[3]
 linkxs:xs_socket[7]
 linkxs:xs[7]
@@ -113,6 +115,5 @@ linkxs:xs[7]
 
 AUTHORS
 -------
-+This man page was written by Martin Sustrik <sustrik@250bpm.com>, Martin
-+Lucina <martin@lucina.net> and Pieter Hintjens <ph@imatix.com>.
-
+This man page was written by Martin Sustrik <sustrik@250bpm.com>, Martin
+Lucina <martin@lucina.net> and Pieter Hintjens <ph@imatix.com>.

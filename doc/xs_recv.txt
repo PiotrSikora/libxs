@@ -29,22 +29,22 @@ function shall fail with 'errno' set to EAGAIN.
 
 Multi-part messages
 ~~~~~~~~~~~~~~~~~~~
-A Crossroads message is composed of 1 or more message parts. Each message
-part is an independent 'xs_msg_t' in its own right. Crossroads ensure atomic
-delivery of messages; peers shall receive either all _message parts_ of a
-message or none at all. The total number of message parts is unlimited except
-by available memory.
+A Crossroads message is composed of 1 or more message parts.  Crossroads
+ensures atomic delivery of messages; peers shall receive either all
+_message parts_ of a message or none at all. The total number of message
+parts is unlimited except by available memory.
 
 An application that processes multipart messages must use the _XS_RCVMORE_
-linkxs:xs_getsockopt[3] option after calling _xs_recv()_ to determine if
-there are further parts to receive.
+linkxs:xs_getsockopt[3] option on the 'socket' after calling _xs_recv()_ to
+determine if there are further parts to receive.
 
 RETURN VALUE
 ------------
-The _xs_recv()_ function shall return number of bytes in the message
-if successful. Note that the value can exceed the value of the 'len' parameter
-in case the message was truncated. If not successful the function shall return
-`-1` and set 'errno' to one of the values defined below.
+The _xs_recv()_ function shall return the number of bytes in the received
+message if successful. Note that the value can exceed the value of the
+'len' parameter, in this case the message was truncated. If not successful
+the function shall return `-1` and set 'errno' to one of the values defined
+below.
 
 
 ERRORS
@@ -79,8 +79,9 @@ assert (nbytes != -1);
 
 SEE ALSO
 --------
-linkxs:xs_recvmsg[3]
-linkxs:xs_send[3]
+Applications that wish to use zero-copy messaging must use
+linkxs:xs_recvmsg[3] instead of _xs_recv()_.
+
 linkxs:xs_sendmsg[3]
 linkxs:xs_getsockopt[3]
 linkxs:xs_socket[7]
@@ -89,6 +90,5 @@ linkxs:xs[7]
 
 AUTHORS
 -------
-+This man page was written by Martin Sustrik <sustrik@250bpm.com>, Martin
-+Lucina <martin@lucina.net> and Pieter Hintjens <ph@imatix.com>.
-
+This man page was written by Martin Sustrik <sustrik@250bpm.com>, Martin
+Lucina <martin@lucina.net> and Pieter Hintjens <ph@imatix.com>.

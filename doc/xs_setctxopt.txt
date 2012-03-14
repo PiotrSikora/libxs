@@ -12,22 +12,24 @@ SYNOPSIS
 --------
 *int xs_setctxopt (void '*context', int 'option_name', const void '*option_value', size_t 'option_len');*
 
-Caution: All options take effect only if set prior to creating the first socket.
 
 DESCRIPTION
 -----------
 The _xs_setctxopt()_ function shall set the option specified by the
-'option_name' argument to the value pointed to by the 'option_value' argument
-for the Crossroads context pointed to by the 'context' argument.
+'option_name' argument to the value pointed to by the 'option_value'
+argument, for the Crossroads context pointed to by the 'context' argument.
 The 'option_len' argument is the size of the option value in bytes.
+
+CAUTION: Context options take effect only if set with _xs_setctxopt()_
+prior to creating the first socket in a given 'context' with _xs_socket()_.
 
 The following options can be set with the _xs_setctxopt()_ function:
 
 
 XS_MAX_SOCKETS: Set maximum number of sockets
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The 'XS_MAX_SOCKETS' option shall set specify the maximum nuber of sockets
-that can be open at the same time.
+The 'XS_MAX_SOCKETS' option shall set the maximum nuber of sockets that can
+be simultaneously active in the given 'context'.
 
 [horizontal]
 Option value type:: int
@@ -36,8 +38,9 @@ Default value:: 512
 
 XS_IO_THREADS: Set number of worker threads
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The 'XS_IO_THREADS' option shall set specify the size of the thread pool to
-handle I/O operations. The value should be at least 1.
+The 'XS_IO_THREADS' option shall set the size of the thread pool created by
+the given 'context' to handle I/O operations. The minimum value for this
+option is `1`.
 
 [horizontal]
 Option value type:: int
@@ -60,21 +63,23 @@ The provided 'context' was invalid.
 
 EXAMPLE
 -------
-.Setting maximal number of sockets to three.
+.Setting the number of I/O threads for a context to four.
 ----
-int val = 3;
-rc = xs_setctxopt (context, XS_CTX_MAX_SOCKETS, &val, sizeof (val));
+void *context = xs_init ();
+int io_threads = 4;
+rc = xs_setctxopt (context, XS_IO_THREADS, &io_threads, sizeof (io_threads));
 assert (rc == 0);
+/* The above call MUST be called before any socket is created in context */
+void *socket = xs_socket (context, XS_PUB);
 ----
 
 SEE ALSO
 --------
-linkxs:xs_getsockopt[3]
-linkxs:xs_setsockopt[3]
 linkxs:xs_init[3]
 linkxs:xs[7]
 
 
 AUTHORS
 -------
-This manual page was written by Martin Sustrik <sustrik@250bpm.com>.
+The Crossroads documentation was written by Martin Sustrik <sustrik@250bpm.com>
+and Martin Lucina <martin@lucina.net>.
