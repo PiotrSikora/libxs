@@ -25,6 +25,7 @@
 
 #if !defined XS_HAVE_WINDOWS && !defined XS_HAVE_OPENVMS
 
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 
