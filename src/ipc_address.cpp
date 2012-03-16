@@ -43,7 +43,7 @@ int xs::ipc_address_t::resolve (const char *path_)
     }
 
     address.sun_family = AF_UNIX;
-    strcpy (address.sun_path, path_);
+    strncpy (address.sun_path, path_, sizeof (address.sun_path));
     return 0;
 }
 
