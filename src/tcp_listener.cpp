@@ -209,7 +209,10 @@ xs::fd_t xs::tcp_listener_t::accept ()
 #else
     if (sock == -1) {
         errno_assert (errno == EAGAIN || errno == EWOULDBLOCK ||
-            errno == EINTR || errno == ECONNABORTED || errno == EPROTO ||
+            errno == EINTR || errno == ECONNABORTED ||
+#ifdef EPROTO
+            errno == EPROTO ||
+#endif
             errno == ENOBUFS);
         return retired_fd;
     }

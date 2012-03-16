@@ -155,7 +155,10 @@ xs::fd_t xs::ipc_listener_t::accept ()
     fd_t sock = ::accept (s, NULL, NULL);
     if (sock == -1) {
         errno_assert (errno == EAGAIN || errno == EWOULDBLOCK ||
-            errno == EINTR || errno == ECONNABORTED || errno == EPROTO ||
+            errno == EINTR || errno == ECONNABORTED ||
+#ifdef EPROTO
+            errno == EPROTO ||
+#endif
             errno == ENOBUFS);
         return retired_fd;
     }
